@@ -1,0 +1,8 @@
+/* Loads the locally bundled Weather Icons font used for Meteostat CoCo chart points. */
+@font-face {
+    font-family: "Weather Icons";
+    font-style: normal;
+    font-weight: normal;
+    font-display: block;
+    src: url("./weathericons-regular-webfont.woff2") format("woff2");
+}
