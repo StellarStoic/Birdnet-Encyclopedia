@@ -29,7 +29,8 @@ encyclopedia.
   - Localized Wikipedia descriptions when available
   - Optional AI translation of English descriptions
   - Taxonomic family information
-  - Global IUCN conservation status from exact iNaturalist taxon matches
+  - Global IUCN conservation status and assessment details from the locally
+    generated official IUCN Red List dataset
   - Bird sounds through eBird
   - Recent iNaturalist observation information
   - Links to iNaturalist, Wikipedia, BirdLife, and eBird
@@ -307,6 +308,9 @@ timestamps, and each row must identify a species.
   taxonomy and sound links.
 - [iNaturalist](https://www.inaturalist.org/) for photographs, fallback
   descriptions, taxon records, and recent observations.
+- [IUCN Red List of Threatened Species](https://www.iucnredlist.org/) for
+  official global conservation categories, assessment narratives, population,
+  habitats, threats, taxonomy, and conservation actions.
 - [Wikipedia](https://www.wikipedia.org/) for localized bird descriptions.
 - [BirdWeather](https://www.birdweather.com/) for public station and detection
   data.
@@ -350,19 +354,63 @@ These libraries are currently loaded from public CDNs.
 |-- my-birdnet.css             # Responsive dashboard themes and layout
 |-- my-birdnet.js              # Imports, BirdWeather, caching, and statistics
 |-- data/
-|   `-- taxonomy.json          # Local eBird taxonomy data
+|   |-- taxonomy.json          # Local eBird taxonomy data
+|   |-- iucn-statuses.json     # Generated global conservation categories
+|   `-- iucn-details.json      # Generated assessment details
 |-- img/                       # Menu and decorative image assets
 |-- lang/
 |   |-- labels_*.txt           # Generated localized bird names
 |   |-- README.md              # Translation maintenance notes
 |   `-- UPSTREAM.txt           # Exact BirdNET-Pi source revision
 `-- tools/
-    `-- update-birdnet-translations.ps1
+    |-- update-birdnet-translations.ps1
+    `-- update-iucn-statuses.py    # Builds local global conservation data
 ```
 
 `index.html` is the deployment entry point. When encyclopedia code changes are
 made, keep `index copy.html` synchronized unless the duplicate is intentionally
 removed from the project.
+
+### Refresh IUCN conservation statuses
+
+The maintenance script in `tools/update-iucn-statuses.py` reads scientific
+names from `lang/labels_en.txt` and generates:
+
+- `data/iucn-statuses.json` for the website.
+- `data/iucn-details.json` for assessment dates, population, elevation, habitat,
+  threats, taxonomy, conservation actions, research, and assessment narratives.
+- `data/iucn-update-report.json` for unmatched, not-assessed, and failed names.
+- `tools/iucn-statuses.checkpoint.json` as resumable local state. The checkpoint
+  is ignored by Git.
+
+For names without a direct IUCN API assessment, including HTTP 404 responses,
+the updater queries iNaturalist. It accepts an exact scientific name, an
+explicit `matched_term` synonym, or an unambiguous reclassification where the
+former species epithet became an infraspecific epithet. A fallback is used only
+when iNaturalist exposes a place-independent global IUCN status. These records
+are labelled `iNaturalist fallback`, and the accepted scientific name is stored
+in the report. Regional statuses and general same-genus approximations are
+never substituted.
+
+Set `IUCN_API_TOKEN` near the top of the script, then run the updater from the
+project root:
+
+```powershell
+# Test authentication and response parsing with five species.
+python tools/update-iucn-statuses.py --limit 5 --restart
+
+# Resume or run the complete refresh after the test succeeds.
+python tools/update-iucn-statuses.py
+```
+
+An `IUCN_API_TOKEN` environment variable can optionally override the token in
+the script. The default request delay is 0.6 seconds. Use `--delay 1.0` if the API returns
+rate-limit responses. Temporary errors use exponential backoff, and rerunning
+the command resumes completed work. Use `--restart` only when a completely new
+six-month dataset should replace the checkpoint. The API normally accepts the
+token as a raw `Authorization` value; if it returns HTTP 401 or 403, retry with
+`--auth-scheme bearer`. Geographic range polygons and assessment points are
+intentionally excluded to keep the website data files manageable.
 
 ## Browser Compatibility
 

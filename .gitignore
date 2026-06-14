@@ -1,1 +1,7 @@
-tools
+# Keep local credentials and resumable API state out of source control.
+.env
+tools/*.checkpoint.json*
+
+# Ignore Python interpreter caches generated while running maintenance scripts.
+__pycache__/
+*.py[cod]

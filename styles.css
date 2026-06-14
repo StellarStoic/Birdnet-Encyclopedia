@@ -358,6 +358,125 @@ body[data-theme="paper"] {
     font-size: 0.72rem;
 }
 
+/* Present locally generated IUCN assessment facts and narratives inside the bird modal. */
+.iucn-assessment-section {
+    margin: 22px 0;
+    padding: 18px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: color-mix(in srgb, var(--primary) 6%, var(--surface-solid));
+    color: var(--text);
+}
+
+.iucn-assessment-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 14px;
+}
+
+.iucn-assessment-heading h3 {
+    margin: 2px 0 0;
+}
+
+.iucn-assessment-heading a {
+    flex: 0 0 auto;
+    color: var(--primary);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.iucn-eyebrow {
+    color: var(--primary);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.iucn-facts-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.iucn-fact {
+    padding: 11px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface-solid);
+}
+
+.iucn-fact span,
+.iucn-fact strong {
+    display: block;
+}
+
+.iucn-fact span {
+    margin-bottom: 4px;
+    color: var(--muted);
+    font-size: 0.76rem;
+}
+
+.iucn-fact strong {
+    line-height: 1.35;
+}
+
+.iucn-detail-block {
+    margin-top: 8px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface-solid);
+}
+
+.iucn-detail-block summary {
+    padding: 11px 13px;
+    color: var(--text);
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.iucn-detail-block p,
+.iucn-detail-block ul {
+    margin: 0;
+    padding: 0 13px 13px;
+    color: var(--muted);
+    line-height: 1.6;
+}
+
+.iucn-detail-block ul {
+    padding-left: 31px;
+}
+
+.iucn-detail-block li + li {
+    margin-top: 8px;
+}
+
+.iucn-detail-block li strong,
+.iucn-detail-block li span {
+    display: block;
+}
+
+.iucn-detail-block li span {
+    margin-top: 2px;
+}
+
+@media (max-width: 620px) {
+    .iucn-assessment-section {
+        padding: 14px;
+    }
+
+    .iucn-assessment-heading {
+        display: grid;
+    }
+
+    .iucn-facts-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 .status-lc {
     background: #4f9b45;
 }
@@ -1518,6 +1637,7 @@ body[data-theme="midnight"] .dropdown-toggle.active .menu-bird-open {
 }
 
 .iucn-filter-details > summary {
+    /* Keep the nested IUCN heading as readable as the main menu controls. */
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -1527,6 +1647,7 @@ body[data-theme="midnight"] .dropdown-toggle.active .menu-bird-open {
     color: var(--text);
     cursor: pointer;
     list-style: none;
+    font-size: 15px;
 }
 
 .iucn-filter-details > summary::-webkit-details-marker {
@@ -1555,14 +1676,15 @@ body[data-theme="midnight"] .dropdown-toggle.active .menu-bird-open {
 }
 
 .iucn-filter-intro {
+    /* Use normal body text sizing for the conservation-system explanation. */
     margin: 5px 8px 8px;
-    padding: 10px;
+    padding: 12px;
     border: 1px solid var(--border);
     border-radius: 8px;
     background: color-mix(in srgb, var(--primary) 7%, var(--surface-solid));
     color: var(--text);
-    font-size: 11px;
-    line-height: 1.4;
+    font-size: 14px;
+    line-height: 1.5;
 }
 
 .iucn-filter-intro p {
@@ -1572,12 +1694,13 @@ body[data-theme="midnight"] .dropdown-toggle.active .menu-bird-open {
 
 .iucn-filter-options {
     display: grid;
-    gap: 3px;
+    gap: 5px;
 }
 
 .iucn-filter-option {
+    /* Give each status label and description enough room for comfortable reading. */
     width: 100%;
-    padding: 9px 10px;
+    padding: 11px 10px;
     border: 0;
     border-radius: 8px;
     background: transparent;
@@ -1597,26 +1720,28 @@ body[data-theme="midnight"] .dropdown-toggle.active .menu-bird-open {
 }
 
 .iucn-filter-option strong {
-    font-size: 12px;
-}
-
-.iucn-filter-option small {
-    margin: 4px 0 0 33px;
-    color: var(--muted);
-    font-size: 10px;
+    font-size: 14px;
     line-height: 1.35;
 }
 
+.iucn-filter-option small {
+    margin: 5px 0 0 39px;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.45;
+}
+
 .iucn-code {
+    /* Enlarge the abbreviation badge alongside the larger option labels. */
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 27px;
-    min-height: 20px;
-    margin-right: 6px;
+    width: 33px;
+    min-height: 24px;
+    margin-right: 7px;
     border-radius: 5px;
     color: #fff;
-    font-size: 10px;
+    font-size: 12px;
 }
 
 #language-options {
