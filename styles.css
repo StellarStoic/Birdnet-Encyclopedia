@@ -162,7 +162,7 @@ body[data-theme="paper"] {
             border-bottom: 1px solid #eee;
         }
 
-        .gender-badge {
+.gender-badge {
             position: absolute;
             top: 10px;
             right: 10px;
@@ -305,6 +305,88 @@ body[data-theme="paper"] {
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+.conservation-card-badge {
+    /* Flag globally at-risk species without obscuring the bird thumbnail. */
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    min-width: 34px;
+    padding: 5px 7px;
+    border: 2px solid rgba(255, 255, 255, 0.9);
+    border-radius: 999px;
+    color: #ffffff;
+    font-size: 0.72rem;
+    font-weight: 800;
+    line-height: 1;
+    text-align: center;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.24);
+}
+
+.conservation-detail {
+    min-width: min(100%, 240px);
+}
+
+.conservation-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    border-radius: 999px;
+    color: #ffffff !important;
+    font-size: 0.83rem;
+    line-height: 1;
+    text-decoration: none;
+}
+
+.conservation-badge strong {
+    padding-right: 8px;
+    border-right: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.conservation-badge:hover,
+.conservation-badge:focus-visible {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+}
+
+.conservation-authority {
+    display: block;
+    margin-top: 5px;
+    color: var(--muted);
+    font-size: 0.72rem;
+}
+
+.status-lc {
+    background: #4f9b45;
+}
+
+.status-nt {
+    background: #7d9448;
+}
+
+.status-vu {
+    background: #d49a20;
+}
+
+.status-en {
+    background: #d66725;
+}
+
+.status-cr {
+    background: #c83232;
+}
+
+.status-ew,
+.status-ex {
+    background: #3f3f46;
+}
+
+.status-dd,
+.status-ne,
+.status-unknown {
+    background: #68737d;
 }
 
 /* Apply the dashboard palette while retaining the encyclopedia's bird-photo backgrounds. */
@@ -503,8 +585,6 @@ body[data-theme="midnight"] .dropdown-toggle.active .menu-bird-open {
     background: color-mix(in srgb, var(--primary) 11%, var(--surface-solid));
     color: var(--primary-strong);
 }
-*** End of File
-
 .menu-action-button {
     /* Override the browser's native white button surface in every theme. */
     background: transparent;
@@ -697,7 +777,7 @@ body[data-theme="midnight"] .dropdown-toggle.active .menu-bird-open {
             font-size: clamp(1.55rem, 4vw, 2rem);
         }
 
-        .ai-consent-card > p {
+.ai-consent-card > p {
             margin: 0 0 14px;
             line-height: 1.6;
             color: #52606b;
@@ -1247,6 +1327,91 @@ body[data-theme="midnight"] .dropdown-toggle.active .menu-bird-open {
     margin-top: 2px;
 }
 
+.credits-card {
+    width: min(100%, 820px);
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+}
+
+.credits-card h3,
+.credits-card p {
+    margin-top: 0;
+}
+
+.credits-highlight {
+    margin: 20px 0;
+    padding: 18px;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--primary);
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--primary) 8%, var(--surface-solid));
+}
+
+.credits-highlight p {
+    margin: 8px 0 0;
+    color: var(--muted);
+    line-height: 1.55;
+}
+
+.credits-card a {
+    color: var(--primary);
+}
+
+.credits-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.credit-link {
+    display: grid;
+    grid-template-columns: 36px minmax(0, 1fr);
+    align-items: center;
+    gap: 11px;
+    min-width: 0;
+    padding: 13px;
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    background: var(--surface-solid);
+    color: var(--text) !important;
+    text-decoration: none;
+    transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.credit-link:hover,
+.credit-link:focus-visible {
+    border-color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 8%, var(--surface-solid));
+    transform: translateY(-2px);
+}
+
+.credit-link > i {
+    color: var(--primary);
+    font-size: 1.25rem;
+    text-align: center;
+}
+
+.credit-link strong,
+.credit-link small {
+    display: block;
+}
+
+.credit-link small {
+    margin-top: 3px;
+    color: var(--muted);
+    line-height: 1.35;
+}
+
+@media (max-width: 620px) {
+    .credits-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .credits-card {
+        padding: 24px 18px;
+    }
+}
+
 .menu-section {
     margin-top: 8px;
     border-top: 1px solid #e5ede1;
@@ -1338,6 +1503,120 @@ body[data-theme="midnight"] .dropdown-toggle.active .menu-bird-open {
 
 .submenu-content {
     padding: 4px 0 2px 12px;
+}
+
+/* Separate the taxonomy list from the nested IUCN conservation controls. */
+.categories-divider {
+    height: 1px;
+    margin: 9px 10px;
+    border: 0;
+    background: var(--border);
+}
+
+.iucn-filter-details {
+    margin: 0 4px 4px;
+}
+
+.iucn-filter-details > summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 11px;
+    border-radius: 8px;
+    color: var(--text);
+    cursor: pointer;
+    list-style: none;
+}
+
+.iucn-filter-details > summary::-webkit-details-marker {
+    display: none;
+}
+
+.iucn-filter-details > summary span {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.iucn-filter-details > summary:hover,
+.iucn-filter-details[open] > summary {
+    color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+}
+
+.iucn-filter-chevron {
+    font-size: 11px;
+    transition: transform 0.2s ease;
+}
+
+.iucn-filter-details[open] .iucn-filter-chevron {
+    transform: rotate(180deg);
+}
+
+.iucn-filter-intro {
+    margin: 5px 8px 8px;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--primary) 7%, var(--surface-solid));
+    color: var(--text);
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+.iucn-filter-intro p {
+    margin: 5px 0 0;
+    color: var(--muted);
+}
+
+.iucn-filter-options {
+    display: grid;
+    gap: 3px;
+}
+
+.iucn-filter-option {
+    width: 100%;
+    padding: 9px 10px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text);
+    text-align: left;
+    cursor: pointer;
+}
+
+.iucn-filter-option:hover,
+.iucn-filter-option.active {
+    background: color-mix(in srgb, var(--primary) 11%, transparent);
+}
+
+.iucn-filter-option strong,
+.iucn-filter-option small {
+    display: block;
+}
+
+.iucn-filter-option strong {
+    font-size: 12px;
+}
+
+.iucn-filter-option small {
+    margin: 4px 0 0 33px;
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 1.35;
+}
+
+.iucn-code {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 27px;
+    min-height: 20px;
+    margin-right: 6px;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 10px;
 }
 
 #language-options {
@@ -1901,4 +2180,63 @@ body[data-theme="midnight"] .dropdown-toggle.active .menu-bird-open {
 .ai-balance-link:hover {
     border-color: var(--primary);
     background: color-mix(in srgb, var(--primary) 7%, var(--surface-solid));
+}
+
+/* Align translated-result notices with the active encyclopedia theme. */
+.translation-header,
+.language-prompt {
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--primary) 7%, var(--surface-solid));
+    color: var(--text);
+}
+
+.translation-header {
+    border-width: 0 0 1px;
+}
+
+.translation-header h2,
+.translation-header h3,
+.language-prompt h2,
+.language-prompt h3 {
+    color: var(--text);
+}
+
+.translation-stats,
+.translation-status,
+.language-prompt p {
+    color: var(--muted);
+}
+
+.translation-warning {
+    border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
+    background: color-mix(in srgb, var(--accent) 16%, var(--surface-solid));
+    color: var(--text);
+}
+
+/* Force dynamically inserted translation summaries to use the active theme surface. */
+body .translation-header {
+    border: 1px solid var(--border) !important;
+    border-radius: 12px;
+    background-color: var(--surface-solid) !important;
+    background-image: linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--primary) 10%, transparent),
+        transparent
+    ) !important;
+    color: var(--text) !important;
+    box-shadow: var(--shadow);
+}
+
+body[data-theme="midnight"] .translation-header {
+    background-color: #192630 !important;
+}
+
+body .translation-header h2,
+body .translation-header h3 {
+    color: var(--text) !important;
+}
+
+body .translation-header .translation-stats,
+body .translation-header .translation-status {
+    color: var(--muted) !important;
 }

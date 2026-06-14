@@ -22,6 +22,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <!-- Public Pollinations app identity; visitor-scoped secret keys are never embedded in source. -->
+    <script>
+        window.BIRD_ENCYCLOPEDIA_CONFIG = {
+            pollinationsAppKey: 'pk_2lwEO7DMMuEkos1g'
+        };
+    </script>
 
 </head>
 <body data-theme="forest">
@@ -54,6 +60,61 @@
                                 <button class="dropdown-item" data-filter="song">Songbirds</button>
                                 <button class="dropdown-item" data-filter="parrot">Parrots</button>
                                 <button class="dropdown-item" data-filter="game">Gamebirds</button>
+
+                                <!-- Separate taxonomy categories from global IUCN conservation filters. -->
+                                <hr class="categories-divider">
+                                <details class="iucn-filter-details">
+                                    <summary>
+                                        <span><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> IUCN status</span>
+                                        <i class="fa-solid fa-chevron-down iucn-filter-chevron" aria-hidden="true"></i>
+                                    </summary>
+                                    <div class="iucn-filter-intro">
+                                        <strong>International Union for Conservation of Nature</strong>
+                                        <p>
+                                            The IUCN Red List measures a species' global risk of extinction.
+                                            Select a category to show birds with that global assessment.
+                                            Results are stored in this browser and checked again after six months.
+                                        </p>
+                                    </div>
+                                    <div class="iucn-filter-options">
+                                        <button class="iucn-filter-option" type="button" data-iucn-filter="lc">
+                                            <strong><span class="iucn-code status-lc">LC</span> Least Concern</strong>
+                                            <small>Evaluated and currently at low risk of extinction.</small>
+                                        </button>
+                                        <button class="iucn-filter-option" type="button" data-iucn-filter="nt">
+                                            <strong><span class="iucn-code status-nt">NT</span> Near Threatened</strong>
+                                            <small>Close to qualifying for a threatened category.</small>
+                                        </button>
+                                        <button class="iucn-filter-option" type="button" data-iucn-filter="vu">
+                                            <strong><span class="iucn-code status-vu">VU</span> Vulnerable</strong>
+                                            <small>Facing a high risk of extinction in the wild.</small>
+                                        </button>
+                                        <button class="iucn-filter-option" type="button" data-iucn-filter="en">
+                                            <strong><span class="iucn-code status-en">EN</span> Endangered</strong>
+                                            <small>Facing a very high risk of extinction in the wild.</small>
+                                        </button>
+                                        <button class="iucn-filter-option" type="button" data-iucn-filter="cr">
+                                            <strong><span class="iucn-code status-cr">CR</span> Critically Endangered</strong>
+                                            <small>Facing an extremely high risk of extinction in the wild.</small>
+                                        </button>
+                                        <button class="iucn-filter-option" type="button" data-iucn-filter="ew">
+                                            <strong><span class="iucn-code status-ew">EW</span> Extinct in the Wild</strong>
+                                            <small>Survives only in captivity or outside its former range.</small>
+                                        </button>
+                                        <button class="iucn-filter-option" type="button" data-iucn-filter="ex">
+                                            <strong><span class="iucn-code status-ex">EX</span> Extinct</strong>
+                                            <small>No reasonable doubt that the last individual has died.</small>
+                                        </button>
+                                        <button class="iucn-filter-option" type="button" data-iucn-filter="dd">
+                                            <strong><span class="iucn-code status-dd">DD</span> Data Deficient</strong>
+                                            <small>Available information is insufficient to assess extinction risk.</small>
+                                        </button>
+                                        <button class="iucn-filter-option" type="button" data-iucn-filter="unknown">
+                                            <strong><span class="iucn-code status-unknown">N/A</span> Unavailable or not evaluated</strong>
+                                            <small>No global IUCN assessment was returned for this species.</small>
+                                        </button>
+                                    </div>
+                                </details>
                             </div>
                         </div>
                     </div>
@@ -91,6 +152,12 @@
                     <!-- Open the optional Pollinations translation settings and consent modal. -->
                     <button class="menu-page-link menu-action-button" id="ai-translation-settings" type="button">
                         <span><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> AI translations</span>
+                        <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                    </button>
+
+                    <!-- Open acknowledgements for the projects and data sources used by this website. -->
+                    <button class="menu-page-link menu-action-button" id="credits-settings" type="button">
+                        <span><i class="fa-solid fa-heart" aria-hidden="true"></i> Credits</span>
                         <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
                     </button>
 
@@ -194,6 +261,72 @@
         </div>
     </div>
 
+    <!-- Credit the open projects, services, and creators which make the encyclopedia possible. -->
+    <div class="ai-consent-modal credits-modal" id="credits-modal" role="dialog" aria-modal="true" aria-labelledby="credits-title" hidden>
+        <div class="ai-consent-card credits-card">
+            <button class="ai-consent-close" id="credits-close" type="button" aria-label="Close credits">&times;</button>
+            <div class="ai-consent-icon" aria-hidden="true">
+                <i class="fa-solid fa-heart"></i>
+            </div>
+            <h2 id="credits-title">Credits and acknowledgements</h2>
+            <p>This website is possible because of open-source projects, community data, and creative contributors.</p>
+
+            <section class="credits-highlight">
+                <h3>BirdNET-Pi</h3>
+                <p>
+                    The biggest credit goes to
+                    <a href="https://github.com/mcguirepr89/BirdNET-Pi" target="_blank" rel="noopener noreferrer">mcguirepr89/BirdNET-Pi</a>,
+                    which made BirdNET-Pi possible. Special kudos go to
+                    <a href="https://github.com/Nachtzuster/BirdNET-Pi" target="_blank" rel="noopener noreferrer">Nachtzuster/BirdNET-Pi</a>
+                    for continuing and expanding that work.
+                </p>
+                <p>
+                    The encyclopedia bird names and translations are based on the BirdNET-Pi localization files
+                    maintained by Nachtzuster.
+                </p>
+            </section>
+
+            <div class="credits-grid">
+                <a class="credit-link" href="https://www.flaticon.com/free-icons/bird" target="_blank" rel="noopener noreferrer">
+                    <i class="fa-solid fa-dove" aria-hidden="true"></i>
+                    <span><strong>Origami bird icon</strong><small>Bird icons created by Freepik - Flaticon</small></span>
+                </a>
+                <a class="credit-link" href="https://www.wikipedia.org/" target="_blank" rel="noopener noreferrer">
+                    <i class="fa-brands fa-wikipedia-w" aria-hidden="true"></i>
+                    <span><strong>Wikipedia</strong><small>Bird descriptions and reference articles</small></span>
+                </a>
+                <a class="credit-link" href="https://commons.wikimedia.org/" target="_blank" rel="noopener noreferrer">
+                    <i class="fa-regular fa-images" aria-hidden="true"></i>
+                    <span><strong>Wikimedia Commons</strong><small>Open media and supporting resources</small></span>
+                </a>
+                <a class="credit-link" href="https://ebird.org/" target="_blank" rel="noopener noreferrer">
+                    <i class="fa-solid fa-feather" aria-hidden="true"></i>
+                    <span><strong>eBird</strong><small>Taxonomy, species references, and observation resources</small></span>
+                </a>
+                <a class="credit-link" href="https://www.inaturalist.org/" target="_blank" rel="noopener noreferrer">
+                    <i class="fa-solid fa-leaf" aria-hidden="true"></i>
+                    <span><strong>iNaturalist</strong><small>Bird photographs, taxa, and observations</small></span>
+                </a>
+                <a class="credit-link" href="https://www.birdlife.org/" target="_blank" rel="noopener noreferrer">
+                    <i class="fa-solid fa-earth-europe" aria-hidden="true"></i>
+                    <span><strong>BirdLife International</strong><small>Bird conservation knowledge and resources</small></span>
+                </a>
+                <a class="credit-link" href="https://pollinations.ai/" target="_blank" rel="noopener noreferrer">
+                    <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
+                    <span><strong>Pollinations AI</strong><small>Optional user-authorized description translations</small></span>
+                </a>
+                <a class="credit-link" href="https://www.birdweather.com/" target="_blank" rel="noopener noreferrer">
+                    <i class="fa-solid fa-tower-broadcast" aria-hidden="true"></i>
+                    <span><strong>BirdWeather</strong><small>Public BirdNET station and detection data</small></span>
+                </a>
+                <a class="credit-link" href="https://dev.meteostat.net/" target="_blank" rel="noopener noreferrer">
+                    <i class="fa-solid fa-cloud-sun" aria-hidden="true"></i>
+                    <span><strong>Meteostat</strong><small>Historical weather observations</small></span>
+                </a>
+            </div>
+        </div>
+    </div>
+
 <script>
     // Production-ready Birdnet-Pi Encyclopedia Application
     class BirdEncyclopedia {
@@ -211,6 +344,9 @@
             this.taxonomyBySciName = new Map(); // Fast scientific-name lookup for category filters
             this.englishNamesBySciName = new Map(); // Reliable fallback detection across language files
             this.pollinationsConsentResolver = null; // Completes the pending description request after the consent modal closes
+            this.activeIucnFilter = null; // Tracks the selected global conservation category
+            this.iucnCacheMaxAge = 180 * 24 * 60 * 60 * 1000; // Recheck global assessments after roughly six months
+            this.iucnStatusCache = this.loadIucnStatusCache(); // Reuses global assessments across reloads and languages
 
             this.currentLanguage = 'en'; // Default to English
             this.availableLanguages = {};
@@ -238,6 +374,9 @@
             this.aiEnableButton = document.getElementById('ai-enable-button');
             this.aiDisableButton = document.getElementById('ai-disable-button');
             this.aiKeyError = document.getElementById('ai-key-error');
+            this.creditsSettings = document.getElementById('credits-settings');
+            this.creditsModal = document.getElementById('credits-modal');
+            this.creditsClose = document.getElementById('credits-close');
 
             this.crossLanguageSearchResults = [];
             this.showCrossLanguageResults = false;
@@ -378,9 +517,18 @@
             const dropdownItems = this.dropdownMenu.querySelectorAll('.dropdown-item[data-filter]');
             dropdownItems.forEach(item => {
                 item.addEventListener('click', (e) => {
-                    const filter = e.target.getAttribute('data-filter');
+                    const filter = e.currentTarget.getAttribute('data-filter');
                     this.handleCategoryFilter(filter);
                     this.hideDropdown();
+                });
+            });
+
+            // Filter birds by the global IUCN category loaded from each exact iNaturalist taxon.
+            this.dropdownMenu.querySelectorAll('[data-iucn-filter]').forEach(item => {
+                item.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    this.hideDropdown();
+                    await this.handleIucnFilter(e.currentTarget.dataset.iucnFilter);
                 });
             });
 
@@ -416,6 +564,7 @@
 
             // Let visitors review or change their optional AI translation preference at any time.
             this.setupAiTranslationConsent();
+            this.setupCreditsModal();
 
             // Browser back/forward cache can restore controls while omitting dynamically created bird cards.
             window.addEventListener('pageshow', (event) => {
@@ -1330,6 +1479,8 @@
 
         handleCategoryFilter(filter) {
             console.log('Filtering by category:', filter);
+            this.activeIucnFilter = null;
+            this.updateIucnFilterSelection();
 
             this.filteredBirds = filter === 'all'
                 ? [...this.birds]
@@ -1338,6 +1489,129 @@
             this.birdGrid.innerHTML = '';
             this.displayedCount = this.displayBirds(0, this.batchSize);
             this.updateLoadMoreButton();
+        }
+
+        async handleIucnFilter(code) {
+            // Resolve any missing statuses before applying a complete global IUCN filter.
+            this.activeIucnFilter = code;
+            this.updateIucnFilterSelection();
+            this.birdGrid.innerHTML = `
+                <div class="loading">
+                    Loading global IUCN assessments for ${this.escapeHtml(code.toUpperCase())}...
+                </div>
+            `;
+            this.loadMoreButton.style.display = 'none';
+
+            const unresolvedBirds = this.birds.filter(
+                bird => !this.isIucnCacheFresh(bird.latin)
+            );
+            unresolvedBirds.forEach(bird => {
+                // Permit stale records to be refreshed even if this bird already has image metadata.
+                bird.apiData = null;
+            });
+            const lookupBatchSize = 20;
+            for (let index = 0; index < unresolvedBirds.length; index += lookupBatchSize) {
+                // Use small sequential batches to avoid sending thousands of simultaneous iNaturalist requests.
+                await this.fetchINatDataForBirds(unresolvedBirds.slice(index, index + lookupBatchSize));
+                const loading = this.birdGrid.querySelector('.loading');
+                if (loading) {
+                    const checked = Math.min(index + lookupBatchSize, unresolvedBirds.length);
+                    loading.textContent =
+                        `Checking IUCN assessments: ${checked.toLocaleString()} of ${unresolvedBirds.length.toLocaleString()}`;
+                }
+            }
+
+            this.filteredBirds = this.birds.filter(
+                bird => {
+                    // Treat a missing assessment as its own selectable category without calling it Data Deficient.
+                    const status = bird.conservationStatus || bird.apiData?.conservation_status;
+                    return code === 'unknown' ? !status : status?.code === code;
+                }
+            );
+            this.birdGrid.innerHTML = '';
+
+            if (this.filteredBirds.length === 0) {
+                this.birdGrid.innerHTML = `
+                    <div class="no-results">
+                        No birds with the ${this.escapeHtml(code.toUpperCase())} global IUCN status were found.
+                    </div>
+                `;
+                this.displayedCount = 0;
+            } else {
+                this.displayedCount = this.displayBirds(0, this.batchSize);
+            }
+            this.updateLoadMoreButton();
+        }
+
+        updateIucnFilterSelection() {
+            // Keep the selected IUCN option visually and accessibly synchronized.
+            this.dropdownMenu.querySelectorAll('[data-iucn-filter]').forEach(option => {
+                const active = option.dataset.iucnFilter === this.activeIucnFilter;
+                option.classList.toggle('active', active);
+                option.setAttribute('aria-pressed', String(active));
+            });
+        }
+
+        loadIucnStatusCache() {
+            // Restore timestamped records and mark legacy status-only entries for a one-time refresh.
+            try {
+                const stored = JSON.parse(
+                    localStorage.getItem('birdEncyclopediaIucnStatuses') || '{}'
+                );
+                return Object.fromEntries(
+                    Object.entries(stored).map(([name, record]) => {
+                        const isTimestampedRecord =
+                            record &&
+                            typeof record === 'object' &&
+                            Object.prototype.hasOwnProperty.call(record, 'checkedAt') &&
+                            Object.prototype.hasOwnProperty.call(record, 'status');
+                        return [
+                            name,
+                            isTimestampedRecord
+                                ? record
+                                : { status: record || null, checkedAt: 0 }
+                        ];
+                    })
+                );
+            } catch (error) {
+                console.warn('Could not read the cached IUCN assessments:', error);
+                return {};
+            }
+        }
+
+        getCachedIucnStatus(scientificName) {
+            // Return the stored normalized status without exposing cache metadata to rendering code.
+            return this.iucnStatusCache[scientificName.toLowerCase()]?.status || null;
+        }
+
+        isIucnCacheFresh(scientificName) {
+            // Treat missing timestamps and records older than six months as due for rechecking.
+            const record = this.iucnStatusCache[scientificName.toLowerCase()];
+            return Boolean(
+                record &&
+                Number.isFinite(record.checkedAt) &&
+                Date.now() - record.checkedAt < this.iucnCacheMaxAge
+            );
+        }
+
+        cacheIucnStatus(scientificName, status) {
+            // Record the check time even when no assessment exists to prevent repeated empty lookups.
+            this.iucnStatusCache[scientificName.toLowerCase()] = {
+                status: status || null,
+                checkedAt: Date.now()
+            };
+        }
+
+        persistIucnStatusCache() {
+            // Save status values and check timestamps so future visits can refresh only stale records.
+            try {
+                localStorage.setItem(
+                    'birdEncyclopediaIucnStatuses',
+                    JSON.stringify(this.iucnStatusCache)
+                );
+            } catch (error) {
+                console.warn('Could not cache the IUCN assessments:', error);
+            }
         }
 
         birdMatchesCategory(bird, category) {
@@ -1452,9 +1726,10 @@
                         const data = await res.json();
                         if (data.results && data.results.length > 0) {
                             // 🎯 Try to find exact species match
-                            let taxon = data.results.find(
+                            const exactTaxon = data.results.find(
                                 t => t.rank === 'species' && t.name.toLowerCase() === bird.latin.toLowerCase()
                             );
+                            let taxon = exactTaxon;
 
                             // 🔍 If no exact match, try to find species with same genus name
                             if (!taxon) {
@@ -1469,12 +1744,30 @@
                                 taxon = data.results[0];
                             }
 
+                            // Fetch the detailed taxon record because search results omit most conservation statuses.
+                            const cacheKey = bird.latin.toLowerCase();
+                            const hasFreshCachedStatus = this.isIucnCacheFresh(cacheKey);
+                            const conservationStatus = hasFreshCachedStatus
+                                ? this.getCachedIucnStatus(cacheKey)
+                                : exactTaxon
+                                    ? await this.fetchGlobalConservationStatus(
+                                        exactTaxon.id,
+                                        exactTaxon.conservation_status,
+                                        bird.taxonomy
+                                    )
+                                    : this.normalizeConservationStatus(null, bird.taxonomy);
+                            bird.conservationStatus = conservationStatus;
+                            if (!hasFreshCachedStatus) {
+                                this.cacheIucnStatus(cacheKey, conservationStatus);
+                            }
+
                             bird.apiData = {
                                 id: taxon.id,
                                 scientific_name: taxon.name,
                                 rank: taxon.rank,
                                 common_name: taxon.preferred_common_name,
                                 description: taxon.wikipedia_summary || "",
+                                conservation_status: conservationStatus,
                                 thumbnail: taxon.default_photo
                                     ? taxon.default_photo.medium_url || taxon.default_photo.url
                                     : null
@@ -1489,6 +1782,7 @@
             });
 
             await Promise.all(promises);
+            this.persistIucnStatusCache();
         }
 
         async fetchRecentINatObservations(taxonId) {
@@ -1595,6 +1889,15 @@
             return localStorage.getItem('pollinationsUserApiKey') || '';
         }
 
+        getEnglishFallbackWarning() {
+            // Explain the English fallback and mention the optional remedy only when AI is not enabled.
+            const aiEnabled = localStorage.getItem('birdAiTranslationPreference') === 'enabled'
+                && this.getPollinationsApiKey().startsWith('sk_');
+            return aiEnabled
+                ? 'A translated description is unavailable in your selected language, so the English source is shown.'
+                : 'A translated description is unavailable in your selected language, so the English source is shown. Enable AI translations from the menu to translate descriptions into your selected language.';
+        }
+
         // Connect the AI settings controls and persist the visitor's explicit translation choice.
         setupAiTranslationConsent() {
             this.aiTranslationSettings?.addEventListener('click', () => {
@@ -1617,6 +1920,32 @@
             this.aiEnableButton?.addEventListener('click', () => {
                 this.startPollinationsAuthorization();
             });
+        }
+
+        setupCreditsModal() {
+            // Open and close the acknowledgements dialog without changing page or menu state.
+            this.creditsSettings?.addEventListener('click', () => {
+                this.hideDropdown();
+                this.creditsModal.hidden = false;
+                document.body.classList.add('ai-consent-open');
+                this.creditsClose?.focus();
+            });
+            this.creditsClose?.addEventListener('click', () => this.closeCreditsModal());
+            this.creditsModal?.addEventListener('click', event => {
+                if (event.target === this.creditsModal) this.closeCreditsModal();
+            });
+            document.addEventListener('keydown', event => {
+                if (event.key === 'Escape' && !this.creditsModal?.hidden) {
+                    this.closeCreditsModal();
+                }
+            });
+        }
+
+        closeCreditsModal() {
+            // Restore scrolling and return focus to the menu control after closing credits.
+            this.creditsModal.hidden = true;
+            document.body.classList.remove('ai-consent-open');
+            this.creditsSettings?.focus();
         }
 
         // Display the Pollinations introduction before redirecting to the official authorization page.
@@ -1838,17 +2167,24 @@
 
 
         updateBirdCardImage(bird) {
-            if (!bird.apiData?.thumbnail) return;
-            
-            // Find the card for this bird and update its image
+            // Update both asynchronous image and conservation metadata on every visible matching card.
             const cards = this.birdGrid.querySelectorAll('.bird-card');
             cards.forEach(card => {
                 const latinElement = card.querySelector('.bird-latin');
                 if (latinElement && latinElement.textContent === bird.latin) {
                     const img = card.querySelector('.bird-image');
-                    if (img) {
+                    if (img && bird.apiData?.thumbnail) {
                         img.setAttribute('data-src', bird.apiData.thumbnail);
                         this.imageObserver.observe(img);
+                    }
+                    const imageContainer = card.querySelector('.bird-image-container');
+                    const existingBadge = imageContainer?.querySelector('.conservation-card-badge');
+                    const badgeHtml = this.renderConservationCardBadge(
+                        bird.conservationStatus || bird.apiData?.conservation_status
+                    );
+                    if (existingBadge) existingBadge.remove();
+                    if (imageContainer && badgeHtml) {
+                        imageContainer.insertAdjacentHTML('beforeend', badgeHtml);
                     }
                 }
             });
@@ -1865,7 +2201,8 @@
                         latin,
                         name: latin,
                         searchText: latin.toLowerCase(),
-                        taxonomy: this.taxonomyBySciName.get(latin.toLowerCase()) || null
+                        taxonomy: this.taxonomyBySciName.get(latin.toLowerCase()) || null,
+                        conservationStatus: this.getCachedIucnStatus(latin)
                     };
                 }
                 
@@ -1876,7 +2213,8 @@
                     latin,
                     name,
                     searchText: `${latin} ${name}`.toLowerCase(),
-                    taxonomy: this.taxonomyBySciName.get(latin.toLowerCase()) || null
+                    taxonomy: this.taxonomyBySciName.get(latin.toLowerCase()) || null,
+                    conservationStatus: this.getCachedIucnStatus(latin)
                 };
             });
         }
@@ -1914,6 +2252,9 @@
                         ${realImg ? `data-src="${realImg}"` : ''}
                         alt="${this.escapeHtml(bird.name)}"
                         loading="lazy">
+                    ${this.renderConservationCardBadge(
+                        bird.conservationStatus || bird.apiData?.conservation_status
+                    )}
                 </div>
                 <div class="bird-info">
                     <h2 class="bird-name">${this.escapeHtml(bird.name)}</h2>
@@ -1927,6 +2268,99 @@
             // Add click event
             card.addEventListener('click', () => this.showBirdDetails(bird));
             return card;
+        }
+
+        async fetchGlobalConservationStatus(taxonId, fallbackStatus = null, taxonomy = null) {
+            // Select only the place-independent IUCN record so regional red lists are not shown as global status.
+            try {
+                const response = await fetch(`https://api.inaturalist.org/v1/taxa/${taxonId}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    const taxon = data.results?.[0];
+                    const statuses = Array.isArray(taxon?.conservation_statuses)
+                        ? taxon.conservation_statuses
+                        : [];
+                    const globalIucnStatus = statuses.find(status =>
+                        !status.place &&
+                        String(status.authority || '').toLowerCase().includes('iucn')
+                    );
+                    const globalStatus = globalIucnStatus ||
+                        statuses.find(status => !status.place) ||
+                        taxon?.conservation_status ||
+                        fallbackStatus;
+                    return this.normalizeConservationStatus(globalStatus, taxonomy);
+                }
+            } catch (error) {
+                console.warn(`Failed to fetch conservation status for taxon ${taxonId}:`, error);
+            }
+            return this.normalizeConservationStatus(fallbackStatus, taxonomy);
+        }
+
+        normalizeConservationStatus(status, taxonomy = null) {
+            // Convert iNaturalist's IUCN status record into stable display metadata for cards and details.
+            const code = String(status?.status || (taxonomy?.extinct ? 'ex' : '')).toLowerCase();
+            if (!code) return null;
+            const categories = {
+                lc: { label: 'Least Concern', severity: 1 },
+                nt: { label: 'Near Threatened', severity: 2 },
+                vu: { label: 'Vulnerable', severity: 3 },
+                en: { label: 'Endangered', severity: 4 },
+                cr: { label: 'Critically Endangered', severity: 5 },
+                ew: { label: 'Extinct in the Wild', severity: 6 },
+                ex: { label: 'Extinct', severity: 7 },
+                dd: { label: 'Data Deficient', severity: 0 },
+                ne: { label: 'Not Evaluated', severity: 0 }
+            };
+            const category = categories[code] || {
+                label: status?.status_name || code.toUpperCase(),
+                severity: 0
+            };
+            return {
+                code,
+                label: category.label,
+                severity: category.severity,
+                authority: status?.authority || 'IUCN Red List',
+                url: status?.url || ''
+            };
+        }
+
+        renderConservationCardBadge(status) {
+            // Keep cards uncluttered by showing only Near Threatened or higher global risk categories.
+            if (!status || status.severity < 2) return '';
+            return `
+                <span class="conservation-card-badge status-${this.escapeHtml(status.code)}"
+                    title="${this.escapeHtml(`${status.authority}: ${status.label}`)}">
+                    ${this.escapeHtml(status.code.toUpperCase())}
+                </span>
+            `;
+        }
+
+        renderConservationDetails(status, scientificName) {
+            // Link directly to the status source when available, with BirdLife DataZone as the fallback.
+            if (!status) {
+                return `
+                    <div class="detail-group conservation-detail">
+                        <div class="detail-label">Global conservation status</div>
+                        <div class="detail-value"><span class="conservation-badge status-unknown">Not available</span></div>
+                    </div>
+                `;
+            }
+            const birdLifeUrl = `https://datazone.birdlife.org/search?search=${encodeURIComponent(scientificName)}`;
+            const statusUrl = status.url || birdLifeUrl;
+            return `
+                <div class="detail-group conservation-detail">
+                    <div class="detail-label">Global conservation status</div>
+                    <div class="detail-value">
+                        <a class="conservation-badge status-${this.escapeHtml(status.code)}"
+                            href="${this.escapeHtml(statusUrl)}" target="_blank" rel="noopener noreferrer"
+                            title="View the conservation-status source">
+                            <strong>${this.escapeHtml(status.code.toUpperCase())}</strong>
+                            <span>${this.escapeHtml(status.label)}</span>
+                        </a>
+                    </div>
+                    <small class="conservation-authority">${this.escapeHtml(status.authority)}</small>
+                </div>
+            `;
         }
 
         // Load taxonomy file from local bundle
@@ -2103,6 +2537,10 @@
                             </div>
                             <div class="detail-value">${bird.name}</div>
                         </div>
+                        ${this.renderConservationDetails(
+                            details.conservation_status,
+                            details.scientific_name || bird.latin
+                        )}
                     </div>
                     <div class="modal-description">
                         <h3>Description</h3>
@@ -2110,7 +2548,7 @@
                             ? '<p class="description-source">AI translation by Pollinations from the English source.</p>'
                             : ''}
                         ${birdDescription.isFallbackEnglish
-                            ? '<p class="description-source description-warning">A translated description is unavailable, so the English source is shown.</p>'
+                            ? `<p class="description-source description-warning">${this.getEnglishFallbackWarning()}</p>`
                             : ''}
                         <p>${this.escapeHtml(birdDescription.text)}</p>
                     </div>

@@ -29,6 +29,7 @@ encyclopedia.
   - Localized Wikipedia descriptions when available
   - Optional AI translation of English descriptions
   - Taxonomic family information
+  - Global IUCN conservation status from exact iNaturalist taxon matches
   - Bird sounds through eBird
   - Recent iNaturalist observation information
   - Links to iNaturalist, Wikipedia, BirdLife, and eBird
@@ -181,7 +182,7 @@ main encyclopedia script:
 <script>
     // Identifies this website on the Pollinations authorization screen.
     window.BIRD_ENCYCLOPEDIA_CONFIG = {
-        pollinationsAppKey: 'pk_your_publishable_app_key'
+        pollinationsAppKey: 'pk_2lwEO7DMMuEkos1g'
     };
 </script>
 ```
