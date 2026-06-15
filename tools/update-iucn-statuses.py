@@ -4,16 +4,21 @@
 from __future__ import annotations
 
 import argparse
+import http.client
+import html
 import json
 import os
 import random
+import socket
 import sys
+import tempfile
 import time
 import urllib.error
 import urllib.parse
 import urllib.request
 from dataclasses import dataclass
 from datetime import datetime, timezone
+from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any
 
@@ -22,7 +27,7 @@ DEFAULT_API_BASE = "https://api.iucnredlist.org/api/v4"
 INAT_API_BASE = "https://api.inaturalist.org/v1"
 DEFAULT_TOKEN_ENV = "IUCN_API_TOKEN"
 # Local maintenance token used only by this manually executed updater.
-IUCN_API_TOKEN = "Zg7cQQJnHgtki7jsWYzFocf9WZUUt7H7yrvp"
+IUCN_API_TOKEN = ""
 VALID_CATEGORIES = {"EX", "EW", "CR", "EN", "VU", "NT", "LC", "DD", "NE"}
 CATEGORY_NAMES = {
     "EX": "Extinct",
@@ -34,6 +39,37 @@ CATEGORY_NAMES = {
     "LC": "Least Concern",
     "DD": "Data Deficient",
     "NE": "Not Evaluated",
+}
+RETRYABLE_NETWORK_ERRORS = (
+    urllib.error.URLError,
+    TimeoutError,
+    ConnectionError,
+    ConnectionResetError,
+    ConnectionAbortedError,
+    BrokenPipeError,
+    http.client.RemoteDisconnected,
+    http.client.IncompleteRead,
+    http.client.BadStatusLine,
+    socket.timeout,
+)
+HTML_BLOCK_TAGS = {
+    "address",
+    "article",
+    "aside",
+    "blockquote",
+    "br",
+    "div",
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    "li",
+    "p",
+    "section",
+    "table",
+    "tr",
 }
 
 
@@ -53,6 +89,54 @@ class IucnRequestError(RuntimeError):
     def __init__(self, message: str, status: int | None = None) -> None:
         super().__init__(message)
         self.status = status
+
+
+class IucnHtmlTextExtractor(HTMLParser):
+    """Convert inconsistent assessment HTML fragments into readable plain text."""
+
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.parts: list[str] = []
+        self.ignored_depth = 0
+
+    def handle_starttag(
+        self, tag: str, attrs: list[tuple[str, str | None]]
+    ) -> None:
+        if tag in {"script", "style"}:
+            self.ignored_depth += 1
+        elif not self.ignored_depth and tag in HTML_BLOCK_TAGS:
+            self.parts.append("\n")
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag in {"script", "style"} and self.ignored_depth:
+            self.ignored_depth -= 1
+        elif not self.ignored_depth and tag in HTML_BLOCK_TAGS:
+            self.parts.append("\n")
+
+    def handle_data(self, data: str) -> None:
+        if not self.ignored_depth:
+            self.parts.append(data)
+
+
+def clean_iucn_text(value: str) -> str:
+    """Remove HTML, decode entities, and retain useful paragraph separation."""
+
+    if not value:
+        return ""
+    extractor = IucnHtmlTextExtractor()
+    extractor.feed(value)
+    extractor.close()
+    text = html.unescape("".join(extractor.parts))
+    lines = [" ".join(line.split()) for line in text.splitlines()]
+    paragraphs: list[str] = []
+    for line in lines:
+        if line:
+            paragraphs.append(line)
+        elif paragraphs and paragraphs[-1] != "":
+            paragraphs.append("")
+    return "\n\n".join(
+        paragraph for paragraph in "\n".join(paragraphs).split("\n\n") if paragraph
+    ).strip()
 
 
 def parse_args() -> argparse.Namespace:
@@ -84,10 +168,10 @@ def parse_args() -> argparse.Namespace:
         help="Detailed unmatched, not-assessed, and failed-name report.",
     )
     parser.add_argument(
-        "--details-output",
+        "--details-directory",
         type=Path,
-        default=project_root / "data" / "iucn-details.json",
-        help="Generated assessment narratives, ecology, population, and threats.",
+        default=project_root / "data" / "iucn-details",
+        help="Directory containing assessment details split by initial letter.",
     )
     parser.add_argument(
         "--checkpoint",
@@ -140,6 +224,11 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Ignore and replace an existing checkpoint.",
     )
+    parser.add_argument(
+        "--publish-only",
+        action="store_true",
+        help="Rebuild website JSON from the checkpoint without making API requests.",
+    )
     return parser.parse_args()
 
 
@@ -189,15 +278,283 @@ def read_json(path: Path, default: Any) -> Any:
         return json.load(handle)
 
 
-def write_json_atomic(path: Path, payload: Any) -> None:
-    """Write formatted UTF-8 JSON through a temporary file to avoid partial datasets."""
+def checkpoint_progress(payload: Any) -> tuple[int, int, int, int]:
+    """Measure checkpoint completeness so recovery can select the newest useful state."""
+
+    if not isinstance(payload, dict):
+        return (0, 0, 0, 0)
+    processed_names = {
+        name.casefold()
+        for section in ("completed", "unmatched", "notAssessed")
+        for name in payload.get(section, {})
+    }
+    return (
+        len(processed_names),
+        len(payload.get("details", {})),
+        len(payload.get("completed", {})),
+        len(payload.get("fallback", {})),
+    )
+
+
+def read_checkpoint_with_recovery(path: Path, default: Any) -> Any:
+    """Load the most complete valid checkpoint, including interrupted temporary writes."""
+
+    candidates = [path]
+    candidates.extend(path.parent.glob(f"{path.name}.tmp*"))
+    candidates.extend(path.parent.glob(f"{path.name}.bak*"))
+    valid: list[tuple[tuple[int, int, int, int], float, Path, Any]] = []
+
+    for candidate in candidates:
+        if not candidate.is_file():
+            continue
+        try:
+            payload = read_json(candidate, default)
+            valid.append(
+                (
+                    checkpoint_progress(payload),
+                    candidate.stat().st_mtime,
+                    candidate,
+                    payload,
+                )
+            )
+        except (OSError, json.JSONDecodeError) as error:
+            print(
+                f"Ignoring invalid checkpoint candidate {candidate.name}: {error}",
+                file=sys.stderr,
+            )
+
+    if not valid:
+        return default
+
+    progress, _, selected_path, selected_payload = max(
+        valid, key=lambda candidate: (candidate[0], candidate[1])
+    )
+    if selected_path != path:
+        print(
+            f"Recovered checkpoint from {selected_path.name} "
+            f"({progress[0]:,} processed, {progress[2]:,} assessments, "
+            f"{progress[1]:,} details).",
+            file=sys.stderr,
+        )
+    return selected_payload
+
+
+def sanitize_json_value(value: Any) -> Any:
+    """Replace Unicode line separators that editors may treat as unusual terminators."""
+
+    if isinstance(value, str):
+        return (
+            value.replace("\u2028", "\n")
+            .replace("\u2029", "\n")
+            .replace("\u0085", "\n")
+        )
+    if isinstance(value, dict):
+        return {
+            sanitize_json_value(key): sanitize_json_value(child)
+            for key, child in value.items()
+        }
+    if isinstance(value, list):
+        return [sanitize_json_value(child) for child in value]
+    if isinstance(value, tuple):
+        return [sanitize_json_value(child) for child in value]
+    return value
+
+
+def write_json_atomic(
+    path: Path,
+    payload: Any,
+    *,
+    max_retries: int = 10,
+    retry_delay: float = 0.25,
+    pretty: bool = False,
+) -> None:
+    """Write JSON atomically and retry transient Windows file-lock failures."""
 
     path.parent.mkdir(parents=True, exist_ok=True)
-    temporary_path = path.with_suffix(path.suffix + ".tmp")
-    with temporary_path.open("w", encoding="utf-8", newline="\n") as handle:
-        json.dump(payload, handle, ensure_ascii=False, indent=2, sort_keys=True)
-        handle.write("\n")
-    temporary_path.replace(path)
+    temporary_path: Path | None = None
+    sanitized_payload = sanitize_json_value(payload)
+    try:
+        # A unique temporary filename avoids collisions with stale files or another process.
+        with tempfile.NamedTemporaryFile(
+            mode="w",
+            encoding="utf-8",
+            newline="\n",
+            dir=path.parent,
+            prefix=f"{path.name}.tmp.",
+            delete=False,
+        ) as handle:
+            temporary_path = Path(handle.name)
+            dump_options = {
+                "ensure_ascii": False,
+                "sort_keys": True,
+            }
+            if pretty:
+                dump_options["indent"] = 2
+            else:
+                dump_options["separators"] = (",", ":")
+            json.dump(sanitized_payload, handle, **dump_options)
+            handle.write("\n")
+            handle.flush()
+            os.fsync(handle.fileno())
+
+        for attempt in range(max_retries + 1):
+            try:
+                os.replace(temporary_path, path)
+                temporary_path = None
+                return
+            except PermissionError as error:
+                if attempt >= max_retries:
+                    raise
+                wait_seconds = min(
+                    10.0,
+                    retry_delay * (2**attempt) + random.uniform(0.05, 0.3),
+                )
+                print(
+                    f"Checkpoint file is temporarily locked; retrying save in "
+                    f"{wait_seconds:.2f}s ({attempt + 1}/{max_retries}).",
+                    file=sys.stderr,
+                )
+                time.sleep(wait_seconds)
+            except OSError:
+                if attempt >= max_retries:
+                    raise
+                time.sleep(min(10.0, retry_delay * (2**attempt)))
+    finally:
+        # Keep a valid temporary checkpoint when replacement fails so startup can recover it.
+        if temporary_path and temporary_path.exists():
+            print(
+                f"Preserved unsaved checkpoint at {temporary_path.name}.",
+                file=sys.stderr,
+            )
+
+
+def detail_bucket(scientific_name: str) -> str:
+    """Map a scientific name to a stable lowercase file bucket."""
+
+    initial = scientific_name[:1].casefold()
+    return initial if initial.isascii() and initial.isalpha() else "other"
+
+
+def prepare_published_detail(record: Any) -> dict[str, Any]:
+    """Keep visitor-relevant conservation fields and remove papers, authors, and credits."""
+
+    if not isinstance(record, dict):
+        return {}
+    taxonomy = record.get("taxonomy") if isinstance(record.get("taxonomy"), dict) else {}
+    published = compact_value(
+        {
+            "scientificName": record.get("scientificName"),
+            "matchedScientificName": record.get("matchedScientificName"),
+            "source": record.get("source"),
+            "assessmentId": record.get("assessmentId"),
+            "assessmentDate": record.get("assessmentDate"),
+            "yearPublished": record.get("yearPublished"),
+            "url": record.get("url"),
+            "criteria": record.get("criteria"),
+            "category": record.get("category"),
+            "categoryLabel": record.get("categoryLabel"),
+            "possiblyExtinct": record.get("possiblyExtinct"),
+            "possiblyExtinctInTheWild": record.get("possiblyExtinctInTheWild"),
+            "scope": record.get("scope"),
+            "populationTrend": record.get("populationTrend"),
+            "population": record.get("population"),
+            "geographicRange": record.get("geographicRange"),
+            "movementPatterns": record.get("movementPatterns"),
+            "documentation": record.get("documentation"),
+            "taxonomy": {
+                "kingdom": taxonomy.get("kingdom"),
+                "phylum": taxonomy.get("phylum"),
+                "class": taxonomy.get("class"),
+                "order": taxonomy.get("order"),
+                "family": taxonomy.get("family"),
+                "genus": taxonomy.get("genus"),
+            },
+            "habitats": record.get("habitats"),
+            "threats": record.get("threats"),
+            "stresses": record.get("stresses"),
+            "conservationActions": record.get("conservationActions"),
+            "research": record.get("research"),
+            "useAndTrade": record.get("useAndTrade"),
+            "systems": record.get("systems"),
+            "biogeographicalRealms": record.get("biogeographicalRealms"),
+        }
+    )
+    return clean_published_strings(published)
+
+
+def clean_published_strings(value: Any) -> Any:
+    """Clean API HTML and entities recursively in website-facing detail records."""
+
+    if isinstance(value, str):
+        return clean_iucn_text(value)
+    if isinstance(value, dict):
+        return {
+            key: cleaned
+            for key, child in value.items()
+            if (cleaned := clean_published_strings(child)) not in (None, "", [], {})
+        }
+    if isinstance(value, list):
+        return [
+            cleaned
+            for child in value
+            if (cleaned := clean_published_strings(child)) not in (None, "", [], {})
+        ]
+    return value
+
+
+def write_detail_buckets(
+    directory: Path,
+    details: dict[str, Any],
+    metadata: dict[str, Any],
+) -> None:
+    """Publish assessment details in small files loaded only when a bird is opened."""
+
+    directory.mkdir(parents=True, exist_ok=True)
+    buckets: dict[str, dict[str, Any]] = {}
+    for scientific_name, record in details.items():
+        published_record = prepare_published_detail(record)
+        if published_record:
+            buckets.setdefault(detail_bucket(scientific_name), {})[
+                scientific_name
+            ] = published_record
+
+    for bucket, records in buckets.items():
+        write_json_atomic(
+            directory / f"{bucket}.json",
+            {
+                "metadata": {
+                    **metadata,
+                    "bucket": bucket,
+                    "detailsCount": len(records),
+                },
+                "details": dict(
+                    sorted(records.items(), key=lambda item: item[0].casefold())
+                ),
+            },
+        )
+
+    # Remove stale generated buckets that no longer have any records.
+    for existing in directory.glob("*.json"):
+        if existing.stem not in buckets:
+            existing.unlink()
+
+
+def save_checkpoint_resilient(path: Path, checkpoint: dict[str, Any]) -> bool:
+    """Save progress without terminating a long API run when Windows holds the file."""
+
+    try:
+        write_json_atomic(path, checkpoint)
+        return True
+    except OSError as error:
+        progress = checkpoint_progress(checkpoint)
+        print(
+            f"WARNING: Could not replace {path.name} after retries: {error}. "
+            f"A recoverable temporary checkpoint was preserved with "
+            f"{progress[0]:,} processed species, {progress[2]:,} assessments, "
+            f"and {progress[1]:,} details. Continuing.",
+            file=sys.stderr,
+        )
+        return False
 
 
 def build_taxon_url(api_base: str, bird: BirdName) -> str:
@@ -260,7 +617,7 @@ def request_json(
                 file=sys.stderr,
             )
             time.sleep(wait_seconds)
-        except (urllib.error.URLError, TimeoutError) as error:
+        except RETRYABLE_NETWORK_ERRORS as error:
             if attempt >= max_retries:
                 raise IucnRequestError(f"Network error: {error}") from error
             wait_seconds = min(120.0, (2**attempt) + random.uniform(0.25, 1.25))
@@ -308,12 +665,20 @@ def request_public_json(
                 min(120.0, (2**attempt) + random.uniform(0.25, 1.25)),
             )
             time.sleep(wait_seconds)
-        except (urllib.error.URLError, TimeoutError) as error:
+        except RETRYABLE_NETWORK_ERRORS as error:
             if attempt >= max_retries:
                 raise IucnRequestError(
                     f"iNaturalist network error: {error}"
                 ) from error
-            time.sleep(min(120.0, (2**attempt) + random.uniform(0.25, 1.25)))
+            wait_seconds = min(
+                120.0, (2**attempt) + random.uniform(0.25, 1.25)
+            )
+            print(
+                f"iNaturalist network error; retrying in {wait_seconds:.1f}s "
+                f"({attempt + 1}/{max_retries}): {error}",
+                file=sys.stderr,
+            )
+            time.sleep(wait_seconds)
 
     raise IucnRequestError("iNaturalist request failed after all retries")
 
@@ -728,9 +1093,7 @@ def extract_assessment_details(payload: Any, scientific_name: str) -> dict[str, 
         "assessmentId": payload.get("assessment_id"),
         "assessmentDate": payload.get("assessment_date"),
         "yearPublished": payload.get("year_published"),
-        "latest": payload.get("latest"),
         "url": payload.get("url"),
-        "citation": payload.get("citation"),
         "criteria": payload.get("criteria"),
         "category": category,
         "categoryLabel": CATEGORY_NAMES.get(category or ""),
@@ -794,10 +1157,7 @@ def extract_assessment_details(payload: Any, scientific_name: str) -> dict[str, 
                 "order": taxon.get("order_name"),
                 "family": taxon.get("family_name"),
                 "genus": taxon.get("genus_name"),
-                "authority": taxon.get("authority"),
-                "commonNames": taxon.get("common_names"),
                 "synonyms": taxon.get("synonyms"),
-                "specialistGroups": taxon.get("ssc_groups"),
             }
         ),
         "habitats": normalize_named_records(payload.get("habitats")),
@@ -812,8 +1172,6 @@ def extract_assessment_details(payload: Any, scientific_name: str) -> dict[str, 
         "biogeographicalRealms": normalize_named_records(
             payload.get("biogeographical_realms")
         ),
-        "references": payload.get("references"),
-        "credits": payload.get("credits"),
     }
     return compact_value(details)
 
@@ -856,7 +1214,7 @@ def main() -> int:
     checkpoint = (
         build_checkpoint()
         if args.restart
-        else read_json(args.checkpoint, build_checkpoint())
+        else read_checkpoint_with_recovery(args.checkpoint, build_checkpoint())
     )
     if checkpoint.get("version", 1) < 2:
         # Version 1 could confuse taxon IDs with assessment IDs, so refresh its summaries once.
@@ -886,7 +1244,8 @@ def main() -> int:
         f"{len(summary_names):,} summaries and {len(detail_names):,} details completed."
     )
 
-    for position, bird in enumerate(birds, start=1):
+    birds_to_process = [] if args.publish_only else birds
+    for position, bird in enumerate(birds_to_process, start=1):
         key = bird.scientific_name.casefold()
         if key in detail_names or bird.scientific_name in checkpoint.get(
             "unmatched", {}
@@ -966,9 +1325,12 @@ def main() -> int:
                 }
                 result = f"failed: {error}"
 
-        # Persist after every species so an interrupted multi-hour refresh resumes safely.
-        write_json_atomic(args.checkpoint, checkpoint)
-        print(f"[{position:,}/{len(birds):,}] {bird.scientific_name}: {result}")
+        # Persist after every species; transient Windows file locks never terminate the API run.
+        save_checkpoint_resilient(args.checkpoint, checkpoint)
+        print(
+            f"[{position:,}/{len(birds_to_process):,}] "
+            f"{bird.scientific_name}: {result}"
+        )
         time.sleep(max(0.0, args.delay))
 
     generated_at = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
@@ -987,13 +1349,11 @@ def main() -> int:
         },
         "statuses": dict(sorted(completed.items(), key=lambda item: item[0].casefold())),
     }
-    details_dataset = {
-        "metadata": {
-            **dataset["metadata"],
-            "detailsCount": len(details),
-            "rangeGeometryIncluded": False,
-        },
-        "details": dict(sorted(details.items(), key=lambda item: item[0].casefold())),
+    details_metadata = {
+        **dataset["metadata"],
+        "detailsCount": len(details),
+        "rangeGeometryIncluded": False,
+        "papersAuthorsAndCreditsIncluded": False,
     }
     report = {
         "metadata": dataset["metadata"],
@@ -1003,11 +1363,14 @@ def main() -> int:
         "iNaturalistFallback": checkpoint.get("fallback", {}),
     }
     write_json_atomic(args.output, dataset)
-    write_json_atomic(args.details_output, details_dataset)
-    write_json_atomic(args.report, report)
+    write_detail_buckets(args.details_directory, details, details_metadata)
+    write_json_atomic(args.report, report, pretty=True)
 
     print(f"Wrote {len(completed):,} assessments to {args.output}")
-    print(f"Wrote {len(details):,} assessment details to {args.details_output}")
+    print(
+        f"Wrote {len(details):,} assessment details to "
+        f"{args.details_directory}"
+    )
     print(f"Wrote update diagnostics to {args.report}")
     if checkpoint.get("failed"):
         print(

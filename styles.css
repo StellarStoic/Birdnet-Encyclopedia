@@ -395,6 +395,15 @@ body[data-theme="paper"] {
     text-transform: uppercase;
 }
 
+/* Identify translated IUCN text without competing with the assessment heading. */
+.iucn-translation-note {
+    display: block;
+    margin-top: 4px;
+    color: var(--muted);
+    font-size: 0.74rem;
+    font-style: italic;
+}
+
 .iucn-facts-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -424,6 +433,12 @@ body[data-theme="paper"] {
     line-height: 1.35;
 }
 
+.iucn-explained-value {
+    cursor: help;
+    text-decoration: underline dotted;
+    text-underline-offset: 3px;
+}
+
 .iucn-detail-block {
     margin-top: 8px;
     border: 1px solid var(--border);
@@ -444,6 +459,10 @@ body[data-theme="paper"] {
     padding: 0 13px 13px;
     color: var(--muted);
     line-height: 1.6;
+}
+
+.iucn-detail-block p {
+    white-space: pre-line;
 }
 
 .iucn-detail-block ul {
@@ -935,6 +954,33 @@ body[data-theme="midnight"] .dropdown-toggle.active .menu-bird-open {
             line-height: 1.45;
         }
 
+        /* Keep the preferred AI language clear and readable in every dashboard theme. */
+        .ai-language-field {
+            display: grid;
+            gap: 7px;
+            margin: 0 0 18px;
+            color: var(--text);
+        }
+
+        .ai-language-field > span {
+            font-weight: 800;
+        }
+
+        .ai-language-field select {
+            width: 100%;
+            padding: 11px 12px;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            background: var(--surface-solid);
+            color: var(--text);
+            font: inherit;
+        }
+
+        .ai-language-field small {
+            color: var(--muted);
+            line-height: 1.4;
+        }
+
         .ai-balance-link {
             display: flex;
             align-items: center;
@@ -1141,6 +1187,63 @@ body[data-theme="midnight"] .dropdown-toggle.active .menu-bird-open {
             color: #2c3e50;
         }
 
+        /* Place observation navigation on both sides of its title and status. */
+        .recent-observation-heading {
+            display: grid;
+            grid-template-columns: 42px minmax(0, 1fr) 42px;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .recent-observation-title {
+            min-width: 0;
+            text-align: center;
+        }
+
+        .recent-observation-title h3 {
+            margin-bottom: 2px;
+        }
+
+        .recent-observation-counter {
+            display: block;
+            color: var(--text);
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .recent-observation-note {
+            display: block;
+            color: var(--muted);
+            font-size: 0.65rem;
+            line-height: 1.25;
+        }
+
+        .recent-observation-nav {
+            width: 42px;
+            height: 42px;
+            padding: 0;
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            background: var(--surface-solid);
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: background-color 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+        }
+
+        .recent-observation-nav:hover:not(:disabled),
+        .recent-observation-nav:focus-visible {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: #ffffff;
+        }
+
+        .recent-observation-nav:disabled {
+            cursor: default;
+            opacity: 0.3;
+        }
+
         .inat-details .detail-group {
             margin-bottom: 10px;
         }
@@ -1206,6 +1309,17 @@ body[data-theme="midnight"] .dropdown-toggle.active .menu-bird-open {
         @media (max-width: 768px) {
             .inat-details {
                 padding: 12px;
+            }
+
+            /* Keep the observation heading usable on narrow modal widths. */
+            .recent-observation-heading {
+                grid-template-columns: 36px minmax(0, 1fr) 36px;
+                gap: 6px;
+            }
+
+            .recent-observation-nav {
+                width: 36px;
+                height: 36px;
             }
 
             .observation-map {
@@ -2060,6 +2174,7 @@ body[data-theme="midnight"] .dropdown-toggle.active .menu-bird-open {
     margin-top: 1.5rem;
     padding-top: 1rem;
     border-top: 1px solid #e9ecef;
+    font-size: 1.3rem;
 }
 
 .external-link {

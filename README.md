@@ -356,7 +356,7 @@ These libraries are currently loaded from public CDNs.
 |-- data/
 |   |-- taxonomy.json          # Local eBird taxonomy data
 |   |-- iucn-statuses.json     # Generated global conservation categories
-|   `-- iucn-details.json      # Generated assessment details
+|   `-- iucn-details/          # Generated assessment details by initial
 |-- img/                       # Menu and decorative image assets
 |-- lang/
 |   |-- labels_*.txt           # Generated localized bird names
@@ -377,8 +377,9 @@ The maintenance script in `tools/update-iucn-statuses.py` reads scientific
 names from `lang/labels_en.txt` and generates:
 
 - `data/iucn-statuses.json` for the website.
-- `data/iucn-details.json` for assessment dates, population, elevation, habitat,
-  threats, taxonomy, conservation actions, research, and assessment narratives.
+- `data/iucn-details/*.json` for assessment dates, population, elevation,
+  habitat, threats, taxonomy, conservation actions, research, and assessment
+  narratives. Files are split by scientific-name initial and loaded on demand.
 - `data/iucn-update-report.json` for unmatched, not-assessed, and failed names.
 - `tools/iucn-statuses.checkpoint.json` as resumable local state. The checkpoint
   is ignored by Git.
@@ -391,6 +392,11 @@ when iNaturalist exposes a place-independent global IUCN status. These records
 are labelled `iNaturalist fallback`, and the accepted scientific name is stored
 in the report. Regional statuses and general same-genus approximations are
 never substituted.
+
+Published detail buckets intentionally omit references, papers, citations,
+assessment authors, contributor credits, common-name lists, and specialist
+group metadata. Species absent from the generated status file are not shown
+with an IUCN badge or assessment panel.
 
 Set `IUCN_API_TOKEN` near the top of the script, then run the updater from the
 project root:
@@ -411,6 +417,32 @@ six-month dataset should replace the checkpoint. The API normally accepts the
 token as a raw `Authorization` value; if it returns HTTP 401 or 403, retry with
 `--auth-scheme bearer`. Geographic range polygons and assessment points are
 intentionally excluded to keep the website data files manageable.
+
+After changing publication fields, rebuild the website files from the completed
+checkpoint without contacting either API:
+
+```powershell
+# Repackage completed checkpoint data without making network requests.
+python tools/update-iucn-statuses.py --publish-only
+```
+
+Checkpoint writes retry transient Windows file locks caused by antivirus,
+indexing, or synchronization tools. If replacement remains blocked, the updater
+keeps running and preserves a valid uniquely named temporary checkpoint. On the
+next start it automatically selects the most complete valid main or temporary
+checkpoint. Resume an interrupted update without `--restart`:
+
+```powershell
+# Continue from the most complete saved checkpoint.
+python tools/update-iucn-statuses.py
+```
+
+The checkpoint is machine-managed state. Do not edit or save
+`tools/iucn-statuses.checkpoint.json` in an editor while the updater is running;
+the file changes after every species, so an open editor tab will correctly
+report that its copy is older. Close the tab or choose **Revert File** instead
+of overwriting it. API-provided Unicode line separators are normalized before
+JSON is written to avoid unusual-line-terminator warnings.
 
 ## Browser Compatibility
 

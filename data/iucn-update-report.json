@@ -1,0 +1,3208 @@
+{
+  "failed": {},
+  "iNaturalistFallback": {
+    "Acanthis cabaret": {
+      "acceptedScientificName": "Acanthis flammea cabaret",
+      "matchedTerm": "Acanthis flammea cabaret",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Acanthis hornemanni": {
+      "acceptedScientificName": "Acanthis flammea",
+      "matchedTerm": "Acanthis hornemanni",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Accipiter erythronemius": {
+      "acceptedScientificName": "Accipiter striatus erythronemius",
+      "matchedTerm": "Accipiter erythronemius",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Accipiter ventralis": {
+      "acceptedScientificName": "Accipiter striatus ventralis",
+      "matchedTerm": "Accipiter ventralis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Acrocephalus baeticatus": {
+      "acceptedScientificName": "Acrocephalus scirpaceus",
+      "matchedTerm": "Acrocephalus baeticatus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Actinodura cyanouroptera": {
+      "acceptedScientificName": "Actinodura cyanouroptera",
+      "matchedTerm": "Actinodura cyanouroptera",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Actinodura nipalensis": {
+      "acceptedScientificName": "Actinodura nipalensis",
+      "matchedTerm": "Actinodura nipalensis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Actinodura strigula": {
+      "acceptedScientificName": "Actinodura strigula",
+      "matchedTerm": "Actinodura strigula",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Actinodura waldeni": {
+      "acceptedScientificName": "Actinodura waldeni",
+      "matchedTerm": "Actinodura waldeni",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Alophoixus finschii": {
+      "acceptedScientificName": "Iole finschii",
+      "matchedTerm": "Alophoixus finschii",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Alophoixus longirostris": {
+      "acceptedScientificName": "Hypsipetes longirostris",
+      "matchedTerm": "Alophoixus longirostris",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Amazilia amabilis": {
+      "acceptedScientificName": "Polyerata amabilis",
+      "matchedTerm": "Amazilia amabilis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Amazilia amazilia": {
+      "acceptedScientificName": "Amazilis amazilia",
+      "matchedTerm": "Amazilia amazilia",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Amazilia beryllina": {
+      "acceptedScientificName": "Saucerottia beryllina",
+      "matchedTerm": "Amazilia beryllina",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Amazilia brevirostris": {
+      "acceptedScientificName": "Chrysuronia brevirostris",
+      "matchedTerm": "Amazilia brevirostris",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Amazilia candida": {
+      "acceptedScientificName": "Chlorestes candida",
+      "matchedTerm": "Amazilia candida",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Amazilia castaneiventris": {
+      "acceptedScientificName": "Saucerottia castaneiventris",
+      "matchedTerm": "Amazilia castaneiventris",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Amazilia chionogaster": {
+      "acceptedScientificName": "Elliotomyia chionogaster",
+      "matchedTerm": "Amazilia chionogaster",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Amazilia cyanocephala": {
+      "acceptedScientificName": "Saucerottia cyanocephala",
+      "matchedTerm": "Amazilia cyanocephala",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Amazilia decora": {
+      "acceptedScientificName": "Polyerata decora",
+      "matchedTerm": "Amazilia decora",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Amazilia fimbriata": {
+      "acceptedScientificName": "Chionomesa fimbriata",
+      "matchedTerm": "Amazilia fimbriata",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Amazilia lactea": {
+      "acceptedScientificName": "Chionomesa lactea",
+      "matchedTerm": "Amazilia lactea",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Amazilia leucogaster": {
+      "acceptedScientificName": "Chrysuronia leucogaster",
+      "matchedTerm": "Amazilia leucogaster",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Amazilia rosenbergi": {
+      "acceptedScientificName": "Polyerata rosenbergi",
+      "matchedTerm": "Amazilia rosenbergi",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Amazilia saucerottei": {
+      "acceptedScientificName": "Saucerottia saucerottei",
+      "matchedTerm": "Amazilia saucerottei",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Amazilia tobaci": {
+      "acceptedScientificName": "Saucerottia tobaci",
+      "matchedTerm": "Amazilia tobaci",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Amazilia versicolor": {
+      "acceptedScientificName": "Chrysuronia versicolor",
+      "matchedTerm": "Amazilia versicolor",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Amazilia violiceps": {
+      "acceptedScientificName": "Ramosomyia violiceps",
+      "matchedTerm": "Amazilia violiceps",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Amazilia viridicauda": {
+      "acceptedScientificName": "Elliotomyia viridicauda",
+      "matchedTerm": "Amazilia viridicauda",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Amblyornis newtoniana": {
+      "acceptedScientificName": "Prionodura newtoniana",
+      "matchedTerm": "Amblyornis newtoniana",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Amphilais seebohmi": {
+      "acceptedScientificName": "Bradypterus seebohmi",
+      "matchedTerm": "Amphilais seebohmi",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Amphispizopsis quinquestriata": {
+      "acceptedScientificName": "Amphispizopsis quinquestriata",
+      "matchedTerm": "Amphispizopsis quinquestriata",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Anser cygnoides": {
+      "acceptedScientificName": "Anser cygnoides",
+      "matchedTerm": "Anser cygnoides",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Anthus lutescens": {
+      "acceptedScientificName": "Anthus chii",
+      "matchedTerm": "Anthus lutescens",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Antigone antigone": {
+      "acceptedScientificName": "Antigone antigone",
+      "matchedTerm": "Antigone antigone",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Antigone canadensis": {
+      "acceptedScientificName": "Antigone canadensis",
+      "matchedTerm": "Antigone canadensis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Antigone rubicunda": {
+      "acceptedScientificName": "Antigone rubicunda",
+      "matchedTerm": "Antigone rubicunda",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Antigone vipio": {
+      "acceptedScientificName": "Antigone vipio",
+      "matchedTerm": "Antigone vipio",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Anurolimnas castaneiceps": {
+      "acceptedScientificName": "Anurolimnas castaneiceps",
+      "matchedTerm": "Anurolimnas castaneiceps",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Anurolimnas fasciatus": {
+      "acceptedScientificName": "Rufirallus fasciatus",
+      "matchedTerm": "Anurolimnas fasciatus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Anurolimnas viridis": {
+      "acceptedScientificName": "Rufirallus viridis",
+      "matchedTerm": "Anurolimnas viridis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Aphantochroa cirrochloris": {
+      "acceptedScientificName": "Eupetomena cirrochloris",
+      "matchedTerm": "Aphantochroa cirrochloris",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Aphelocoma insularis": {
+      "acceptedScientificName": "Aphelocoma insularis",
+      "matchedTerm": "Aphelocoma insularis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Apus melba": {
+      "acceptedScientificName": "Tachymarptis melba",
+      "matchedTerm": "Apus melba",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Arborophila chloropus": {
+      "acceptedScientificName": "Tropicoperdix chloropus",
+      "matchedTerm": "Arborophila chloropus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Artamus leucorynchus": {
+      "acceptedScientificName": "Artamus leucorynchus",
+      "matchedTerm": "Artamus leucorynchus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Asio grammicus": {
+      "acceptedScientificName": "Asio grammicus",
+      "matchedTerm": "Asio grammicus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Asthenes sclateri": {
+      "acceptedScientificName": "Asthenes wyatti",
+      "matchedTerm": "Asthenes sclateri",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Atlapetes tibialis": {
+      "acceptedScientificName": "Atlapetes tibialis",
+      "matchedTerm": "Atlapetes tibialis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Atthis ellioti": {
+      "acceptedScientificName": "Selasphorus ellioti",
+      "matchedTerm": "Atthis ellioti",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Atthis heloisa": {
+      "acceptedScientificName": "Selasphorus heloisa",
+      "matchedTerm": "Atthis heloisa",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Brachypodius eutilotus": {
+      "acceptedScientificName": "Microtarsus eutilotus",
+      "matchedTerm": "Brachypodius eutilotus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Brachypodius melanocephalos": {
+      "acceptedScientificName": "Microtarsus melanocephalos",
+      "matchedTerm": "Brachypodius melanocephalos",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Brachypodius melanoleucos": {
+      "acceptedScientificName": "Microtarsus melanoleucos",
+      "matchedTerm": "Brachypodius melanoleucos",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Brachypodius urostictus": {
+      "acceptedScientificName": "Microtarsus urostictus",
+      "matchedTerm": "Brachypodius urostictus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Bucco macrodactylus": {
+      "acceptedScientificName": "Bucco macrodactylus",
+      "matchedTerm": "Bucco macrodactylus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Bucco tamatia": {
+      "acceptedScientificName": "Bucco tamatia",
+      "matchedTerm": "Bucco tamatia",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Buceros vigil": {
+      "acceptedScientificName": "Rhinoplax vigil",
+      "matchedTerm": "Buceros vigil",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Buthraupis wetmorei": {
+      "acceptedScientificName": "Tephrophilus wetmorei",
+      "matchedTerm": "Buthraupis wetmorei",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Cacicus leucoramphus": {
+      "acceptedScientificName": "Cacicus chrysonotus leucoramphus",
+      "matchedTerm": "Cacicus leucoramphus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Cacomantis leucolophus": {
+      "acceptedScientificName": "Caliechthrus leucolophus",
+      "matchedTerm": "Cacomantis leucolophus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Cacomantis pallidus": {
+      "acceptedScientificName": "Heteroscenes pallidus",
+      "matchedTerm": "Cacomantis pallidus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Cacomantis sepulcralis": {
+      "acceptedScientificName": "Cacomantis sepulcralis",
+      "matchedTerm": "Cacomantis sepulcralis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Calendulauda alopex": {
+      "acceptedScientificName": "Calendulauda africanoides",
+      "matchedTerm": "Calendulauda alopex",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Calocitta colliei": {
+      "acceptedScientificName": "Cyanocorax colliei",
+      "matchedTerm": "Calocitta colliei",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Calocitta formosa": {
+      "acceptedScientificName": "Cyanocorax formosus",
+      "matchedTerm": "Calocitta formosa",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Calyptorhynchus baudinii": {
+      "acceptedScientificName": "Zanda baudinii",
+      "matchedTerm": "Calyptorhynchus baudinii",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Calyptorhynchus funereus": {
+      "acceptedScientificName": "Zanda funerea",
+      "matchedTerm": "Calyptorhynchus funereus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Calyptorhynchus latirostris": {
+      "acceptedScientificName": "Zanda latirostris",
+      "matchedTerm": "Calyptorhynchus latirostris",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Camaroptera brevicaudata": {
+      "acceptedScientificName": "Camaroptera brachyura",
+      "matchedTerm": "Camaroptera brevicaudata",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Campylopterus curvipennis": {
+      "acceptedScientificName": "Pampa curvipennis",
+      "matchedTerm": "Campylopterus curvipennis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Campylopterus excellens": {
+      "acceptedScientificName": "Pampa curvipennis excellens",
+      "matchedTerm": "Campylopterus excellens",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Campylopterus rufus": {
+      "acceptedScientificName": "Pampa rufa",
+      "matchedTerm": "Campylopterus rufus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Caprimulgus binotatus": {
+      "acceptedScientificName": "Veles binotatus",
+      "matchedTerm": "Caprimulgus binotatus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Caprimulgus nigriscapularis": {
+      "acceptedScientificName": "Caprimulgus pectoralis nigriscapularis",
+      "matchedTerm": "Caprimulgus nigriscapularis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Caracara cheriway": {
+      "acceptedScientificName": "Caracara plancus",
+      "matchedTerm": "Caracara cheriway",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Cecropis striolata": {
+      "acceptedScientificName": "Cecropis daurica",
+      "matchedTerm": "Cecropis striolata",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Celeus grammicus": {
+      "acceptedScientificName": "Celeus undatus",
+      "matchedTerm": "Celeus grammicus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Centronyx bairdii": {
+      "acceptedScientificName": "Centronyx bairdii",
+      "matchedTerm": "Centronyx bairdii",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Centronyx henslowii": {
+      "acceptedScientificName": "Centronyx henslowii",
+      "matchedTerm": "Centronyx henslowii",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Cercotrichas barbata": {
+      "acceptedScientificName": "Tychaedon barbata",
+      "matchedTerm": "Cercotrichas barbata",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Cercotrichas coryphoeus": {
+      "acceptedScientificName": "Tychaedon coryphoeus",
+      "matchedTerm": "Cercotrichas coryphoeus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Cercotrichas quadrivirgata": {
+      "acceptedScientificName": "Tychaedon quadrivirgata",
+      "matchedTerm": "Cercotrichas quadrivirgata",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Cercotrichas signata": {
+      "acceptedScientificName": "Tychaedon signata",
+      "matchedTerm": "Cercotrichas signata",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Chaetornis striata": {
+      "acceptedScientificName": "Schoenicola striatus",
+      "matchedTerm": "Chaetornis striata",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Charadrius morinellus": {
+      "acceptedScientificName": "Eudromias morinellus",
+      "matchedTerm": "Charadrius morinellus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Chlorocharis emiliae": {
+      "acceptedScientificName": "Zosterops emiliae",
+      "matchedTerm": "Chlorocharis emiliae",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Chlorophonia cyanocephala": {
+      "acceptedScientificName": "Chlorophonia cyanocephala",
+      "matchedTerm": "Chlorophonia cyanocephala",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Chlorophonia elegantissima": {
+      "acceptedScientificName": "Chlorophonia elegantissima",
+      "matchedTerm": "Chlorophonia elegantissima",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Chlorophonia musica": {
+      "acceptedScientificName": "Chlorophonia musica",
+      "matchedTerm": "Chlorophonia musica",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Chloropicus fuscescens": {
+      "acceptedScientificName": "Dendropicos fuscescens",
+      "matchedTerm": "Chloropicus fuscescens",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Chloropicus goertae": {
+      "acceptedScientificName": "Dendropicos goertae",
+      "matchedTerm": "Chloropicus goertae",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Chloropicus griseocephalus": {
+      "acceptedScientificName": "Dendropicos griseocephalus",
+      "matchedTerm": "Chloropicus griseocephalus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Chloropicus namaquus": {
+      "acceptedScientificName": "Chloropicus namaquus",
+      "matchedTerm": "Chloropicus namaquus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Chloropicus spodocephalus": {
+      "acceptedScientificName": "Dendropicos spodocephalus",
+      "matchedTerm": "Chloropicus spodocephalus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Chlorospingus flavovirens": {
+      "acceptedScientificName": "Bangsia flavovirens",
+      "matchedTerm": "Chlorospingus flavovirens",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Chlorostilbon canivetii": {
+      "acceptedScientificName": "Cynanthus canivetii",
+      "matchedTerm": "Chlorostilbon canivetii",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Chlorothraupis carmioli": {
+      "acceptedScientificName": "Chlorothraupis carmioli",
+      "matchedTerm": "Chlorothraupis carmioli",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Chlorothraupis frenata": {
+      "acceptedScientificName": "Chlorothraupis frenata",
+      "matchedTerm": "Chlorothraupis frenata",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Chlorothraupis olivacea": {
+      "acceptedScientificName": "Chlorothraupis olivacea",
+      "matchedTerm": "Chlorothraupis olivacea",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Chlorothraupis stolzmanni": {
+      "acceptedScientificName": "Chlorothraupis stolzmanni",
+      "matchedTerm": "Chlorothraupis stolzmanni",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Cholornis unicolor": {
+      "acceptedScientificName": "Paradoxornis unicolor",
+      "matchedTerm": "Cholornis unicolor",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Chroicocephalus brunnicephalus": {
+      "acceptedScientificName": "Chroicocephalus brunnicephalus",
+      "matchedTerm": "Chroicocephalus brunnicephalus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Chroicocephalus cirrocephalus": {
+      "acceptedScientificName": "Chroicocephalus cirrocephalus",
+      "matchedTerm": "Chroicocephalus cirrocephalus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Chroicocephalus genei": {
+      "acceptedScientificName": "Chroicocephalus genei",
+      "matchedTerm": "Chroicocephalus genei",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Chroicocephalus maculipennis": {
+      "acceptedScientificName": "Chroicocephalus maculipennis",
+      "matchedTerm": "Chroicocephalus maculipennis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Chroicocephalus novaehollandiae": {
+      "acceptedScientificName": "Chroicocephalus novaehollandiae",
+      "matchedTerm": "Chroicocephalus novaehollandiae",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Chroicocephalus philadelphia": {
+      "acceptedScientificName": "Chroicocephalus philadelphia",
+      "matchedTerm": "Chroicocephalus philadelphia",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Chroicocephalus ridibundus": {
+      "acceptedScientificName": "Chroicocephalus ridibundus",
+      "matchedTerm": "Chroicocephalus ridibundus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Chroicocephalus serranus": {
+      "acceptedScientificName": "Chroicocephalus serranus",
+      "matchedTerm": "Chroicocephalus serranus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Chrysococcyx basalis": {
+      "acceptedScientificName": "Chalcites basalis",
+      "matchedTerm": "Chrysococcyx basalis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Chrysococcyx lucidus": {
+      "acceptedScientificName": "Chalcites lucidus",
+      "matchedTerm": "Chrysococcyx lucidus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Chrysococcyx minutillus": {
+      "acceptedScientificName": "Chalcites minutillus",
+      "matchedTerm": "Chrysococcyx minutillus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Chrysococcyx osculans": {
+      "acceptedScientificName": "Chalcites osculans",
+      "matchedTerm": "Chrysococcyx osculans",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Cincloramphus mariei": {
+      "acceptedScientificName": "Cincloramphus mariae",
+      "matchedTerm": "Cincloramphus mariei",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Coccothraustes abeillei": {
+      "acceptedScientificName": "Hesperiphona abeillei",
+      "matchedTerm": "Coccothraustes abeillei",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Coccothraustes vespertinus": {
+      "acceptedScientificName": "Hesperiphona vespertina",
+      "matchedTerm": "Coccothraustes vespertinus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Colluricincla rufogaster": {
+      "acceptedScientificName": "Colluricincla megarhyncha",
+      "matchedTerm": "Colluricincla rufogaster",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Columba larvata": {
+      "acceptedScientificName": "Aplopelia larvata",
+      "matchedTerm": "Columba larvata",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Conostoma aemodium": {
+      "acceptedScientificName": "Paradoxornis aemodius",
+      "matchedTerm": "Conostoma aemodium",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Coracina caesia": {
+      "acceptedScientificName": "Ceblepyris caesius",
+      "matchedTerm": "Coracina caesia",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Coracina cinerea": {
+      "acceptedScientificName": "Ceblepyris cinereus",
+      "matchedTerm": "Coracina cinerea",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Coracina pectoralis": {
+      "acceptedScientificName": "Ceblepyris pectoralis",
+      "matchedTerm": "Coracina pectoralis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Corvinella corvina": {
+      "acceptedScientificName": "Corvinella corvina",
+      "matchedTerm": "Corvinella corvina",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Corvinella melanoleuca": {
+      "acceptedScientificName": "Urolestes melanoleucus",
+      "matchedTerm": "Corvinella melanoleuca",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Corvus culminatus": {
+      "acceptedScientificName": "Corvus macrorhynchos culminatus",
+      "matchedTerm": "Corvus macrorhynchos culminatus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Corythaixoides leucogaster": {
+      "acceptedScientificName": "Crinifer leucogaster",
+      "matchedTerm": "Corythaixoides leucogaster",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Cossypha anomala": {
+      "acceptedScientificName": "Dessonornis anomalus",
+      "matchedTerm": "Cossypha anomala",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Cossypha archeri": {
+      "acceptedScientificName": "Dessonornis archeri",
+      "matchedTerm": "Cossypha archeri",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Cossypha caffra": {
+      "acceptedScientificName": "Dessonornis caffer",
+      "matchedTerm": "Cossypha caffra",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Cossypha humeralis": {
+      "acceptedScientificName": "Dessonornis humeralis",
+      "matchedTerm": "Cossypha humeralis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Cossypha polioptera": {
+      "acceptedScientificName": "Sheppardia polioptera",
+      "matchedTerm": "Cossypha polioptera",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Cracticus quoyi": {
+      "acceptedScientificName": "Melloria quoyi",
+      "matchedTerm": "Cracticus quoyi",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Cranioleuca gutturata": {
+      "acceptedScientificName": "Thripophaga gutturata",
+      "matchedTerm": "Cranioleuca gutturata",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Crateroscelis murina": {
+      "acceptedScientificName": "Origma murina",
+      "matchedTerm": "Crateroscelis murina",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Crateroscelis robusta": {
+      "acceptedScientificName": "Origma robusta",
+      "matchedTerm": "Crateroscelis robusta",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Cyanocorax caeruleus": {
+      "acceptedScientificName": "Cyanocorax caeruleus",
+      "matchedTerm": "Cyanocorax caeruleus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Cyanocorax luxuosus": {
+      "acceptedScientificName": "Cyanocorax yncas",
+      "matchedTerm": "Cyanocorax luxuosus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Cyanoderma ambiguum": {
+      "acceptedScientificName": "Cyanoderma rufifrons",
+      "matchedTerm": "Cyanoderma ambiguum",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Cyanomitra veroxii": {
+      "acceptedScientificName": "Cyanomitra veroxii",
+      "matchedTerm": "Cyanomitra veroxii",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Cyornis hoevelli": {
+      "acceptedScientificName": "Eumyias hoevelli",
+      "matchedTerm": "Cyornis hoevelli",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Cyornis sanfordi": {
+      "acceptedScientificName": "Eumyias sanfordi",
+      "matchedTerm": "Cyornis sanfordi",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Dasylophus cumingi": {
+      "acceptedScientificName": "Dasylophus cumingi",
+      "matchedTerm": "Dasylophus cumingi",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Dendrocoptes auriceps": {
+      "acceptedScientificName": "Dendrocoptes auriceps",
+      "matchedTerm": "Dendrocoptes auriceps",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Dendrocoptes medius": {
+      "acceptedScientificName": "Dendrocoptes medius",
+      "matchedTerm": "Dendrocoptes medius",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Dendroperdix sephaena": {
+      "acceptedScientificName": "Ortygornis sephaena",
+      "matchedTerm": "Dendroperdix sephaena",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Dicrurus divaricatus": {
+      "acceptedScientificName": "Dicrurus adsimilis",
+      "matchedTerm": "Dicrurus divaricatus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Dinopium rafflesii": {
+      "acceptedScientificName": "Gecinulus rafflesii",
+      "matchedTerm": "Dinopium rafflesii",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Dixiphia pipra": {
+      "acceptedScientificName": "Pseudopipra pipra",
+      "matchedTerm": "Dixiphia pipra",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Dryobates affinis": {
+      "acceptedScientificName": "Veniliornis affinis",
+      "matchedTerm": "Dryobates affinis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Dryobates albolarvatus": {
+      "acceptedScientificName": "Leuconotopicus albolarvatus",
+      "matchedTerm": "Dryobates albolarvatus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Dryobates arizonae": {
+      "acceptedScientificName": "Leuconotopicus arizonae",
+      "matchedTerm": "Dryobates arizonae",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Dryobates borealis": {
+      "acceptedScientificName": "Leuconotopicus borealis",
+      "matchedTerm": "Dryobates borealis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Dryobates callonotus": {
+      "acceptedScientificName": "Veniliornis callonotus",
+      "matchedTerm": "Dryobates callonotus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Dryobates cassini": {
+      "acceptedScientificName": "Veniliornis cassini",
+      "matchedTerm": "Dryobates cassini",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Dryobates dignus": {
+      "acceptedScientificName": "Veniliornis dignus",
+      "matchedTerm": "Dryobates dignus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Dryobates frontalis": {
+      "acceptedScientificName": "Veniliornis frontalis",
+      "matchedTerm": "Dryobates frontalis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Dryobates fumigatus": {
+      "acceptedScientificName": "Leuconotopicus fumigatus",
+      "matchedTerm": "Dryobates fumigatus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Dryobates kirkii": {
+      "acceptedScientificName": "Veniliornis kirkii",
+      "matchedTerm": "Dryobates kirkii",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Dryobates lignarius": {
+      "acceptedScientificName": "Veniliornis lignarius",
+      "matchedTerm": "Dryobates lignarius",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Dryobates maculifrons": {
+      "acceptedScientificName": "Veniliornis maculifrons",
+      "matchedTerm": "Dryobates maculifrons",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Dryobates mixtus": {
+      "acceptedScientificName": "Veniliornis mixtus",
+      "matchedTerm": "Dryobates mixtus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Dryobates nigriceps": {
+      "acceptedScientificName": "Veniliornis nigriceps",
+      "matchedTerm": "Dryobates nigriceps",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Dryobates passerinus": {
+      "acceptedScientificName": "Veniliornis passerinus",
+      "matchedTerm": "Dryobates passerinus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Dryobates spilogaster": {
+      "acceptedScientificName": "Veniliornis spilogaster",
+      "matchedTerm": "Dryobates spilogaster",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Dryobates stricklandi": {
+      "acceptedScientificName": "Leuconotopicus stricklandi",
+      "matchedTerm": "Dryobates stricklandi",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Dryobates villosus": {
+      "acceptedScientificName": "Leuconotopicus villosus",
+      "matchedTerm": "Dryobates villosus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Dryocopus lineatus": {
+      "acceptedScientificName": "Dryocopus lineatus",
+      "matchedTerm": "Dryocopus lineatus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Dryocopus pileatus": {
+      "acceptedScientificName": "Dryocopus pileatus",
+      "matchedTerm": "Dryocopus pileatus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Dryocopus schulzii": {
+      "acceptedScientificName": "Dryocopus schulzii",
+      "matchedTerm": "Dryocopus schulzii",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Elaenia chilensis": {
+      "acceptedScientificName": "Elaenia albiceps chilensis",
+      "matchedTerm": "Elaenia chilensis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Eupodotis afra": {
+      "acceptedScientificName": "Afrotis afra",
+      "matchedTerm": "Eupodotis afra",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Eupodotis afraoides": {
+      "acceptedScientificName": "Afrotis afraoides",
+      "matchedTerm": "Eupodotis afraoides",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Eupodotis ruficrista": {
+      "acceptedScientificName": "Lophotis ruficrista",
+      "matchedTerm": "Eupodotis ruficrista",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Eupodotis vigorsii": {
+      "acceptedScientificName": "Heterotetrax vigorsii",
+      "matchedTerm": "Eupodotis vigorsii",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Falcipennis canadensis": {
+      "acceptedScientificName": "Canachites canadensis",
+      "matchedTerm": "Falcipennis canadensis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Francolinus gularis": {
+      "acceptedScientificName": "Ortygornis gularis",
+      "matchedTerm": "Francolinus gularis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Francolinus pondicerianus": {
+      "acceptedScientificName": "Ortygornis pondicerianus",
+      "matchedTerm": "Francolinus pondicerianus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Gallirallus okinawae": {
+      "acceptedScientificName": "Gallirallus okinawae",
+      "matchedTerm": "Gallirallus okinawae",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Gallirallus philippensis": {
+      "acceptedScientificName": "Gallirallus philippensis",
+      "matchedTerm": "Gallirallus philippensis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Gallirallus torquatus": {
+      "acceptedScientificName": "Gallirallus torquatus",
+      "matchedTerm": "Gallirallus torquatus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Garrulax calvus": {
+      "acceptedScientificName": "Melanocichla calva",
+      "matchedTerm": "Garrulax calvus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Garrulax lugubris": {
+      "acceptedScientificName": "Melanocichla lugubris",
+      "matchedTerm": "Garrulax lugubris",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Garrulax perspicillatus": {
+      "acceptedScientificName": "Pterorhinus perspicillatus",
+      "matchedTerm": "Garrulax perspicillatus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Glaucestrilda caerulescens": {
+      "acceptedScientificName": "Glaucestrilda caerulescens",
+      "matchedTerm": "Glaucestrilda caerulescens",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Glaucidium californicum": {
+      "acceptedScientificName": "Glaucidium gnoma",
+      "matchedTerm": "Glaucidium californicum",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Glaucidium hoskinsii": {
+      "acceptedScientificName": "Glaucidium gnoma hoskinsii",
+      "matchedTerm": "Glaucidium gnoma hoskinsii",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Grallaria urraoensis": {
+      "acceptedScientificName": "Grallaria urraoensis",
+      "matchedTerm": "Grallaria urraoensis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Gypsophila rufipectus": {
+      "acceptedScientificName": "Gypsophila rufipectus",
+      "matchedTerm": "Gypsophila rufipectus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Haliaeetus humilis": {
+      "acceptedScientificName": "Icthyophaga humilis",
+      "matchedTerm": "Haliaeetus humilis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Haliaeetus ichthyaetus": {
+      "acceptedScientificName": "Icthyophaga ichthyaetus",
+      "matchedTerm": "Haliaeetus ichthyaetus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Hapalocrex flaviventer": {
+      "acceptedScientificName": "Laterallus flaviventer",
+      "matchedTerm": "Hapalocrex flaviventer",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Hemispingus piurae": {
+      "acceptedScientificName": "Sphenopsis melanotis",
+      "matchedTerm": "Hemispingus piurae",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Horornis vulcanius": {
+      "acceptedScientificName": "Horornis flavolivaceus",
+      "matchedTerm": "Horornis vulcanius",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Hylocharis cyanus": {
+      "acceptedScientificName": "Chlorestes cyanus",
+      "matchedTerm": "Hylocharis cyanus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Hylocharis eliciae": {
+      "acceptedScientificName": "Chlorestes eliciae",
+      "matchedTerm": "Hylocharis eliciae",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Hylocharis leucotis": {
+      "acceptedScientificName": "Basilinna leucotis",
+      "matchedTerm": "Hylocharis leucotis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Hylocharis xantusii": {
+      "acceptedScientificName": "Basilinna xantusii",
+      "matchedTerm": "Hylocharis xantusii",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Hylopezus berlepschi": {
+      "acceptedScientificName": "Myrmothera berlepschi",
+      "matchedTerm": "Hylopezus berlepschi",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Hylopezus dives": {
+      "acceptedScientificName": "Myrmothera dives",
+      "matchedTerm": "Hylopezus dives",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Hylopezus fulviventris": {
+      "acceptedScientificName": "Myrmothera fulviventris",
+      "matchedTerm": "Hylopezus fulviventris",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Hylopezus nattereri": {
+      "acceptedScientificName": "Cryptopezus nattereri",
+      "matchedTerm": "Hylopezus nattereri",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Ianthocincla albogularis": {
+      "acceptedScientificName": "Pterorhinus albogularis",
+      "matchedTerm": "Ianthocincla albogularis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Ianthocincla caerulata": {
+      "acceptedScientificName": "Pterorhinus caerulatus",
+      "matchedTerm": "Ianthocincla caerulata",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Ianthocincla chinensis": {
+      "acceptedScientificName": "Pterorhinus chinensis",
+      "matchedTerm": "Ianthocincla chinensis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Ianthocincla davidi": {
+      "acceptedScientificName": "Pterorhinus davidi",
+      "matchedTerm": "Ianthocincla davidi",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Ianthocincla delesserti": {
+      "acceptedScientificName": "Pterorhinus delesserti",
+      "matchedTerm": "Ianthocincla delesserti",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Ianthocincla nuchalis": {
+      "acceptedScientificName": "Pterorhinus nuchalis",
+      "matchedTerm": "Ianthocincla nuchalis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Ianthocincla pectoralis": {
+      "acceptedScientificName": "Pterorhinus pectoralis",
+      "matchedTerm": "Ianthocincla pectoralis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Ianthocincla poecilorhyncha": {
+      "acceptedScientificName": "Pterorhinus poecilorhynchus",
+      "matchedTerm": "Ianthocincla poecilorhyncha",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Ianthocincla ruficollis": {
+      "acceptedScientificName": "Pterorhinus ruficollis",
+      "matchedTerm": "Ianthocincla ruficollis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Ianthocincla sannio": {
+      "acceptedScientificName": "Pterorhinus sannio",
+      "matchedTerm": "Ianthocincla sannio",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Ianthocincla treacheri": {
+      "acceptedScientificName": "Pterorhinus treacheri",
+      "matchedTerm": "Ianthocincla treacheri",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Ichthyaetus audouinii": {
+      "acceptedScientificName": "Ichthyaetus audouinii",
+      "matchedTerm": "Ichthyaetus audouinii",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Ichthyaetus ichthyaetus": {
+      "acceptedScientificName": "Ichthyaetus ichthyaetus",
+      "matchedTerm": "Ichthyaetus ichthyaetus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Ichthyaetus melanocephalus": {
+      "acceptedScientificName": "Ichthyaetus melanocephalus",
+      "matchedTerm": "Ichthyaetus melanocephalus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Icterus bullockii": {
+      "acceptedScientificName": "Icterus bullockii",
+      "matchedTerm": "Icterus bullockii",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Idiopsar speculifer": {
+      "acceptedScientificName": "Idiopsar speculifer",
+      "matchedTerm": "Idiopsar speculifer",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Iole indica": {
+      "acceptedScientificName": "Acritillas indica",
+      "matchedTerm": "Iole indica",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Ixothraupis guttata": {
+      "acceptedScientificName": "Ixothraupis guttata",
+      "matchedTerm": "Ixothraupis guttata",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Ixothraupis punctata": {
+      "acceptedScientificName": "Ixothraupis punctata",
+      "matchedTerm": "Ixothraupis punctata",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Ixothraupis rufigula": {
+      "acceptedScientificName": "Ixothraupis rufigula",
+      "matchedTerm": "Ixothraupis rufigula",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Ixothraupis varia": {
+      "acceptedScientificName": "Ixothraupis varia",
+      "matchedTerm": "Ixothraupis varia",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Juliamyia julie": {
+      "acceptedScientificName": "Chlorestes julie",
+      "matchedTerm": "Juliamyia julie",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Ketupa blakistoni": {
+      "acceptedScientificName": "Ketupa blakistoni",
+      "matchedTerm": "Ketupa blakistoni",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Lepidocolaptes layardi": {
+      "acceptedScientificName": "Lepidocolaptes fuscicapillus layardi",
+      "matchedTerm": "Lepidocolaptes layardi",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Lepidopyga coeruleogularis": {
+      "acceptedScientificName": "Chrysuronia coeruleogularis",
+      "matchedTerm": "Lepidopyga coeruleogularis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Leucippus baeri": {
+      "acceptedScientificName": "Thaumasius baeri",
+      "matchedTerm": "Leucippus baeri",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Leucippus chlorocercus": {
+      "acceptedScientificName": "Talaphorus chlorocercus",
+      "matchedTerm": "Leucippus chlorocercus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Leucophaeus atricilla": {
+      "acceptedScientificName": "Leucophaeus atricilla",
+      "matchedTerm": "Leucophaeus atricilla",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Leucophaeus modestus": {
+      "acceptedScientificName": "Leucophaeus modestus",
+      "matchedTerm": "Leucophaeus modestus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Leucophaeus pipixcan": {
+      "acceptedScientificName": "Leucophaeus pipixcan",
+      "matchedTerm": "Leucophaeus pipixcan",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Leucophaeus scoresbii": {
+      "acceptedScientificName": "Leucophaeus scoresbii",
+      "matchedTerm": "Leucophaeus scoresbii",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Lichmera limbata": {
+      "acceptedScientificName": "Lichmera indistincta limbata",
+      "matchedTerm": "Lichmera limbata",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Lithobates catesbeianus": {
+      "acceptedScientificName": "Lithobates catesbeianus",
+      "matchedTerm": "Lithobates catesbeianus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Lithobates clamitans": {
+      "acceptedScientificName": "Lithobates clamitans",
+      "matchedTerm": "Lithobates clamitans",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Locustella amnicola": {
+      "acceptedScientificName": "Helopsaltes amnicola",
+      "matchedTerm": "Locustella amnicola",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Locustella certhiola": {
+      "acceptedScientificName": "Helopsaltes certhiola",
+      "matchedTerm": "Locustella certhiola",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Locustella fasciolata": {
+      "acceptedScientificName": "Helopsaltes fasciolatus",
+      "matchedTerm": "Locustella fasciolata",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Locustella ochotensis": {
+      "acceptedScientificName": "Helopsaltes ochotensis",
+      "matchedTerm": "Locustella ochotensis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Locustella pleskei": {
+      "acceptedScientificName": "Helopsaltes pleskei",
+      "matchedTerm": "Locustella pleskei",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Locustella pryeri": {
+      "acceptedScientificName": "Helopsaltes pryeri",
+      "matchedTerm": "Locustella pryeri",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Lophochroa leadbeateri": {
+      "acceptedScientificName": "Cacatua leadbeateri",
+      "matchedTerm": "Lophochroa leadbeateri",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Loriotus cristatus": {
+      "acceptedScientificName": "Loriotus cristatus",
+      "matchedTerm": "Loriotus cristatus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Loriotus luctuosus": {
+      "acceptedScientificName": "Loriotus luctuosus",
+      "matchedTerm": "Loriotus luctuosus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Loxops mana": {
+      "acceptedScientificName": "Loxops mana",
+      "matchedTerm": "Loxops mana",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Lybius bidentatus": {
+      "acceptedScientificName": "Pogonornis bidentatus",
+      "matchedTerm": "Lybius bidentatus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Megapomatorhinus erythrocnemis": {
+      "acceptedScientificName": "Erythrogenys erythrocnemis",
+      "matchedTerm": "Megapomatorhinus erythrocnemis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Megapomatorhinus erythrogenys": {
+      "acceptedScientificName": "Erythrogenys erythrogenys",
+      "matchedTerm": "Megapomatorhinus erythrogenys",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Megapomatorhinus gravivox": {
+      "acceptedScientificName": "Erythrogenys gravivox",
+      "matchedTerm": "Megapomatorhinus gravivox",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Megapomatorhinus hypoleucos": {
+      "acceptedScientificName": "Erythrogenys hypoleucos",
+      "matchedTerm": "Megapomatorhinus hypoleucos",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Megapomatorhinus mcclellandi": {
+      "acceptedScientificName": "Erythrogenys mcclellandi",
+      "matchedTerm": "Megapomatorhinus mcclellandi",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Megapomatorhinus swinhoei": {
+      "acceptedScientificName": "Erythrogenys swinhoei",
+      "matchedTerm": "Megapomatorhinus swinhoei",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Megascops nudipes": {
+      "acceptedScientificName": "Gymnasio nudipes",
+      "matchedTerm": "Megascops nudipes",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Melaenornis silens": {
+      "acceptedScientificName": "Sigelus silens",
+      "matchedTerm": "Melaenornis silens",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Melanerpes santacruzi": {
+      "acceptedScientificName": "Melanerpes aurifrons santacruzi",
+      "matchedTerm": "Melanerpes aurifrons santacruzi",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Meliphaga gracilis": {
+      "acceptedScientificName": "Meliphaga gracilis",
+      "matchedTerm": "Meliphaga gracilis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Milvago chimango": {
+      "acceptedScientificName": "Daptrius chimango",
+      "matchedTerm": "Milvago chimango",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Minla annectens": {
+      "acceptedScientificName": "Leioptila annectens",
+      "matchedTerm": "Minla annectens",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Mirafra cantillans": {
+      "acceptedScientificName": "Mirafra javanica",
+      "matchedTerm": "Mirafra cantillans",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Montifringilla blanfordi": {
+      "acceptedScientificName": "Pyrgilauda blanfordi",
+      "matchedTerm": "Montifringilla blanfordi",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Montifringilla taczanowskii": {
+      "acceptedScientificName": "Onychostruthus taczanowskii",
+      "matchedTerm": "Montifringilla taczanowskii",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Muscicapa tyrrhenica": {
+      "acceptedScientificName": "Muscicapa striata",
+      "matchedTerm": "Muscicapa tyrrhenica",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Mustelirallus albicollis": {
+      "acceptedScientificName": "Mustelirallus albicollis",
+      "matchedTerm": "Mustelirallus albicollis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Mustelirallus erythrops": {
+      "acceptedScientificName": "Mustelirallus erythrops",
+      "matchedTerm": "Mustelirallus erythrops",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Myrmecocichla collaris": {
+      "acceptedScientificName": "Myrmecocichla arnotti collaris",
+      "matchedTerm": "Myrmecocichla collaris",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Nengetus cinereus": {
+      "acceptedScientificName": "Nengetus cinereus",
+      "matchedTerm": "Nengetus cinereus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Neocossyphus finschi": {
+      "acceptedScientificName": "Stizorhina finschi",
+      "matchedTerm": "Neocossyphus finschi",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Neocossyphus fraseri": {
+      "acceptedScientificName": "Stizorhina fraseri",
+      "matchedTerm": "Neocossyphus fraseri",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Ninox jacquinoti": {
+      "acceptedScientificName": "Athene jacquinoti",
+      "matchedTerm": "Ninox jacquinoti",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Nyctibius bracteatus": {
+      "acceptedScientificName": "Phyllaemulor bracteatus",
+      "matchedTerm": "Nyctibius bracteatus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Nystalus striatipectus": {
+      "acceptedScientificName": "Nystalus maculatus striatipectus",
+      "matchedTerm": "Nystalus striatipectus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Oceanodroma castro": {
+      "acceptedScientificName": "Hydrobates castro",
+      "matchedTerm": "Oceanodroma castro",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Oceanodroma leucorhoa": {
+      "acceptedScientificName": "Hydrobates leucorhous",
+      "matchedTerm": "Oceanodroma leucorhoa",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Ochthoeca diadema": {
+      "acceptedScientificName": "Silvicultrix diadema",
+      "matchedTerm": "Ochthoeca diadema",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Ochthoeca frontalis": {
+      "acceptedScientificName": "Silvicultrix frontalis",
+      "matchedTerm": "Ochthoeca frontalis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Ochthoeca jelskii": {
+      "acceptedScientificName": "Silvicultrix jelskii",
+      "matchedTerm": "Ochthoeca jelskii",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Ochthoeca pulchella": {
+      "acceptedScientificName": "Silvicultrix pulchella",
+      "matchedTerm": "Ochthoeca pulchella",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Oressochen jubatus": {
+      "acceptedScientificName": "Oressochen jubatus",
+      "matchedTerm": "Oressochen jubatus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Oressochen melanopterus": {
+      "acceptedScientificName": "Oressochen melanopterus",
+      "matchedTerm": "Oressochen melanopterus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Otus madagascariensis": {
+      "acceptedScientificName": "Otus rutilus madagascariensis",
+      "matchedTerm": "Otus madagascariensis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Pachycephala fuliginosa": {
+      "acceptedScientificName": "Pachycephala pectoralis fuliginosa",
+      "matchedTerm": "Pachycephala fuliginosa fuliginosa",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Pachycephala occidentalis": {
+      "acceptedScientificName": "Pachycephala pectoralis occidentalis",
+      "matchedTerm": "Pachycephala pectoralis occidentalis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Pachyphantes superciliosus": {
+      "acceptedScientificName": "Pachyphantes superciliosus",
+      "matchedTerm": "Pachyphantes superciliosus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Parophasma galinieri": {
+      "acceptedScientificName": "Sylvia galinieri",
+      "matchedTerm": "Parophasma galinieri",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Parvipsitta porphyrocephala": {
+      "acceptedScientificName": "Psitteuteles porphyrocephalus",
+      "matchedTerm": "Parvipsitta porphyrocephala",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Parvipsitta pusilla": {
+      "acceptedScientificName": "Psitteuteles pusillus",
+      "matchedTerm": "Parvipsitta pusilla",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Peliperdix coqui": {
+      "acceptedScientificName": "Campocolinus coqui",
+      "matchedTerm": "Peliperdix coqui",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Periparus amabilis": {
+      "acceptedScientificName": "Periparus amabilis",
+      "matchedTerm": "Periparus amabilis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Periparus elegans": {
+      "acceptedScientificName": "Periparus elegans",
+      "matchedTerm": "Periparus elegans",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Periparus venustulus": {
+      "acceptedScientificName": "Periparus venustulus",
+      "matchedTerm": "Periparus venustulus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Periporphyrus erythromelas": {
+      "acceptedScientificName": "Periporphyrus erythromelas",
+      "matchedTerm": "Periporphyrus erythromelas",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Phalacrocorax auritus": {
+      "acceptedScientificName": "Nannopterum auritum",
+      "matchedTerm": "Phalacrocorax auritus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Phalacrocorax brasilianus": {
+      "acceptedScientificName": "Nannopterum brasilianum",
+      "matchedTerm": "Phalacrocorax brasilianus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Phalaropus tricolor": {
+      "acceptedScientificName": "Phalaropus tricolor",
+      "matchedTerm": "Phalaropus tricolor",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Philemon novaeguineae": {
+      "acceptedScientificName": "Philemon buceroides novaeguineae",
+      "matchedTerm": "Philemon novaeguineae",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Philemon yorki": {
+      "acceptedScientificName": "Philemon buceroides yorki",
+      "matchedTerm": "Philemon buceroides yorki",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Philydor erythropterum": {
+      "acceptedScientificName": "Dendroma erythroptera",
+      "matchedTerm": "Philydor erythropterum",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Philydor rufum": {
+      "acceptedScientificName": "Dendroma rufa",
+      "matchedTerm": "Philydor rufum",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Phyllastrephus placidus": {
+      "acceptedScientificName": "Phyllastrephus cabanisi",
+      "matchedTerm": "Phyllastrephus placidus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Phylloscartes eximius": {
+      "acceptedScientificName": "Pogonotriccus eximius",
+      "matchedTerm": "Phylloscartes eximius",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Phylloscartes lanyoni": {
+      "acceptedScientificName": "Pogonotriccus lanyoni",
+      "matchedTerm": "Phylloscartes lanyoni",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Phylloscartes ophthalmicus": {
+      "acceptedScientificName": "Pogonotriccus ophthalmicus",
+      "matchedTerm": "Phylloscartes ophthalmicus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Phylloscartes poecilotis": {
+      "acceptedScientificName": "Pogonotriccus poecilotis",
+      "matchedTerm": "Phylloscartes poecilotis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Phylloscopus occisinensis": {
+      "acceptedScientificName": "Phylloscopus affinis occisinensis",
+      "matchedTerm": "Phylloscopus occisinensis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Pica nuttalli": {
+      "acceptedScientificName": "Pica nuttalli",
+      "matchedTerm": "Pica nuttalli",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Picumnus fulvescens": {
+      "acceptedScientificName": "Picumnus limae",
+      "matchedTerm": "Picumnus fulvescens",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Piranga lutea": {
+      "acceptedScientificName": "Piranga flava",
+      "matchedTerm": "Piranga lutea",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Pitangus lictor": {
+      "acceptedScientificName": "Philohydor lictor",
+      "matchedTerm": "Pitangus lictor",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Platysteira blissetti": {
+      "acceptedScientificName": "Platysteira blissetti",
+      "matchedTerm": "Platysteira blissetti",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Platysteira castanea": {
+      "acceptedScientificName": "Dyaphorophyia castanea",
+      "matchedTerm": "Platysteira castanea",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Platysteira hormophora": {
+      "acceptedScientificName": "Dyaphorophyia hormophora",
+      "matchedTerm": "Platysteira hormophora",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Poecilostreptus cabanisi": {
+      "acceptedScientificName": "Poecilostreptus cabanisi",
+      "matchedTerm": "Poecilostreptus cabanisi",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Poecilostreptus palmeri": {
+      "acceptedScientificName": "Poecilostreptus palmeri",
+      "matchedTerm": "Poecilostreptus palmeri",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Poliolimnas cinereus": {
+      "acceptedScientificName": "Poliolimnas cinereus",
+      "matchedTerm": "Poliolimnas cinereus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Porphyrio martinica": {
+      "acceptedScientificName": "Porphyrio martinica",
+      "matchedTerm": "Porphyrio martinica",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Porphyrospiza alaudina": {
+      "acceptedScientificName": "Rhopospina alaudina",
+      "matchedTerm": "Porphyrospiza alaudina",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Porzana spiloptera": {
+      "acceptedScientificName": "Laterallus spiloptera",
+      "matchedTerm": "Porzana spiloptera",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Prinia melanops": {
+      "acceptedScientificName": "Prinia bairdii",
+      "matchedTerm": "Prinia melanops",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Priotelus roseigaster": {
+      "acceptedScientificName": "Priotelus roseigaster",
+      "matchedTerm": "Priotelus roseigaster",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Psephotus varius": {
+      "acceptedScientificName": "Psephotellus varius",
+      "matchedTerm": "Psephotus varius",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Pseudeos cardinalis": {
+      "acceptedScientificName": "Chalcopsitta cardinalis",
+      "matchedTerm": "Pseudeos cardinalis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Pseudocolaptes boissonneautii": {
+      "acceptedScientificName": "Pseudocolaptes boissonneautii",
+      "matchedTerm": "Pseudocolaptes boissonneautii",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Psilorhinus morio": {
+      "acceptedScientificName": "Cyanocorax morio",
+      "matchedTerm": "Psilorhinus morio",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Psittacula calthrapae": {
+      "acceptedScientificName": "Psittacula calthrapae",
+      "matchedTerm": "Psittacula calthrapae",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Psittacula eques": {
+      "acceptedScientificName": "Psittacula eques",
+      "matchedTerm": "Psittacula eques",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Psittacula eupatria": {
+      "acceptedScientificName": "Psittacula eupatria",
+      "matchedTerm": "Psittacula eupatria",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Psittacula finschii": {
+      "acceptedScientificName": "Psittacula finschii",
+      "matchedTerm": "Psittacula finschii",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Psittacula krameri": {
+      "acceptedScientificName": "Psittacula krameri",
+      "matchedTerm": "Psittacula krameri",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Psittacula longicauda": {
+      "acceptedScientificName": "Psittacula longicauda",
+      "matchedTerm": "Psittacula longicauda",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Psittiparus gularis": {
+      "acceptedScientificName": "Paradoxornis gularis",
+      "matchedTerm": "Psittiparus gularis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Pteroglossus beauharnaesii": {
+      "acceptedScientificName": "Pteroglossus beauharnaisii",
+      "matchedTerm": "Pteroglossus beauharnaesii",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Pteruthius ripleyi": {
+      "acceptedScientificName": "Pteruthius aeralatus ripleyi",
+      "matchedTerm": "Pteruthius ripleyi",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Ptilinopus magnificus": {
+      "acceptedScientificName": "Megaloprepia magnifica",
+      "matchedTerm": "Ptilinopus magnificus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Ptilinopus occipitalis": {
+      "acceptedScientificName": "Ramphiculus occipitalis",
+      "matchedTerm": "Ptilinopus occipitalis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Ptiloris magnificus": {
+      "acceptedScientificName": "Ptiloris magnificus",
+      "matchedTerm": "Ptiloris magnificus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Ptiloris paradiseus": {
+      "acceptedScientificName": "Ptiloris paradiseus",
+      "matchedTerm": "Ptiloris paradiseus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Ptiloris victoriae": {
+      "acceptedScientificName": "Ptiloris victoriae",
+      "matchedTerm": "Ptiloris victoriae",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Pycnonotus striatus": {
+      "acceptedScientificName": "Alcurus striatus",
+      "matchedTerm": "Pycnonotus striatus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Pycnonotus tricolor": {
+      "acceptedScientificName": "Pycnonotus barbatus tricolor",
+      "matchedTerm": "Pycnonotus tricolor",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Pyrocephalus obscurus": {
+      "acceptedScientificName": "Pyrocephalus rubinus",
+      "matchedTerm": "Pyrocephalus obscurus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Pyrope pyrope": {
+      "acceptedScientificName": "Pyrope pyrope",
+      "matchedTerm": "Pyrope pyrope",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Ramphocelus icteronotus": {
+      "acceptedScientificName": "Ramphocelus flammigerus icteronotus",
+      "matchedTerm": "Ramphocelus icteronotus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Ramphotrigon flammulatum": {
+      "acceptedScientificName": "Ramphotrigon flammulatum",
+      "matchedTerm": "Ramphotrigon flammulatum",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Rauenia bonariensis": {
+      "acceptedScientificName": "Rauenia bonariensis",
+      "matchedTerm": "Rauenia bonariensis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Regulus calendula": {
+      "acceptedScientificName": "Corthylio calendula",
+      "matchedTerm": "Regulus calendula",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Reinwardtipicus validus": {
+      "acceptedScientificName": "Chrysocolaptes validus",
+      "matchedTerm": "Reinwardtipicus validus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Rhodothraupis celaeno": {
+      "acceptedScientificName": "Periporphyrus celaeno",
+      "matchedTerm": "Rhodothraupis celaeno",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Rhopocichla atriceps": {
+      "acceptedScientificName": "Dumetia atriceps",
+      "matchedTerm": "Rhopocichla atriceps",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Rhopospina alaudina": {
+      "acceptedScientificName": "Rhopospina alaudina",
+      "matchedTerm": "Rhopospina alaudina",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Rhopospina caerulescens": {
+      "acceptedScientificName": "Rhopospina caerulescens",
+      "matchedTerm": "Rhopospina caerulescens",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Saltatricula atricollis": {
+      "acceptedScientificName": "Saltatricula atricollis",
+      "matchedTerm": "Saltatricula atricollis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Saltatricula multicolor": {
+      "acceptedScientificName": "Saltatricula multicolor",
+      "matchedTerm": "Saltatricula multicolor",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Schoenicola brevirostris": {
+      "acceptedScientificName": "Catriscus brevirostris",
+      "matchedTerm": "Schoenicola brevirostris",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Sericornis citreogularis": {
+      "acceptedScientificName": "Neosericornis citreogularis",
+      "matchedTerm": "Sericornis citreogularis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Sericornis papuensis": {
+      "acceptedScientificName": "Aethomyias papuensis",
+      "matchedTerm": "Sericornis papuensis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Serpophaga munda": {
+      "acceptedScientificName": "Serpophaga subcristata munda",
+      "matchedTerm": "Serpophaga munda",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Sicalis uropygialis": {
+      "acceptedScientificName": "Sicalis uropygialis",
+      "matchedTerm": "Sicalis uropygialis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Sinosuthora webbiana": {
+      "acceptedScientificName": "Suthora webbiana",
+      "matchedTerm": "Sinosuthora webbiana",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Spizelloides arborea": {
+      "acceptedScientificName": "Spizelloides arborea",
+      "matchedTerm": "Spizelloides arborea",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Sporaeginthus subflavus": {
+      "acceptedScientificName": "Amandava subflava",
+      "matchedTerm": "Sporaeginthus subflavus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Stactolaema olivacea": {
+      "acceptedScientificName": "Cryptolybia olivacea",
+      "matchedTerm": "Stactolaema olivacea",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Stercorarius antarcticus": {
+      "acceptedScientificName": "Stercorarius antarcticus",
+      "matchedTerm": "Stercorarius antarcticus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Stercorarius maccormicki": {
+      "acceptedScientificName": "Stercorarius maccormicki",
+      "matchedTerm": "Stercorarius maccormicki",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Stercorarius skua": {
+      "acceptedScientificName": "Stercorarius skua",
+      "matchedTerm": "Stercorarius skua",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Stilpnia cayana": {
+      "acceptedScientificName": "Stilpnia cayana",
+      "matchedTerm": "Stilpnia cayana",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Stilpnia cyanicollis": {
+      "acceptedScientificName": "Stilpnia cyanicollis",
+      "matchedTerm": "Stilpnia cyanicollis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Stilpnia heinei": {
+      "acceptedScientificName": "Stilpnia heinei",
+      "matchedTerm": "Stilpnia heinei",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Stilpnia larvata": {
+      "acceptedScientificName": "Stilpnia larvata",
+      "matchedTerm": "Stilpnia larvata",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Stilpnia nigrocincta": {
+      "acceptedScientificName": "Stilpnia nigrocincta",
+      "matchedTerm": "Stilpnia nigrocincta",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Stilpnia peruviana": {
+      "acceptedScientificName": "Stilpnia peruviana",
+      "matchedTerm": "Stilpnia peruviana",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Stilpnia preciosa": {
+      "acceptedScientificName": "Stilpnia preciosa",
+      "matchedTerm": "Stilpnia preciosa",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Stilpnia vitriolina": {
+      "acceptedScientificName": "Stilpnia vitriolina",
+      "matchedTerm": "Stilpnia vitriolina",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Stizoptera bichenovii": {
+      "acceptedScientificName": "Stizoptera bichenovii",
+      "matchedTerm": "Stizoptera bichenovii",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Streptopelia chinensis": {
+      "acceptedScientificName": "Spilopelia chinensis",
+      "matchedTerm": "Streptopelia chinensis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Streptopelia picturata": {
+      "acceptedScientificName": "Nesoenas picturatus",
+      "matchedTerm": "Streptopelia picturata",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Streptopelia senegalensis": {
+      "acceptedScientificName": "Spilopelia senegalensis",
+      "matchedTerm": "Streptopelia senegalensis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Stymphalornis acutirostris": {
+      "acceptedScientificName": "Formicivora acutirostris",
+      "matchedTerm": "Stymphalornis acutirostris",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Suiriri affinis": {
+      "acceptedScientificName": "Guyramemua affine",
+      "matchedTerm": "Suiriri affinis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Sylvia althaea": {
+      "acceptedScientificName": "Curruca curruca althaea",
+      "matchedTerm": "Sylvia althaea",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Sylvia balearica": {
+      "acceptedScientificName": "Curruca balearica",
+      "matchedTerm": "Sylvia balearica",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Sylvia boehmi": {
+      "acceptedScientificName": "Curruca boehmi",
+      "matchedTerm": "Sylvia boehmi",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Sylvia communis": {
+      "acceptedScientificName": "Curruca communis",
+      "matchedTerm": "Sylvia communis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Sylvia conspicillata": {
+      "acceptedScientificName": "Curruca conspicillata",
+      "matchedTerm": "Sylvia conspicillata",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Sylvia crassirostris": {
+      "acceptedScientificName": "Curruca crassirostris",
+      "matchedTerm": "Sylvia crassirostris",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Sylvia curruca": {
+      "acceptedScientificName": "Curruca curruca",
+      "matchedTerm": "Sylvia curruca",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Sylvia deserticola": {
+      "acceptedScientificName": "Curruca deserticola",
+      "matchedTerm": "Sylvia deserticola",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Sylvia hortensis": {
+      "acceptedScientificName": "Curruca hortensis",
+      "matchedTerm": "Sylvia hortensis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Sylvia layardi": {
+      "acceptedScientificName": "Curruca layardi",
+      "matchedTerm": "Sylvia layardi",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Sylvia leucomelaena": {
+      "acceptedScientificName": "Curruca leucomelaena",
+      "matchedTerm": "Sylvia leucomelaena",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Sylvia melanocephala": {
+      "acceptedScientificName": "Curruca melanocephala",
+      "matchedTerm": "Sylvia melanocephala",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Sylvia melanothorax": {
+      "acceptedScientificName": "Curruca melanothorax",
+      "matchedTerm": "Sylvia melanothorax",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Sylvia mystacea": {
+      "acceptedScientificName": "Curruca mystacea",
+      "matchedTerm": "Sylvia mystacea",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Sylvia nana": {
+      "acceptedScientificName": "Curruca nana",
+      "matchedTerm": "Sylvia nana",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Sylvia nisoria": {
+      "acceptedScientificName": "Curruca nisoria",
+      "matchedTerm": "Sylvia nisoria",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Sylvia ruppeli": {
+      "acceptedScientificName": "Curruca ruppeli",
+      "matchedTerm": "Sylvia ruppeli",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Sylvia sarda": {
+      "acceptedScientificName": "Curruca sarda",
+      "matchedTerm": "Sylvia sarda",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Sylvia subalpina": {
+      "acceptedScientificName": "Curruca subalpina",
+      "matchedTerm": "Sylvia subalpina",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Sylvia subcoerulea": {
+      "acceptedScientificName": "Curruca subcoerulea",
+      "matchedTerm": "Sylvia subcoerulea",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Sylvia undata": {
+      "acceptedScientificName": "Curruca undata",
+      "matchedTerm": "Sylvia undata",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Sylviorthorhynchus desmursii": {
+      "acceptedScientificName": "Sylviorthorhynchus desmursii",
+      "matchedTerm": "Sylviorthorhynchus desmursii",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Tachycineta leucopyga": {
+      "acceptedScientificName": "Tachycineta leucopyga",
+      "matchedTerm": "Tachycineta leucopyga",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Tachyphonus cristatus": {
+      "acceptedScientificName": "Loriotus cristatus",
+      "matchedTerm": "Tachyphonus cristatus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Tachyphonus delatrii": {
+      "acceptedScientificName": "Tachyphonus delatrii",
+      "matchedTerm": "Tachyphonus delatrii",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Tachyphonus luctuosus": {
+      "acceptedScientificName": "Loriotus luctuosus",
+      "matchedTerm": "Tachyphonus luctuosus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Tachyphonus surinamus": {
+      "acceptedScientificName": "Tachyphonus surinamus",
+      "matchedTerm": "Tachyphonus surinamus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Tauraco porphyreolophus": {
+      "acceptedScientificName": "Gallirex porphyreolophus",
+      "matchedTerm": "Tauraco porphyreolophus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Telophorus bocagei": {
+      "acceptedScientificName": "Chlorophoneus bocagei",
+      "matchedTerm": "Telophorus bocagei",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Telophorus nigrifrons": {
+      "acceptedScientificName": "Chlorophoneus nigrifrons",
+      "matchedTerm": "Telophorus nigrifrons",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Telophorus olivaceus": {
+      "acceptedScientificName": "Chlorophoneus olivaceus",
+      "matchedTerm": "Telophorus olivaceus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Telophorus sulfureopectus": {
+      "acceptedScientificName": "Chlorophoneus sulfureopectus",
+      "matchedTerm": "Telophorus sulfureopectus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Tetrao tetrix": {
+      "acceptedScientificName": "Lyrurus tetrix",
+      "matchedTerm": "Tetrao tetrix",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Thalasseus acuflavidus": {
+      "acceptedScientificName": "Thalasseus sandvicensis",
+      "matchedTerm": "Thalasseus acuflavidus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Thectocercus acuticaudatus": {
+      "acceptedScientificName": "Thectocercus acuticaudatus",
+      "matchedTerm": "Thectocercus acuticaudatus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Thraupis abbas": {
+      "acceptedScientificName": "Thraupis abbas",
+      "matchedTerm": "Thraupis abbas",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Thraupis cyanocephala": {
+      "acceptedScientificName": "Sporathraupis cyanocephala",
+      "matchedTerm": "Thraupis cyanocephala",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Thraupis cyanoptera": {
+      "acceptedScientificName": "Thraupis cyanoptera",
+      "matchedTerm": "Thraupis cyanoptera",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Thraupis episcopus": {
+      "acceptedScientificName": "Thraupis episcopus",
+      "matchedTerm": "Thraupis episcopus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Thraupis ornata": {
+      "acceptedScientificName": "Thraupis ornata",
+      "matchedTerm": "Thraupis ornata",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Thraupis palmarum": {
+      "acceptedScientificName": "Thraupis palmarum",
+      "matchedTerm": "Thraupis palmarum",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Threskiornis molucca": {
+      "acceptedScientificName": "Threskiornis molucca",
+      "matchedTerm": "Threskiornis molucca",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Thripophaga berlepschi": {
+      "acceptedScientificName": "Cranioleuca berlepschi",
+      "matchedTerm": "Thripophaga berlepschi",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Tijuca atra": {
+      "acceptedScientificName": "Lipaugus ater",
+      "matchedTerm": "Tijuca atra",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Trachyphonus purpuratus": {
+      "acceptedScientificName": "Trachylaemus purpuratus",
+      "matchedTerm": "Trachyphonus purpuratus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Tumbezia salvini": {
+      "acceptedScientificName": "Ochthoeca salvini",
+      "matchedTerm": "Tumbezia salvini",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Turdinus abbotti": {
+      "acceptedScientificName": "Malacocincla abbotti",
+      "matchedTerm": "Turdinus abbotti",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Turdinus brevicaudatus": {
+      "acceptedScientificName": "Gypsophila brevicaudata",
+      "matchedTerm": "Turdinus brevicaudatus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Turdinus crassus": {
+      "acceptedScientificName": "Gypsophila crassa",
+      "matchedTerm": "Turdinus crassus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Turdinus rufipectus": {
+      "acceptedScientificName": "Gypsophila rufipectus",
+      "matchedTerm": "Turdinus rufipectus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Turdinus sepiarius": {
+      "acceptedScientificName": "Malacocincla sepiaria",
+      "matchedTerm": "Turdinus sepiarius",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Turdoides affinis": {
+      "acceptedScientificName": "Argya affinis",
+      "matchedTerm": "Turdoides affinis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Turdoides caudata": {
+      "acceptedScientificName": "Argya caudata",
+      "matchedTerm": "Turdoides caudata",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Turdoides earlei": {
+      "acceptedScientificName": "Argya earlei",
+      "matchedTerm": "Turdoides earlei",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Turdoides fulva": {
+      "acceptedScientificName": "Argya fulva",
+      "matchedTerm": "Turdoides fulva",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Turdoides longirostris": {
+      "acceptedScientificName": "Argya longirostris",
+      "matchedTerm": "Turdoides longirostris",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Turdoides malcolmi": {
+      "acceptedScientificName": "Argya malcolmi",
+      "matchedTerm": "Turdoides malcolmi",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Turdoides rubiginosa": {
+      "acceptedScientificName": "Argya rubiginosa",
+      "matchedTerm": "Turdoides rubiginosa",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Turdoides rufescens": {
+      "acceptedScientificName": "Argya rufescens",
+      "matchedTerm": "Turdoides rufescens",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Turdoides striata": {
+      "acceptedScientificName": "Argya striata",
+      "matchedTerm": "Turdoides striata",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Turdoides subrufa": {
+      "acceptedScientificName": "Argya subrufa",
+      "matchedTerm": "Turdoides subrufa",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Upupa africana": {
+      "acceptedScientificName": "Upupa epops africana",
+      "matchedTerm": "Upupa africana",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Uranomitra franciae": {
+      "acceptedScientificName": "Uranomitra franciae",
+      "matchedTerm": "Uranomitra franciae",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Urosphena pallidipes": {
+      "acceptedScientificName": "Hemitesia pallidipes",
+      "matchedTerm": "Urosphena pallidipes",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Vanellus cayanus": {
+      "acceptedScientificName": "Hoploxypterus cayanus",
+      "matchedTerm": "Vanellus cayanus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Vireo hypochryseus": {
+      "acceptedScientificName": "Vireo hypochryseus",
+      "matchedTerm": "Vireo hypochryseus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Woodfordia superciliosa": {
+      "acceptedScientificName": "Zosterops superciliosus",
+      "matchedTerm": "Woodfordia superciliosa",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Xenops rutilans": {
+      "acceptedScientificName": "Xenops rutilans",
+      "matchedTerm": "Xenops rutilans",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Yuhina castaniceps": {
+      "acceptedScientificName": "Staphida castaniceps",
+      "matchedTerm": "Yuhina castaniceps",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Yuhina everetti": {
+      "acceptedScientificName": "Staphida everetti",
+      "matchedTerm": "Yuhina everetti",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Yuhina torqueola": {
+      "acceptedScientificName": "Staphida torqueola",
+      "matchedTerm": "Yuhina torqueola",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Yungipicus canicapillus": {
+      "acceptedScientificName": "Yungipicus canicapillus",
+      "matchedTerm": "Yungipicus canicapillus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Yungipicus kizuki": {
+      "acceptedScientificName": "Yungipicus kizuki",
+      "matchedTerm": "Yungipicus kizuki",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Yungipicus maculatus": {
+      "acceptedScientificName": "Yungipicus maculatus",
+      "matchedTerm": "Yungipicus maculatus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Yungipicus moluccensis": {
+      "acceptedScientificName": "Yungipicus moluccensis",
+      "matchedTerm": "Yungipicus moluccensis",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Yungipicus nanus": {
+      "acceptedScientificName": "Yungipicus nanus",
+      "matchedTerm": "Yungipicus nanus",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    },
+    "Zimmerius flavidifrons": {
+      "acceptedScientificName": "Zimmerius viridiflavus flavidifrons",
+      "matchedTerm": "Zimmerius chrysops flavidifrons",
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}); global status recovered from an exact name or controlled taxonomy alias in iNaturalist.",
+      "source": "iNaturalist"
+    }
+  },
+  "metadata": {
+    "failedCount": 0,
+    "generatedAt": "2026-06-15T17:34:46+00:00",
+    "iNaturalistFallbackCount": 456,
+    "input": "D:\\domen\\DEV\\Bird_encyclopedia\\lang\\labels_en.txt",
+    "notAssessedCount": 3,
+    "source": "IUCN Red List API v4",
+    "speciesCount": 6898,
+    "unmatchedCount": 148
+  },
+  "notAssessed": {
+    "Atlanticus testaceus": {
+      "reason": "IUCN API returned no global assessment. iNaturalist taxon found without a global IUCN status."
+    },
+    "Oecanthus niveus": {
+      "reason": "IUCN API returned no global assessment. iNaturalist taxon found without a global IUCN status."
+    },
+    "Scudderia texensis": {
+      "reason": "IUCN API returned no global assessment. iNaturalist taxon found without a global IUCN status."
+    }
+  },
+  "unmatched": {
+    "Ailuroedus maculosus": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Alcippe fratercula": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Alcippe hueti": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Allonemobius allardi": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Allonemobius tinnulus": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Allonemobius walkeri": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Amaurospiza aequatorialis": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Amaurospiza concolor": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Amazilia edward": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist scientific name or unambiguous synonym not found."
+    },
+    "Amblycorypha alexanderi": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Amblycorypha longinicta": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Amblycorypha oblongifolia": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Amblycorypha rotundifolia": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Anas diazi": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Anaxipha exigua": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Anser serrirostris": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Aphelocoma woodhouseii": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Arachnothera everetti": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Basileuterus delattrii": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Batrachostomus affinis": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Butorides virescens": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Cantorchilus elutus": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Centropus burchellii": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Colibri cyanotus": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Collocalia affinis": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Conocephalus brevipennis": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Conocephalus fasciatus": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Copsychus stricklandii": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Corapipo altera": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Corvus cornix": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Corvus minutus": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Curruca iberiae": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Cyrtoxipha columbiana": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Empidonomus aurantioatrocristatus": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist scientific name or unambiguous synonym not found."
+    },
+    "Eudynamys melanorhynchus": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Eunemobius carolinus": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Eunemobius confusus": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Ficedula speculigera": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Frederickena fulva": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Geothlypis velata": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Grallaria cajamarcae": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Grallaria gravesi": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Grallaria occabambae": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Grallaria saturata": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Gryllus assimilis": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Gryllus fultoni": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Gryllus pennsylvanicus": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Gryllus rubens": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Haematopus bachmani": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Hemispingus auricularis": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist scientific name or unambiguous synonym not found."
+    },
+    "Herpsilochmus frater": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Himantopus leucocephalus": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Himantopus melanurus": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Himantopus mexicanus": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Human non-vocal": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist scientific name or unambiguous synonym not found."
+    },
+    "Human vocal": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist scientific name or unambiguous synonym not found."
+    },
+    "Human whistle": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist scientific name or unambiguous synonym not found."
+    },
+    "Hyliola regilla": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist scientific name or unambiguous synonym not found."
+    },
+    "Hylopezus paraensis": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Hylopezus whittakeri": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Hypsipetes guimarasensis": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Iole crypta": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Kurochkinegramma hypogrammicum": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Laniarius major": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Lanius humeralis": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Larus brachyrhynchus": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Larus vegae": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Loxia sinesciuris": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Machlolophus aplonotus": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Macropygia doreya": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Megascops centralis": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Megascops roraimae": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Microcentrum rhombifolium": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Miogryllus saussurei": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Muscicapa williamsoni": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Neoconocephalus bivocatus": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Neoconocephalus ensiger": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Neoconocephalus retusus": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Neoconocephalus robustus": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Neonemobius cubensis": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Nystalus obamai": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Oecanthus celerinictus": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Oecanthus fultoni": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Oecanthus nigricornis": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Oecanthus pini": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Oecanthus quadripunctatus": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Oenanthe melanoleuca": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Orchelimum agile": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Orchelimum concinnum": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Orchelimum pulchellum": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Orocharis saltator": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Pachycephala chlorura": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Pachycephala macrorhyncha": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Parus cinereus": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Parus minor": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Pericrocotus speciosus": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Phyllopalpus pulchellus": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Phylloscopus makirensis": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Phylloscopus nigrorum": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Pica bottanensis": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Pica serica": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Picoides dorsalis": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Platysteira concreta": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Polioptila bilineata": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Porphyrio madagascariensis": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Porphyrio melanotus": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Porphyrio poliocephalus": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Power tools": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist scientific name or unambiguous synonym not found."
+    },
+    "Prinia lepida": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Prinia striata": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Psittacara strenuus": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Psittacula columboides": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Psittacula cyanocephala": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Psittacula himalayana": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Pterophylla camellifolia": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Pteruthius intermedius": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Pycnonotus conradi": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Pyriglena maura": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Ramphocaenus sticturus": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Rubigula erythropthalmos": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Saxicola maurus": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Saxicola rubicola": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Saxicola stejnegeri": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Sclerurus obscurior": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Scudderia curvicauda": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Scudderia furcata": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Scytalopus androstictus": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Scytalopus frankeae": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Scytalopus intermedius": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Setophaga aestiva": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Stilpnia cyanoptera": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Sturnia blythii": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Sylvia cantillans": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist scientific name or unambiguous synonym not found."
+    },
+    "Taenioptynx brodiei": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Thraupis sayaca": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Tockus kempi": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Tockus rufirostris": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Todiramphus sacer": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Todiramphus sordidus": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Todiramphus tristrami": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Trogon caligatus": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Trogon ramonianus": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Turdinus crispifrons": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist scientific name or unambiguous synonym not found."
+    },
+    "Turdoides huttoni": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Turdus daguae": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Tyto furcata": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Tyto javanica": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    },
+    "Zosterops anderssoni": {
+      "reason": "IUCN API returned HTTP 404 (HTTP 404: {\"error\":\"Not found\"}). iNaturalist taxon found without a global IUCN status."
+    }
+  }
+}
