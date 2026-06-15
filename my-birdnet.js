@@ -418,7 +418,7 @@ class MyBirdNETDashboard {
 
     async loadPreferredLanguage() {
         // Reuse the main encyclopedia language and its scientific-name translation file.
-        document.documentElement.lang = this.currentLanguage.replace('_', '-');
+        await window.BirdI18n?.setLanguage(this.currentLanguage, { persist: false });
         const languageNames = {
             en: 'English', sl: 'Slovenščina', de: 'Deutsch', fr: 'Français',
             es: 'Español', it: 'Italiano', hr: 'Hrvatski', nl: 'Nederlands',
@@ -426,7 +426,7 @@ class MyBirdNETDashboard {
             zh_CN: '简体中文', zh_TW: '繁體中文'
         };
         document.getElementById('inherited-language').textContent =
-            `Encyclopedia language: ${languageNames[this.currentLanguage] || this.currentLanguage}`;
+            `${this.t('nav.language')}: ${languageNames[this.currentLanguage] || this.currentLanguage}`;
         if (this.currentLanguage === 'en') return;
 
         try {
@@ -1151,10 +1151,10 @@ class MyBirdNETDashboard {
         });
         document.getElementById('date-range-selection').style.left = '0%';
         document.getElementById('date-range-selection').style.width = '0%';
-        document.getElementById('date-range-start-label').textContent = 'Start';
-        document.getElementById('date-range-end-label').textContent = 'End';
+        document.getElementById('date-range-start-label').textContent = this.t('common.start');
+        document.getElementById('date-range-end-label').textContent = this.t('common.end');
         document.getElementById('date-range-result-count').textContent = '';
-        document.getElementById('dataset-name').textContent = 'Observations';
+        document.getElementById('dataset-name').textContent = this.t('dashboard.observations');
         document.getElementById('dataset-summary').textContent = '';
         this.floatingDataContext.hidden = true;
 
@@ -3569,7 +3569,7 @@ class MyBirdNETDashboard {
         const resolvedStart = startDate || (startKey ? new Date(`${startKey}T00:00:00`) : null);
         const resolvedEnd = endDate || (endKey ? new Date(`${endKey}T00:00:00`) : null);
         const sourcePrefix = this.importKind === 'birdweather' ? 'Station' : 'Local';
-        this.floatingDataSource.textContent = `${sourcePrefix}: ${this.datasetName || 'Observations'}`;
+        this.floatingDataSource.textContent = `${sourcePrefix}: ${this.datasetName || this.t('dashboard.observations')}`;
         this.floatingDataRange.textContent = resolvedStart && resolvedEnd
             ? `Range: ${this.formatShortDate(resolvedStart)} – ${this.formatShortDate(resolvedEnd)}`
             : 'Range unavailable';
@@ -3593,8 +3593,8 @@ class MyBirdNETDashboard {
     renderMetrics() {
         const stats = this.stats;
         const metrics = [
-            ['Detections', this.formatNumber(stats.totalDetections), this.importKind === 'ebird' ? 'Aggregated records' : 'All imported records'],
-            ['Species', this.formatNumber(stats.uniqueSpecies), 'Unique imported species'],
+            [this.t('common.detections'), this.formatNumber(stats.totalDetections), this.importKind === 'ebird' ? 'Aggregated records' : 'All imported records'],
+            [this.t('common.species'), this.formatNumber(stats.uniqueSpecies), 'Unique imported species'],
             ['Active days', this.formatNumber(stats.activeDays), `${stats.spanDays} calendar-day span`],
             ['Per active day', stats.detectionsPerActiveDay.toFixed(1), 'Average detections'],
             ['Average confidence', stats.averageConfidence === null ? 'N/A' : `${(stats.averageConfidence * 100).toFixed(1)}%`, 'Across scored detections'],
@@ -3721,7 +3721,7 @@ class MyBirdNETDashboard {
             data: {
                 labels: timelineLabels,
                 datasets: [
-                    this.dataset('Detections', timelineDetections, colors[0], style !== 'bars'),
+                    this.dataset(this.t('common.detections'), timelineDetections, colors[0], style !== 'bars'),
                     ...timelineWeatherDatasets
                 ]
             },
@@ -3734,7 +3734,7 @@ class MyBirdNETDashboard {
             type: style === 'lines' ? 'line' : 'bar',
             data: {
                 labels: topSpecies.map(item => item.commonName),
-                datasets: [this.dataset('Detections', topSpecies.map(item => item.count), colors[1], style === 'lines')]
+                datasets: [this.dataset(this.t('common.detections'), topSpecies.map(item => item.count), colors[1], style === 'lines')]
             },
             options: this.chartOptions(axisColor, gridColor, {
                 indexAxis: style === 'lines' ? 'x' : 'y',
@@ -3754,7 +3754,7 @@ class MyBirdNETDashboard {
             data: {
                 labels: categories.map(([name]) => name),
                 datasets: [{
-                    label: 'Detections',
+                    label: this.t('common.detections'),
                     data: categories.map(([, count]) => count),
                     backgroundColor: categories.map((_, index) => colors[index % colors.length]),
                     borderWidth: 0
@@ -3769,7 +3769,7 @@ class MyBirdNETDashboard {
             type: style === 'lines' ? 'line' : 'bar',
             data: {
                 labels: Array.from({ length: 24 }, (_, hour) => `${String(hour).padStart(2, '0')}:00`),
-                datasets: [this.dataset('Detections', this.stats.hour, colors[2], style === 'lines')]
+                datasets: [this.dataset(this.t('common.detections'), this.stats.hour, colors[2], style === 'lines')]
             },
             options: baseOptions
         });
@@ -3821,7 +3821,7 @@ class MyBirdNETDashboard {
             type: style === 'lines' ? 'line' : 'bar',
             data: {
                 labels: this.monthNames(),
-                datasets: [this.dataset('Detections', this.stats.month, colors[3], style === 'lines')]
+                datasets: [this.dataset(this.t('common.detections'), this.stats.month, colors[3], style === 'lines')]
             },
             options: baseOptions
         });
@@ -3878,9 +3878,9 @@ class MyBirdNETDashboard {
             data: {
                 labels: weeks.map(([week]) => week),
                 datasets: [
-                    this.dataset('Detections', weeks.map(([, value]) => value.detections), colors[0], style !== 'bars'),
+                    this.dataset(this.t('common.detections'), weeks.map(([, value]) => value.detections), colors[0], style !== 'bars'),
                     {
-                        ...this.dataset('Unique species', weeks.map(([, value]) => value.species.size), colors[5], true),
+                        ...this.dataset(this.t('chart.uniqueSpecies'), weeks.map(([, value]) => value.species.size), colors[5], true),
                         yAxisID: 'species'
                     },
                     ...weeklyWeatherDatasets
@@ -4796,12 +4796,22 @@ class MyBirdNETDashboard {
         return Number.isFinite(value) ? `${(value * 100).toFixed(1)}%` : '0.0%';
     }
 
+    // Resolve shared interface text while retaining the English key as a defensive fallback.
+    t(key, values = {}) {
+        return typeof window !== 'undefined'
+            ? window.BirdI18n?.t(key, values) || key
+            : key;
+    }
+
     formatNumber(value) {
-        return new Intl.NumberFormat().format(value);
+        return new Intl.NumberFormat(this.currentLanguage.replace('_', '-')).format(value);
     }
 
     formatShortDate(date) {
-        return new Intl.DateTimeFormat(undefined, { year: 'numeric', month: 'short', day: 'numeric' }).format(date);
+        return new Intl.DateTimeFormat(
+            this.currentLanguage.replace('_', '-'),
+            { year: 'numeric', month: 'short', day: 'numeric' }
+        ).format(date);
     }
 
     escapeHTML(value) {

@@ -14,7 +14,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-i18n-title="dashboard.pageTitle">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -24,22 +24,23 @@
     <link rel="stylesheet" href="vendor/weather-icons/weather-icons-local.css">
     <link rel="stylesheet" href="my-birdnet.css">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <script src="i18n.js"></script>
 </head>
 <body data-theme="forest">
     <header class="app-header">
         <a class="back-link" href="index.html">
             <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-            Bird Encyclopedia
+            <span data-i18n="dashboard.back">Bird Encyclopedia</span>
         </a>
         <div>
-            <p class="eyebrow">Birds observation analytics</p>
-            <h1>My BirdNET</h1>
-            <p>Analyze a private export or explore public observations from a nearby stations.</p>
+            <p class="eyebrow" data-i18n="dashboard.eyebrow">Birds observation analytics</p>
+            <h1 data-i18n="app.myBirdnet">My BirdNET</h1>
+            <p data-i18n="dashboard.intro">Analyze a private export or explore public observations from a nearby stations.</p>
             <p class="inherited-language" id="inherited-language"></p>
         </div>
         <div class="header-controls">
             <!-- Visual preferences share one top-right control group. -->
-            <label for="theme-select">Dashboard theme
+            <label for="theme-select"><span data-i18n="dashboard.theme">Dashboard theme</span>
                 <select id="theme-select">
                     <option value="forest">Forest</option>
                     <option value="midnight">Midnight</option>
@@ -47,7 +48,7 @@
                     <option value="paper">Paper</option>
                 </select>
             </label>
-            <label for="chart-style">Chart style
+            <label for="chart-style"><span data-i18n="dashboard.chartStyle">Chart style</span>
                 <select id="chart-style">
                     <option value="mixed">Mixed</option>
                     <option value="bars">Bars</option>
@@ -62,7 +63,7 @@
             <!-- This shortcut appears after an uploaded dataset has been saved in IndexedDB. -->
             <div class="saved-file-card" id="saved-file-card" hidden>
                 <div>
-                    <span class="eyebrow">Saved in this browser</span>
+                    <span class="eyebrow" data-i18n="dashboard.savedBrowser">Saved in this browser</span>
                     <strong id="saved-file-name">BirdNET-Pi export</strong>
                 </div>
                 <div class="saved-file-actions">
@@ -82,9 +83,9 @@
                     <!-- Accept browser-specific gzip MIME types in addition to file extensions. -->
                     <input id="file-input" type="file" accept=".csv,.txt,.gz,.gzip,text/csv,text/plain,application/gzip,application/x-gzip" hidden>
                     <i class="fa-solid fa-cloud-arrow-up drop-icon" aria-hidden="true"></i>
-                    <h2>Use your BirdNET-Pi export</h2>
+                    <h2 data-i18n="dashboard.useExport">Use your BirdNET-Pi export</h2>
                     <p>Drop a detection CSV, compressed export, TXT file, or BirdNET-Pi eBird checklist CSV.</p>
-                    <button class="primary-button" id="choose-file" type="button">Choose file</button>
+                    <button class="primary-button" id="choose-file" type="button" data-i18n="action.chooseFile">Choose file</button>
                     <p class="format-note">
                         Private: the file stays in this browser.
                         Best results use <code>Date, Time, Sci_Name, Com_Name, Confidence</code>.
@@ -93,12 +94,12 @@
 
                 <div class="birdweather-source">
                     <i class="fa-solid fa-location-dot source-icon" aria-hidden="true"></i>
-                    <h2>Explore a nearby BirdWeather station</h2>
+                    <h2 data-i18n="dashboard.exploreStation">Explore a nearby BirdWeather station</h2>
                     <p>Use public observations from a station near your current location. No BirdNET-Pi export is required.</p>
 
                     <!-- Controls limit the geographic search and the amount of public detection history loaded. -->
                     <div class="birdweather-options">
-                        <label for="birdweather-radius">List search radius
+                        <label for="birdweather-radius"><span data-i18n="dashboard.searchRadius">List search radius</span>
                             <select id="birdweather-radius">
                                 <option value="10">10 km</option>
                                 <option value="25" selected>25 km</option>
@@ -106,7 +107,7 @@
                                 <option value="100">100 km</option>
                             </select>
                         </label>
-                        <label for="birdweather-period">Observation period
+                        <label for="birdweather-period"><span data-i18n="dashboard.period">Observation period</span>
                             <select id="birdweather-period">
                                 <option value="1:day">Last 24 hours</option>
                                 <option value="3:day">Last 3 days</option>
@@ -122,15 +123,15 @@
                     <div class="station-discovery-actions">
                         <button class="primary-button" id="find-nearby-stations" type="button">
                             <i class="fa-solid fa-location-crosshairs" aria-hidden="true"></i>
-                            Find nearby stations
+                            <span data-i18n="action.findStations">Find nearby stations</span>
                         </button>
                         <button class="secondary-button" id="choose-station-map" type="button">
                             <i class="fa-solid fa-map-location-dot" aria-hidden="true"></i>
-                            Choose from map
+                            <span data-i18n="action.chooseMap">Choose from map</span>
                         </button>
                         <button class="secondary-button" id="show-favourite-stations" type="button">
                             <i class="fa-solid fa-star" aria-hidden="true"></i>
-                            Favourites
+                            <span data-i18n="action.favourites">Favourites</span>
                             <span class="favourite-count" id="favourite-station-count">0</span>
                         </button>
                     </div>
@@ -138,10 +139,10 @@
 
                     <!-- A station ID fallback works when geolocation is unavailable or intentionally disabled. -->
                     <div class="station-id-form">
-                        <label for="birdweather-station-id">Or enter a BirdWeather station ID</label>
+                        <label for="birdweather-station-id" data-i18n="dashboard.stationId">Or enter a BirdWeather station ID</label>
                         <div>
                             <input id="birdweather-station-id" type="text" inputmode="text" placeholder="e.g. 15888, ID15888, or #15888">
-                            <button class="secondary-button" id="load-station-id" type="button">Load station</button>
+                            <button class="secondary-button" id="load-station-id" type="button" data-i18n="action.loadStation">Load station</button>
                         </div>
                     </div>
 
@@ -158,8 +159,8 @@
         <section class="dashboard" id="dashboard" hidden>
             <div class="dataset-toolbar">
                 <div>
-                    <p class="eyebrow">Loaded dataset</p>
-                    <h2 id="dataset-name">Observations</h2>
+                    <p class="eyebrow" data-i18n="dashboard.loadedDataset">Loaded dataset</p>
+                    <h2 id="dataset-name" data-i18n="dashboard.observations">Observations</h2>
                     <p id="dataset-summary"></p>
                 </div>
                 <div class="toolbar-actions">
@@ -189,8 +190,8 @@
             <section class="date-range-panel">
                 <div class="date-range-heading">
                     <div>
-                        <p class="eyebrow">Time window</p>
-                        <h2>Filter observations by date</h2>
+                        <p class="eyebrow" data-i18n="dashboard.timeWindow">Time window</p>
+                        <h2 data-i18n="dashboard.filterDate">Filter observations by date</h2>
                     </div>
                     <div class="date-range-values">
                         <strong id="date-range-start-label">Start</strong>
@@ -207,7 +208,7 @@
                 </div>
                 <div class="date-range-footer">
                     <span id="date-range-result-count"></span>
-                    <button class="secondary-button" id="reset-date-range" type="button">Full date range</button>
+                    <button class="secondary-button" id="reset-date-range" type="button" data-i18n="action.fullRange">Full date range</button>
                 </div>
             </section>
 
@@ -215,14 +216,14 @@
             <section class="weather-panel">
                 <div class="weather-panel-heading">
                     <div>
-                        <p class="eyebrow">Environmental context</p>
-                        <h2>Weather overlays</h2>
+                        <p class="eyebrow" data-i18n="dashboard.environment">Environmental context</p>
+                        <h2 data-i18n="dashboard.weather">Weather overlays</h2>
                         <p>Compare detections with temperature, dew point, humidity, precipitation, pressure, wind, gusts, and weather conditions from Meteostat.</p>
                     </div>
                     <label class="weather-toggle">
                         <input id="weather-toggle" type="checkbox">
                         <span class="weather-toggle-track" aria-hidden="true"></span>
-                        <span>Include weather</span>
+                        <span data-i18n="dashboard.includeWeather">Include weather</span>
                     </label>
                 </div>
                 <div class="weather-settings" id="weather-settings" hidden>
@@ -230,9 +231,9 @@
                         Meteostat RapidAPI key
                         <input id="meteostat-api-key" type="password" autocomplete="off" placeholder="Your personal RapidAPI key">
                     </label>
-                    <button class="secondary-button" id="save-weather-key" type="button">Save key and load weather</button>
-                    <button class="secondary-button" id="refresh-weather" type="button">Update weather now</button>
-                    <button class="secondary-button" id="clear-weather-cache" type="button">Clear weather cache</button>
+                    <button class="secondary-button" id="save-weather-key" type="button" data-i18n="action.saveWeather">Save key and load weather</button>
+                    <button class="secondary-button" id="refresh-weather" type="button" data-i18n="action.updateWeather">Update weather now</button>
+                    <button class="secondary-button" id="clear-weather-cache" type="button" data-i18n="action.clearWeather">Clear weather cache</button>
                     <p class="weather-help">
                         Your personal RapidAPI key lets the dashboard locate nearby Meteostat stations and request
                         missing or selected hourly weather. Windows of two days or less use hourly values; longer
@@ -252,8 +253,8 @@
             <section class="insights-panel">
                 <div class="section-heading">
                     <div>
-                        <p class="eyebrow">Highlights</p>
-                        <h2>Observation insights</h2>
+                        <p class="eyebrow" data-i18n="dashboard.highlights">Highlights</p>
+                        <h2 data-i18n="dashboard.insights">Observation insights</h2>
                     </div>
                 </div>
                 <div class="insight-grid" id="insight-grid"></div>
@@ -263,7 +264,7 @@
                 <article class="chart-card chart-card-wide">
                     <div class="chart-heading">
                         <div>
-                            <h3>Observation timeline</h3>
+                            <h3 data-i18n="chart.timeline">Observation timeline</h3>
                             <p id="timeline-chart-description">Detection activity by day</p>
                         </div>
                     </div>
@@ -273,7 +274,7 @@
                 <article class="chart-card">
                     <div class="chart-heading chart-heading-with-image">
                         <div>
-                            <h3>Most observed species</h3>
+                            <h3 data-i18n="chart.mostObserved">Most observed species</h3>
                             <p>Top species by detections</p>
                         </div>
                         <img
@@ -288,7 +289,7 @@
                 <article class="chart-card">
                     <div class="chart-heading">
                         <div>
-                            <h3>Bird categories</h3>
+                            <h3 data-i18n="chart.categories">Bird categories</h3>
                             <p>Taxonomy-based observation ratio</p>
                         </div>
                     </div>
@@ -298,7 +299,7 @@
                 <article class="chart-card">
                     <div class="chart-heading">
                         <div>
-                            <h3>Time of day</h3>
+                            <h3 data-i18n="chart.timeOfDay">Time of day</h3>
                             <p>Hourly activity pattern</p>
                         </div>
                     </div>
@@ -308,10 +309,10 @@
                 <article class="chart-card chart-card-wide species-explorer-card">
                     <div class="chart-heading species-explorer-heading">
                         <div>
-                            <h3>Species activity explorer</h3>
+                            <h3 data-i18n="chart.speciesExplorer">Species activity explorer</h3>
                             <p>Choose a species to compare detections over time and its most active hours</p>
                         </div>
-                        <label for="activity-species-select">Species
+                        <label for="activity-species-select"><span data-i18n="common.species">Species</span>
                             <select id="activity-species-select"></select>
                         </label>
                     </div>
@@ -321,7 +322,7 @@
                             <div class="chart-wrap"><canvas id="selected-species-timeline-chart"></canvas></div>
                         </div>
                         <div>
-                            <h4>Most active hours</h4>
+                            <h4 data-i18n="chart.mostActiveHours">Most active hours</h4>
                             <div class="chart-wrap"><canvas id="selected-species-hour-chart"></canvas></div>
                         </div>
                     </div>
@@ -330,7 +331,7 @@
                 <article class="chart-card">
                     <div class="chart-heading">
                         <div>
-                            <h3>Month and season</h3>
+                            <h3 data-i18n="chart.monthSeason">Month and season</h3>
                             <p>Annual observation distribution</p>
                         </div>
                     </div>
@@ -340,7 +341,7 @@
                 <article class="chart-card">
                     <div class="chart-heading">
                         <div>
-                            <h3>Species detected once</h3>
+                            <h3 data-i18n="chart.detectedOnce">Species detected once</h3>
                             <p id="single-species-description">Each bar names a species observed exactly once</p>
                         </div>
                     </div>
@@ -350,7 +351,7 @@
                 <article class="chart-card chart-card-wide">
                     <div class="chart-heading">
                         <div>
-                            <h3>Weekly species richness</h3>
+                            <h3 data-i18n="chart.weeklyRichness">Weekly species richness</h3>
                             <p>Unique species and detections per ISO week</p>
                         </div>
                     </div>
@@ -361,8 +362,8 @@
             <section class="species-panel">
                 <div class="section-heading species-heading">
                     <div>
-                        <p class="eyebrow">Species details</p>
-                        <h2>Observation table</h2>
+                        <p class="eyebrow" data-i18n="table.speciesDetails">Species details</p>
+                        <h2 data-i18n="table.observationTable">Observation table</h2>
                     </div>
                     <input id="species-filter" type="search" placeholder="Filter species...">
                 </div>
@@ -370,16 +371,16 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>Image</th>
-                                <th>Species</th>
-                                <th>Scientific name</th>
-                                <th>Category</th>
-                                <th>Detections</th>
-                                <th>Share</th>
-                                <th>Avg. confidence</th>
-                                <th>First seen</th>
-                                <th>Last seen</th>
-                                <th>Active days</th>
+                                <th data-i18n="table.image">Image</th>
+                                <th data-i18n="table.species">Species</th>
+                                <th data-i18n="table.scientificName">Scientific name</th>
+                                <th data-i18n="table.category">Category</th>
+                                <th data-i18n="table.detections">Detections</th>
+                                <th data-i18n="table.share">Share</th>
+                                <th data-i18n="table.confidence">Avg. confidence</th>
+                                <th data-i18n="table.firstSeen">First seen</th>
+                                <th data-i18n="table.lastSeen">Last seen</th>
+                                <th data-i18n="table.activeDays">Active days</th>
                             </tr>
                         </thead>
                         <tbody id="species-table-body"></tbody>
@@ -394,8 +395,8 @@
         <section class="map-modal" role="dialog" aria-modal="true" aria-labelledby="station-map-title">
             <div class="modal-heading">
                 <div>
-                    <p class="eyebrow">Nearby BirdWeather stations</p>
-                    <h2 id="station-map-title">Choose a station from the map</h2>
+                    <p class="eyebrow" data-i18n="map.nearbyStations">Nearby BirdWeather stations</p>
+                    <h2 id="station-map-title" data-i18n="map.chooseStation">Choose a station from the map</h2>
                     <p id="station-map-status">Move or zoom the map to load every station in the visible area.</p>
                 </div>
                 <button class="icon-button" id="close-station-map" type="button" aria-label="Close station map">
@@ -404,7 +405,7 @@
             </div>
             <!-- Photon provides OpenStreetMap-based place recommendations and recenters the station viewport. -->
             <div class="map-place-search">
-                <label for="map-place-input">Search for a place</label>
+                <label for="map-place-input" data-i18n="map.searchPlace">Search for a place</label>
                 <div class="map-place-input-wrap">
                     <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
                     <input
@@ -437,8 +438,8 @@
         <section class="weather-map-modal" role="dialog" aria-modal="true" aria-labelledby="weather-map-title">
             <div class="modal-heading">
                 <div>
-                    <p class="eyebrow">Meteostat weather sources</p>
-                    <h2 id="weather-map-title">Weather station map</h2>
+                    <p class="eyebrow" data-i18n="map.weatherSources">Meteostat weather sources</p>
+                    <h2 id="weather-map-title" data-i18n="map.weatherStation">Weather station map</h2>
                     <p>Lines connect the BirdNET data location with each weather station used in the average.</p>
                 </div>
                 <button class="icon-button" id="close-weather-map" type="button" aria-label="Close weather station map">
@@ -453,9 +454,9 @@
     <div class="modal-overlay progress-overlay" id="fetch-progress-modal" hidden>
         <section class="progress-modal" role="dialog" aria-modal="true" aria-labelledby="fetch-progress-title">
             <div class="progress-spinner" aria-hidden="true"></div>
-            <p class="eyebrow">BirdWeather import</p>
-            <h2 id="fetch-progress-title">Preparing station observations</h2>
-            <p id="fetch-progress-message">Contacting BirdWeather...</p>
+            <p class="eyebrow" data-i18n="import.birdweather">BirdWeather import</p>
+            <h2 id="fetch-progress-title" data-i18n="import.preparing">Preparing station observations</h2>
+            <p id="fetch-progress-message" data-i18n="import.contacting">Contacting BirdWeather...</p>
             <div class="progress-track" role="progressbar" id="fetch-progress-bar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
                 <span id="fetch-progress-fill"></span>
             </div>
@@ -466,7 +467,7 @@
             </div>
             <button class="secondary-button cancel-fetch-button" id="cancel-station-fetch" type="button">
                 <i class="fa-solid fa-ban" aria-hidden="true"></i>
-                Cancel import
+                <span data-i18n="action.cancelImport">Cancel import</span>
             </button>
         </section>
     </div>

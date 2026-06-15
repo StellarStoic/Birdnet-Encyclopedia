@@ -245,6 +245,13 @@ There is currently no offline service worker. Core data files are local, but
 photographs, descriptions, observations, maps, charts, fonts/icons, and AI
 translations require network access or previously cached browser data.
 
+## Interface Translations
+
+Application interface translations are independent JSON files in
+[`i18n/`](i18n/README.md). `i18n/en.json` is the source template for Crowdin,
+Weblate, or manual translation. Bird species-name translations remain in
+`lang/labels_CODE.txt`.
+
 ## Updating Bird Translations
 
 Bird name translations come from:
