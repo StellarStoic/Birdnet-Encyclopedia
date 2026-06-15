@@ -981,6 +981,31 @@ body[data-theme="midnight"] .dropdown-toggle.active .menu-bird-open {
             line-height: 1.4;
         }
 
+        /* Make the recommended translation default explicit without overpowering the selector. */
+        .ai-model-recommendation {
+            color: var(--text);
+            font-size: 0.86rem;
+            line-height: 1.4;
+        }
+
+        /* Summarize the provider-reported tokens consumed by the latest translation request. */
+        .ai-token-usage {
+            display: grid;
+            gap: 4px;
+            margin: -4px 0 18px;
+            padding: 11px 13px;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            background: color-mix(in srgb, var(--primary) 6%, var(--surface-solid));
+            color: var(--text);
+        }
+
+        .ai-token-usage span {
+            color: var(--muted);
+            font-size: 0.82rem;
+            line-height: 1.4;
+        }
+
         .ai-balance-link {
             display: flex;
             align-items: center;

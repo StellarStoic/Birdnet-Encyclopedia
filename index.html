@@ -244,6 +244,19 @@
                 <select id="ai-preferred-language"></select>
                 <small>The currently selected encyclopedia language is used as the initial choice. You can change it here.</small>
             </label>
+            <!-- Load Pollinations text models dynamically and display their token capacity and recent usage. -->
+            <label class="ai-language-field" for="ai-text-model">
+                <span>Text translation model</span>
+                <select id="ai-text-model">
+                    <option value="openai-fast">openai-fast</option>
+                </select>
+                <strong class="ai-model-recommendation">If in doubt, leave this unchanged on openai-fast.</strong>
+                <small id="ai-model-context">Loading available text models...</small>
+            </label>
+            <div class="ai-token-usage" id="ai-token-usage">
+                <strong>Last translation usage</strong>
+                <span id="ai-token-usage-value">No AI translation request recorded yet.</span>
+            </div>
             <p class="ai-connection-help">
                 Pollinations will open its secure app-authorization page. Sign in, review the access request,
                 and approve it to connect your account. Your account remains in control of its budget and access.
@@ -383,6 +396,10 @@
             this.aiDisableButton = document.getElementById('ai-disable-button');
             this.aiKeyError = document.getElementById('ai-key-error');
             this.aiPreferredLanguage = document.getElementById('ai-preferred-language');
+            this.aiTextModel = document.getElementById('ai-text-model');
+            this.aiModelContext = document.getElementById('ai-model-context');
+            this.aiTokenUsageValue = document.getElementById('ai-token-usage-value');
+            this.pollinationsTextModels = [];
             this.creditsSettings = document.getElementById('credits-settings');
             this.creditsModal = document.getElementById('credits-modal');
             this.creditsClose = document.getElementById('credits-close');
@@ -1944,6 +1961,11 @@
             return localStorage.getItem('birdAiPreferredLanguage') || this.currentLanguage || 'en';
         }
 
+        // Return the visitor's chosen Pollinations text model with a stable translation default.
+        getAiTextModel() {
+            return localStorage.getItem('birdAiTextModel') || 'openai-fast';
+        }
+
         // Fill the AI language selector from the same languages available in the encyclopedia.
         populateAiLanguageOptions() {
             if (!this.aiPreferredLanguage) return;
@@ -1965,6 +1987,84 @@
 
             if (!languages[selectedLanguage] && languages.en) {
                 this.aiPreferredLanguage.value = 'en';
+            }
+        }
+
+        // Fetch the live Pollinations catalog and keep only chat-compatible models which output text.
+        async populateAiTextModels() {
+            if (!this.aiTextModel) return;
+            const selectedModel = this.getAiTextModel();
+
+            try {
+                const response = await fetch('https://gen.pollinations.ai/v1/models');
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const payload = await response.json();
+                this.pollinationsTextModels = (payload.data || [])
+                    .filter(model => (
+                        model.output_modalities?.includes('text')
+                        && !model.output_modalities?.includes('audio')
+                        && model.supported_endpoints?.includes('/v1/chat/completions')
+                    ))
+                    .sort((first, second) => first.id.localeCompare(second.id));
+
+                if (!this.pollinationsTextModels.length) {
+                    throw new Error('No text models were returned');
+                }
+
+                this.aiTextModel.innerHTML = this.pollinationsTextModels
+                    .map(model => {
+                        const context = model.context_length
+                            ? `${Number(model.context_length).toLocaleString()} context tokens`
+                            : 'context limit not listed';
+                        return `
+                            <option value="${this.escapeHtml(model.id)}" ${model.id === selectedModel ? 'selected' : ''}>
+                                ${this.escapeHtml(`${model.id} — ${context}`)}
+                            </option>
+                        `;
+                    })
+                    .join('');
+
+                if (!this.pollinationsTextModels.some(model => model.id === selectedModel)) {
+                    this.aiTextModel.value = this.pollinationsTextModels.some(model => model.id === 'openai-fast')
+                        ? 'openai-fast'
+                        : this.pollinationsTextModels[0].id;
+                    this.saveAiTextModel();
+                }
+            } catch (error) {
+                console.warn('Could not load the Pollinations text-model catalog:', error);
+                this.pollinationsTextModels = [{
+                    id: selectedModel,
+                    context_length: null
+                }];
+                this.aiTextModel.innerHTML = `
+                    <option value="${this.escapeHtml(selectedModel)}">${this.escapeHtml(selectedModel)}</option>
+                `;
+            }
+
+            this.updateAiModelDetails();
+        }
+
+        // Explain the selected model's context capacity and restore actual usage from the last request.
+        updateAiModelDetails() {
+            const selectedModel = this.aiTextModel?.value || this.getAiTextModel();
+            const model = this.pollinationsTextModels.find(item => item.id === selectedModel);
+            if (this.aiModelContext) {
+                this.aiModelContext.textContent = model?.context_length
+                    ? `Maximum context window: ${Number(model.context_length).toLocaleString()} tokens.`
+                    : 'Pollinations does not currently list a context-token limit for this model.';
+            }
+
+            if (this.aiTokenUsageValue) {
+                try {
+                    const usage = JSON.parse(localStorage.getItem('birdAiLastTokenUsage') || 'null');
+                    this.aiTokenUsageValue.textContent = usage
+                        ? `${usage.model}: ${Number(usage.totalTokens || 0).toLocaleString()} total tokens `
+                            + `(${Number(usage.promptTokens || 0).toLocaleString()} input + `
+                            + `${Number(usage.completionTokens || 0).toLocaleString()} output).`
+                        : 'No AI translation request recorded yet.';
+                } catch (error) {
+                    this.aiTokenUsageValue.textContent = 'No AI translation request recorded yet.';
+                }
             }
         }
 
@@ -2005,12 +2105,44 @@
             this.aiPreferredLanguage?.addEventListener('change', () => {
                 this.saveAiPreferredLanguage();
             });
+
+            this.aiTextModel?.addEventListener('change', () => {
+                this.saveAiTextModel();
+                this.updateAiModelDetails();
+                if (this.getPollinationsApiKey().startsWith('sk_')) {
+                    // Existing BYOP keys may only permit the model chosen during their authorization.
+                    localStorage.removeItem('pollinationsUserApiKey');
+                    localStorage.removeItem('birdAiTranslationPreference');
+                    this.aiKeyError.textContent = 'The model changed. Reconnect Pollinations to authorize this text model.';
+                    this.aiKeyError.hidden = false;
+                }
+            });
         }
 
         // Persist the chosen AI language without changing the encyclopedia interface language.
         saveAiPreferredLanguage() {
             const languageCode = this.aiPreferredLanguage?.value;
             if (languageCode) localStorage.setItem('birdAiPreferredLanguage', languageCode);
+        }
+
+        // Persist the chosen text model so all future description and IUCN requests use it.
+        saveAiTextModel() {
+            const model = this.aiTextModel?.value;
+            if (model) localStorage.setItem('birdAiTextModel', model);
+        }
+
+        // Save Pollinations' actual token accounting from a completed translation response.
+        recordAiTokenUsage(usage, model) {
+            if (!usage) return;
+            const tokenUsage = {
+                model,
+                promptTokens: usage.prompt_tokens || 0,
+                completionTokens: usage.completion_tokens || 0,
+                totalTokens: usage.total_tokens || 0,
+                recordedAt: new Date().toISOString()
+            };
+            localStorage.setItem('birdAiLastTokenUsage', JSON.stringify(tokenUsage));
+            this.updateAiModelDetails();
         }
 
         setupCreditsModal() {
@@ -2043,6 +2175,7 @@
         openAiTranslationConsent({ settingsOnly = false } = {}) {
             this.aiKeyError.hidden = true;
             this.populateAiLanguageOptions();
+            this.populateAiTextModels();
             this.aiConsentModal.hidden = false;
             document.body.classList.add('ai-consent-open');
 
@@ -2058,6 +2191,7 @@
 
         // Redirect to Pollinations BYOP so the visitor can approve a scoped key for this website.
         startPollinationsAuthorization() {
+            this.saveAiTextModel();
             const redirectUrl = `${window.location.origin}${window.location.pathname}${window.location.search}`;
             const state = window.crypto?.randomUUID?.()
                 || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -2065,7 +2199,7 @@
             const params = new URLSearchParams({
                 redirect_uri: redirectUrl,
                 state,
-                models: 'openai-fast',
+                models: this.getAiTextModel(),
                 expiry: '7',
                 budget: '5'
             });
@@ -2146,7 +2280,8 @@
             }
 
             const cacheStorageKey = 'birdDescriptionTranslationsV1';
-            const cacheKey = `${bird.latin}|${languageCode}|${description.length}|${description.slice(0, 80)}`;
+            const selectedModel = this.getAiTextModel();
+            const cacheKey = `${bird.latin}|${languageCode}|${selectedModel}|${description.length}|${description.slice(0, 80)}`;
             let translationCache = {};
 
             try {
@@ -2173,7 +2308,7 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        model: 'openai-fast',
+                        model: selectedModel,
                         messages: [
                             {
                                 role: 'system',
@@ -2192,6 +2327,8 @@
                 }
 
                 const data = await response.json();
+                // Display the provider-reported input, output, and total tokens for this request.
+                this.recordAiTokenUsage(data.usage, selectedModel);
                 const translatedDescription = data.choices?.[0]?.message?.content?.trim();
                 if (!translatedDescription) {
                     throw new Error('Pollinations returned an empty translation');
@@ -2326,6 +2463,7 @@
                 'iucn-v1',
                 scientificName.toLowerCase(),
                 languageCode,
+                this.getAiTextModel(),
                 this.fingerprintTranslationSource(sourceText)
             ].join('|');
             const cachedTranslation = await this.getCachedAiTranslation(cacheKey);
@@ -2337,6 +2475,7 @@
             if (!apiKey) return assessment;
 
             const targetLanguage = this.languageMap[languageCode]?.name || languageCode;
+            const selectedModel = this.getAiTextModel();
             try {
                 // Request matching JSON keys so translated narratives can be restored to their original sections.
                 const response = await fetch('https://gen.pollinations.ai/v1/chat/completions', {
@@ -2346,7 +2485,7 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        model: 'openai-fast',
+                        model: selectedModel,
                         messages: [
                             {
                                 role: 'system',
@@ -2365,6 +2504,8 @@
                 }
 
                 const data = await response.json();
+                // Keep the last real token count visible in AI settings.
+                this.recordAiTokenUsage(data.usage, selectedModel);
                 const rawTranslation = data.choices?.[0]?.message?.content?.trim() || '';
                 const jsonText = rawTranslation.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '');
                 const translation = JSON.parse(jsonText);
