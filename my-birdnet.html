@@ -18,13 +18,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My BirdNET Statistics</title>
+    <meta name="description" content="Analyze private BirdNET-Pi exports or public BirdWeather station observations with responsive charts, species statistics, time windows, weather overlays, and local browser storage.">
+    <meta name="keywords" content="BirdNET statistics, BirdNET-Pi export, BirdWeather station, bird observation analytics, bird charts, bird detections, Meteostat weather">
+    <meta name="author" content="StellarStoic">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="theme-color" content="#4c8620">
+    <link rel="canonical" href="https://birdnet.woopod.com/my-birdnet.html">
+    <link rel="alternate" href="https://birdnet.woopod.com/my-birdnet.html" hreflang="x-default">
+    <title>My BirdNET Statistics | BirdNET-Pi Export and BirdWeather Analytics</title>
+    <!-- Open Graph metadata gives search engines and social previews a concise dashboard summary. -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="BirdNET-Pi Encyclopedia">
+    <meta property="og:title" content="My BirdNET Statistics">
+    <meta property="og:description" content="Analyze BirdNET-Pi exports or public BirdWeather station observations with species, time, category, and weather charts.">
+    <meta property="og:url" content="https://birdnet.woopod.com/my-birdnet.html">
+    <meta property="og:image" content="https://birdnet.woopod.com/img/origami_bird_B-ICO.png">
+    <meta property="og:image:alt" content="Origami bird icon for My BirdNET statistics">
+    <!-- Twitter/X cards reuse the same static preview image for link sharing. -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="My BirdNET Statistics">
+    <meta name="twitter:description" content="Private BirdNET-Pi export analysis and public BirdWeather station charts in your browser.">
+    <meta name="twitter:image" content="https://birdnet.woopod.com/img/origami_bird_B-ICO.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <link rel="stylesheet" href="vendor/weather-icons/weather-icons-local.css">
     <link rel="stylesheet" href="my-birdnet.css">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" href="/img/origami_bird_B-ICO.png">
+    <link rel="manifest" href="/site.webmanifest">
     <script src="i18n.js"></script>
+    <!-- Structured data describes the browser-only statistics dashboard for search engines. -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            "name": "My BirdNET Statistics",
+            "url": "https://birdnet.woopod.com/my-birdnet.html",
+            "applicationCategory": "DataVisualizationApplication",
+            "operatingSystem": "Any",
+            "description": "A browser-only dashboard for BirdNET-Pi export analysis and public BirdWeather station observation statistics.",
+            "image": "https://birdnet.woopod.com/img/origami_bird_B-ICO.png",
+            "isAccessibleForFree": true,
+            "inLanguage": "en",
+            "creator": {
+                "@type": "Person",
+                "name": "StellarStoic"
+            },
+            "about": [
+                {
+                    "@type": "Thing",
+                    "name": "BirdNET-Pi observations"
+                },
+                {
+                    "@type": "Thing",
+                    "name": "BirdWeather stations"
+                },
+                {
+                    "@type": "Thing",
+                    "name": "Bird observation analytics"
+                }
+            ]
+        }
+    </script>
 </head>
 <body data-theme="forest">
     <header class="app-header">
@@ -42,17 +97,17 @@
             <!-- Visual preferences share one top-right control group. -->
             <label for="theme-select"><span data-i18n="dashboard.theme">Dashboard theme</span>
                 <select id="theme-select">
-                    <option value="forest">Forest</option>
-                    <option value="midnight">Midnight</option>
-                    <option value="sunrise">Sunrise</option>
-                    <option value="paper">Paper</option>
+                    <option value="forest" data-i18n="theme.forest">Forest</option>
+                    <option value="midnight" data-i18n="theme.midnight">Midnight</option>
+                    <option value="sunrise" data-i18n="theme.sunrise">Sunrise</option>
+                    <option value="paper" data-i18n="theme.paper">Paper</option>
                 </select>
             </label>
             <label for="chart-style"><span data-i18n="dashboard.chartStyle">Chart style</span>
                 <select id="chart-style">
-                    <option value="mixed">Mixed</option>
-                    <option value="bars">Bars</option>
-                    <option value="lines">Lines</option>
+                    <option value="mixed" data-i18n="chartStyle.mixed">Mixed</option>
+                    <option value="bars" data-i18n="chartStyle.bars">Bars</option>
+                    <option value="lines" data-i18n="chartStyle.lines">Lines</option>
                 </select>
             </label>
         </div>
@@ -69,33 +124,32 @@
                 <div class="saved-file-actions">
                     <button class="secondary-button" id="open-saved-file" type="button">
                         <i class="fa-solid fa-chart-column" aria-hidden="true"></i>
-                        Open saved statistics
+                        <span data-i18n="action.openSavedStats">Open saved statistics</span>
                     </button>
                     <button class="danger-button" id="delete-saved-file" type="button">
                         <i class="fa-solid fa-trash" aria-hidden="true"></i>
-                        Delete saved file
+                        <span data-i18n="action.deleteSavedFile">Delete saved file</span>
                     </button>
                 </div>
             </div>
             <!-- Offer private file analysis and nearby public BirdWeather observations as equal data sources. -->
             <div class="source-grid">
-                <div class="drop-zone" id="drop-zone" tabindex="0" role="button" aria-label="Upload BirdNET observations">
+                <div class="drop-zone" id="drop-zone" tabindex="0" role="button" aria-label="Upload BirdNET observations" data-i18n-aria-label="import.uploadAria">
                     <!-- Accept browser-specific gzip MIME types in addition to file extensions. -->
                     <input id="file-input" type="file" accept=".csv,.txt,.gz,.gzip,text/csv,text/plain,application/gzip,application/x-gzip" hidden>
                     <i class="fa-solid fa-cloud-arrow-up drop-icon" aria-hidden="true"></i>
                     <h2 data-i18n="dashboard.useExport">Use your BirdNET-Pi export</h2>
-                    <p>Drop a detection CSV, compressed export, TXT file, or BirdNET-Pi eBird checklist CSV.</p>
+                    <p data-i18n="import.dropDescription">Drop a detection CSV, compressed export, TXT file, or BirdNET-Pi eBird checklist CSV from your own BirdNET-Pi exported backup files.</p>
                     <button class="primary-button" id="choose-file" type="button" data-i18n="action.chooseFile">Choose file</button>
                     <p class="format-note">
-                        Private: the file stays in this browser.
-                        Best results use <code>Date, Time, Sci_Name, Com_Name, Confidence</code>.
+                        <span data-i18n="import.privateNote">Private: the file stays in this browser.</span>
                     </p>
                 </div>
 
                 <div class="birdweather-source">
                     <i class="fa-solid fa-location-dot source-icon" aria-hidden="true"></i>
                     <h2 data-i18n="dashboard.exploreStation">Explore a nearby BirdWeather station</h2>
-                    <p>Use public observations from a station near your current location. No BirdNET-Pi export is required.</p>
+                    <p data-i18n="birdweather.sourceDescription">Use public observations from a station near your current location.</p>
 
                     <!-- Controls limit the geographic search and the amount of public detection history loaded. -->
                     <div class="birdweather-options">
@@ -109,13 +163,13 @@
                         </label>
                         <label for="birdweather-period"><span data-i18n="dashboard.period">Observation period</span>
                             <select id="birdweather-period">
-                                <option value="1:day">Last 24 hours</option>
-                                <option value="3:day">Last 3 days</option>
-                                <option value="7:day" selected>Last 7 days</option>
-                                <option value="30:day">Last 30 days</option>
-                                <option value="3:month">Last 3 months</option>
-                                <option value="6:month">Last 6 months</option>
-                                <option value="12:month">Last 12 months</option>
+                                <option value="1:day" data-i18n="period.last24Hours">Last 24 hours</option>
+                                <option value="3:day" data-i18n="period.last3Days">Last 3 days</option>
+                                <option value="7:day" selected data-i18n="period.last7Days">Last 7 days</option>
+                                <option value="30:day" data-i18n="period.last30Days">Last 30 days</option>
+                                <option value="3:month" data-i18n="period.last3Months">Last 3 months</option>
+                                <option value="6:month" data-i18n="period.last6Months">Last 6 months</option>
+                                <option value="12:month" data-i18n="period.last12Months">Last 12 months</option>
                             </select>
                         </label>
                     </div>
@@ -135,20 +189,20 @@
                             <span class="favourite-count" id="favourite-station-count">0</span>
                         </button>
                     </div>
-                    <p class="privacy-note">Your browser asks for permission. Coordinates are not saved by this website.</p>
+                    <p class="privacy-note" data-i18n="birdweather.privacyNote">Your browser asks for permission. Coordinates are not saved by this website.</p>
 
                     <!-- A station ID fallback works when geolocation is unavailable or intentionally disabled. -->
                     <div class="station-id-form">
                         <label for="birdweather-station-id" data-i18n="dashboard.stationId">Or enter a BirdWeather station ID</label>
                         <div>
-                            <input id="birdweather-station-id" type="text" inputmode="text" placeholder="e.g. 15888, ID15888, or #15888">
+                            <input id="birdweather-station-id" type="text" inputmode="text" placeholder="e.g. 15888, ID15888, or #15888" data-i18n-placeholder="birdweather.stationPlaceholder">
                             <button class="secondary-button" id="load-station-id" type="button" data-i18n="action.loadStation">Load station</button>
                         </div>
                     </div>
 
                     <div class="station-results" id="station-results" aria-live="polite"></div>
                     <p class="source-attribution">
-                        Public data provided by
+                        <span data-i18n="birdweather.attributionPrefix">Public data provided by</span>
                         <a href="https://www.birdweather.com/" target="_blank" rel="noopener noreferrer">BirdWeather</a>.
                     </p>
                 </div>
@@ -167,19 +221,19 @@
                     <!-- Source controls preserve the uploaded dataset while visitors explore public stations. -->
                     <button class="secondary-button" id="show-saved-file" type="button" hidden>
                         <i class="fa-solid fa-file-csv" aria-hidden="true"></i>
-                        Open saved uploaded file
+                        <span data-i18n="action.openSavedUploadedFile">Open saved uploaded file</span>
                     </button>
                     <button class="secondary-button" id="change-station" type="button">
                         <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
-                        Explore stations
+                        <span data-i18n="action.exploreStations">Explore stations</span>
                     </button>
                     <button class="secondary-button" id="replace-file" type="button">
                         <i class="fa-solid fa-file-arrow-up" aria-hidden="true"></i>
-                        Replace uploaded file
+                        <span data-i18n="action.replaceUploadedFile">Replace uploaded file</span>
                     </button>
                     <button class="danger-button" id="delete-loaded-dataset" type="button">
                         <i class="fa-solid fa-trash" aria-hidden="true"></i>
-                        Delete uploaded file
+                        <span data-i18n="action.deleteUploadedFile">Delete uploaded file</span>
                     </button>
                 </div>
             </div>
@@ -195,7 +249,7 @@
                     </div>
                     <div class="date-range-values">
                         <strong id="date-range-start-label">Start</strong>
-                        <span>to</span>
+                        <span data-i18n="common.to">to</span>
                         <strong id="date-range-end-label">End</strong>
                     </div>
                 </div>
@@ -203,8 +257,8 @@
                     <div class="dual-range-track">
                         <span id="date-range-selection"></span>
                     </div>
-                    <input id="date-range-start" type="range" min="0" max="0" value="0" aria-label="Start date">
-                    <input id="date-range-end" type="range" min="0" max="0" value="0" aria-label="End date">
+                    <input id="date-range-start" type="range" min="0" max="0" value="0" aria-label="Start date" data-i18n-aria-label="common.startDate">
+                    <input id="date-range-end" type="range" min="0" max="0" value="0" aria-label="End date" data-i18n-aria-label="common.endDate">
                 </div>
                 <div class="date-range-footer">
                     <span id="date-range-result-count"></span>
@@ -218,35 +272,42 @@
                     <div>
                         <p class="eyebrow" data-i18n="dashboard.environment">Environmental context</p>
                         <h2 data-i18n="dashboard.weather">Weather overlays</h2>
-                        <p>Compare detections with temperature, dew point, humidity, precipitation, pressure, wind, gusts, and weather conditions from Meteostat.</p>
+                        <p data-i18n="weather.compareDescription">Compare detections with temperature, dew point, humidity, precipitation, pressure, wind, gusts, and weather conditions from Meteostat.</p>
                     </div>
-                    <label class="weather-toggle">
-                        <input id="weather-toggle" type="checkbox">
-                        <span class="weather-toggle-track" aria-hidden="true"></span>
-                        <span data-i18n="dashboard.includeWeather">Include weather</span>
-                    </label>
+                    <div class="weather-heading-actions">
+                        <label class="weather-toggle">
+                            <input id="weather-toggle" type="checkbox">
+                            <span class="weather-toggle-track" aria-hidden="true"></span>
+                            <span data-i18n="dashboard.includeWeather">Include weather</span>
+                        </label>
+                        <button class="secondary-button weather-settings-toggle" id="weather-settings-toggle" type="button" aria-expanded="false">
+                            <i class="fa-solid fa-sliders" aria-hidden="true"></i>
+                            <span data-i18n="weather.settings">Weather settings</span>
+                        </button>
+                    </div>
                 </div>
                 <div class="weather-settings" id="weather-settings" hidden>
                     <label for="meteostat-api-key">
-                        Meteostat RapidAPI key
-                        <input id="meteostat-api-key" type="password" autocomplete="off" placeholder="Your personal RapidAPI key">
+                        <span data-i18n="weather.apiKeyLabel">Meteostat RapidAPI key</span>
+                        <input id="meteostat-api-key" type="password" autocomplete="off" placeholder="Your personal RapidAPI key" data-i18n-placeholder="weather.apiKeyPlaceholder">
                     </label>
                     <button class="secondary-button" id="save-weather-key" type="button" data-i18n="action.saveWeather">Save key and load weather</button>
                     <button class="secondary-button" id="refresh-weather" type="button" data-i18n="action.updateWeather">Update weather now</button>
                     <button class="secondary-button" id="clear-weather-cache" type="button" data-i18n="action.clearWeather">Clear weather cache</button>
                     <p class="weather-help">
-                        Your personal RapidAPI key lets the dashboard locate nearby Meteostat stations and request
-                        missing or selected hourly weather. Windows of two days or less use hourly values; longer
-                        windows use daily averages. Results are cached in this browser and refresh automatically
-                        after seven days, while "Update weather now" requests fresh data immediately. Each station
-                        lookup, metadata request, and hourly or daily data request can count against your RapidAPI plan.
-                        The application which owns the key must be subscribed to Meteostat's Basic plan.
-                        <a href="https://rapidapi.com/meteostat/api/meteostat/" target="_blank" rel="noopener noreferrer">Open Meteostat on RapidAPI</a>.
+                        <span data-i18n="weather.helpText">Your personal RapidAPI key lets the dashboard locate nearby Meteostat stations and request missing or selected hourly weather. Windows of two days or less use hourly values; longer windows use daily averages. Results are cached in this browser and refresh automatically after seven days, while "Update weather now" requests fresh data immediately. Each station lookup, metadata request, and hourly or daily data request can count against your RapidAPI plan. The application which owns the key must be subscribed to Meteostat's Basic plan.</span>
+                        <a href="https://rapidapi.com/meteostat/api/meteostat/" target="_blank" rel="noopener noreferrer" data-i18n="weather.openRapidApi">Open Meteostat on RapidAPI</a>.
                     </p>
                     <p class="weather-api-usage" id="weather-api-usage" aria-live="polite">
-                        API requests remaining will appear here when RapidAPI exposes quota headers.
+                        <span data-i18n="weather.apiUsagePlaceholder">API requests remaining will appear here when RapidAPI exposes quota headers.</span>
                     </p>
-                    <button class="weather-status" id="weather-status" type="button" aria-live="polite" disabled></button>
+                </div>
+                <div class="weather-status-row" id="weather-status-row" hidden>
+                    <p class="weather-status" id="weather-status" aria-live="polite"></p>
+                    <button class="primary-button weather-stations-button" id="weather-stations-button" type="button" hidden>
+                        <i class="fa-solid fa-map-location-dot" aria-hidden="true"></i>
+                        <span data-i18n="weather.viewStations">View weather stations</span>
+                    </button>
                 </div>
             </section>
 
@@ -265,7 +326,7 @@
                     <div class="chart-heading">
                         <div>
                             <h3 data-i18n="chart.timeline">Observation timeline</h3>
-                            <p id="timeline-chart-description">Detection activity by day</p>
+                            <p id="timeline-chart-description" data-i18n="chart.timelineDescription">Detection activity by day</p>
                         </div>
                     </div>
                     <div class="chart-wrap chart-wrap-wide"><canvas id="timeline-chart"></canvas></div>
@@ -275,13 +336,13 @@
                     <div class="chart-heading chart-heading-with-image">
                         <div>
                             <h3 data-i18n="chart.mostObserved">Most observed species</h3>
-                            <p>Top species by detections</p>
+                            <p data-i18n="chart.mostObservedDescription">Top species by detections</p>
                         </div>
                         <img
                             id="top-species-thumbnail"
                             class="chart-heading-thumbnail species-thumbnail"
                             src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect width='80' height='80' rx='12' fill='%23e7eee4'/%3E%3Cpath d='M20 48c10-20 27-25 42-15-8 1-14 5-18 11 8-2 14 0 18 5-16 9-31 7-42-1Z' fill='%23769a70'/%3E%3C/svg%3E"
-                            alt="Most observed bird">
+                            alt="Most observed bird" data-i18n-alt="chart.mostObservedBird">
                     </div>
                     <div class="chart-wrap"><canvas id="species-chart"></canvas></div>
                 </article>
@@ -290,7 +351,7 @@
                     <div class="chart-heading">
                         <div>
                             <h3 data-i18n="chart.categories">Bird categories</h3>
-                            <p>Taxonomy-based observation ratio</p>
+                            <p data-i18n="chart.categoriesDescription">Taxonomy-based observation ratio</p>
                         </div>
                     </div>
                     <div class="chart-wrap"><canvas id="category-chart"></canvas></div>
@@ -300,7 +361,7 @@
                     <div class="chart-heading">
                         <div>
                             <h3 data-i18n="chart.timeOfDay">Time of day</h3>
-                            <p>Hourly activity pattern</p>
+                            <p data-i18n="chart.timeOfDayDescription">Hourly activity pattern</p>
                         </div>
                     </div>
                     <div class="chart-wrap"><canvas id="hour-chart"></canvas></div>
@@ -310,7 +371,7 @@
                     <div class="chart-heading species-explorer-heading">
                         <div>
                             <h3 data-i18n="chart.speciesExplorer">Species activity explorer</h3>
-                            <p>Choose a species to compare detections over time and its most active hours</p>
+                            <p data-i18n="chart.speciesExplorerDescription">Choose a species to compare detections over time and its most active hours</p>
                         </div>
                         <label for="activity-species-select"><span data-i18n="common.species">Species</span>
                             <select id="activity-species-select"></select>
@@ -318,7 +379,7 @@
                     </div>
                     <div class="species-explorer-grid">
                         <div>
-                            <h4 id="species-timeline-description">Daily detections over the selected window</h4>
+                            <h4 id="species-timeline-description" data-i18n="chart.speciesDailyDescription">Daily detections over the selected window</h4>
                             <div class="chart-wrap"><canvas id="selected-species-timeline-chart"></canvas></div>
                         </div>
                         <div>
@@ -332,7 +393,7 @@
                     <div class="chart-heading">
                         <div>
                             <h3 data-i18n="chart.monthSeason">Month and season</h3>
-                            <p>Annual observation distribution</p>
+                            <p data-i18n="chart.monthSeasonDescription">Annual observation distribution</p>
                         </div>
                     </div>
                     <div class="chart-wrap"><canvas id="month-chart"></canvas></div>
@@ -342,7 +403,7 @@
                     <div class="chart-heading">
                         <div>
                             <h3 data-i18n="chart.detectedOnce">Species detected once</h3>
-                            <p id="single-species-description">Each bar names a species observed exactly once</p>
+                            <p id="single-species-description" data-i18n="chart.detectedOnceDescription">Each bar names a species observed exactly once</p>
                         </div>
                     </div>
                     <div class="chart-wrap chart-wrap-single"><canvas id="single-species-chart"></canvas></div>
@@ -352,7 +413,7 @@
                     <div class="chart-heading">
                         <div>
                             <h3 data-i18n="chart.weeklyRichness">Weekly species richness</h3>
-                            <p>Unique species and detections per ISO week</p>
+                            <p data-i18n="chart.weeklyRichnessDescription">Unique species and detections per ISO week</p>
                         </div>
                     </div>
                     <div class="chart-wrap chart-wrap-wide"><canvas id="week-chart"></canvas></div>
@@ -365,7 +426,7 @@
                         <p class="eyebrow" data-i18n="table.speciesDetails">Species details</p>
                         <h2 data-i18n="table.observationTable">Observation table</h2>
                     </div>
-                    <input id="species-filter" type="search" placeholder="Filter species...">
+                    <input id="species-filter" type="search" placeholder="Filter species..." data-i18n-placeholder="table.filterSpecies">
                 </div>
                 <div class="table-wrap">
                     <table>
@@ -397,9 +458,9 @@
                 <div>
                     <p class="eyebrow" data-i18n="map.nearbyStations">Nearby BirdWeather stations</p>
                     <h2 id="station-map-title" data-i18n="map.chooseStation">Choose a station from the map</h2>
-                    <p id="station-map-status">Move or zoom the map to load every station in the visible area.</p>
+                    <p id="station-map-status" data-i18n="map.moveZoomStatus">Move or zoom the map to load every station in the visible area.</p>
                 </div>
-                <button class="icon-button" id="close-station-map" type="button" aria-label="Close station map">
+                <button class="icon-button" id="close-station-map" type="button" aria-label="Close station map" data-i18n-aria-label="map.closeStationMap">
                     <i class="fa-solid fa-xmark" aria-hidden="true"></i>
                 </button>
             </div>
@@ -413,6 +474,7 @@
                         type="search"
                         autocomplete="off"
                         placeholder="City, region, landmark, or address"
+                        data-i18n-placeholder="map.placePlaceholder"
                         aria-controls="map-place-recommendations"
                         aria-expanded="false">
                 </div>
@@ -421,14 +483,15 @@
                     id="map-place-recommendations"
                     role="listbox"
                     aria-label="Place recommendations"
+                    data-i18n-aria-label="map.placeRecommendations"
                     hidden></div>
-                <span class="map-search-attribution" id="map-search-attribution">Place search uses OpenStreetMap data through Photon.</span>
+                <span class="map-search-attribution" id="map-search-attribution" data-i18n="map.searchAttribution">Place search uses OpenStreetMap data through Photon.</span>
             </div>
-            <div id="station-map" class="station-map" aria-label="Map of nearby BirdWeather stations"></div>
-            <div class="map-legend" aria-label="Station activity legend">
-                <span><i class="map-legend-dot online"></i> Online</span>
-                <span><i class="map-legend-dot inactive"></i> Not recently active</span>
-                <span><i class="map-legend-dot stale"></i> Inactive 6+ months</span>
+            <div id="station-map" class="station-map" aria-label="Map of nearby BirdWeather stations" data-i18n-aria-label="map.stationMapAria"></div>
+            <div class="map-legend" aria-label="Station activity legend" data-i18n-aria-label="map.legendAria">
+                <span><i class="map-legend-dot online"></i> <span data-i18n="common.online">Online</span></span>
+                <span><i class="map-legend-dot inactive"></i> <span data-i18n="map.notRecentlyActive">Not recently active</span></span>
+                <span><i class="map-legend-dot stale"></i> <span data-i18n="map.inactiveSixMonths">Inactive 6+ months</span></span>
             </div>
         </section>
     </div>
@@ -440,13 +503,13 @@
                 <div>
                     <p class="eyebrow" data-i18n="map.weatherSources">Meteostat weather sources</p>
                     <h2 id="weather-map-title" data-i18n="map.weatherStation">Weather station map</h2>
-                    <p>Lines connect the BirdNET data location with each weather station used in the average.</p>
+                    <p data-i18n="map.weatherLinesDescription">Lines connect the BirdNET data location with each weather station used in the average.</p>
                 </div>
-                <button class="icon-button" id="close-weather-map" type="button" aria-label="Close weather station map">
+                <button class="icon-button" id="close-weather-map" type="button" aria-label="Close weather station map" data-i18n-aria-label="map.closeWeatherMap">
                     <i class="fa-solid fa-xmark" aria-hidden="true"></i>
                 </button>
             </div>
-            <div id="weather-station-map" class="weather-station-map" aria-label="Map of Meteostat weather stations"></div>
+            <div id="weather-station-map" class="weather-station-map" aria-label="Map of Meteostat weather stations" data-i18n-aria-label="map.weatherMapAria"></div>
         </section>
     </div>
 
@@ -462,8 +525,8 @@
             </div>
             <div class="progress-details">
                 <strong id="fetch-progress-percent">0%</strong>
-                <span id="fetch-progress-count">Waiting for the first page...</span>
-                <span id="fetch-progress-eta">Calculating time remaining...</span>
+                <span id="fetch-progress-count" data-i18n="import.waitingFirstPage">Waiting for the first page...</span>
+                <span id="fetch-progress-eta" data-i18n="import.calculatingTime">Calculating time remaining...</span>
             </div>
             <button class="secondary-button cancel-fetch-button" id="cancel-station-fetch" type="button">
                 <i class="fa-solid fa-ban" aria-hidden="true"></i>

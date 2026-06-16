@@ -45,10 +45,13 @@ class MyBirdNETDashboard {
         this.dateRangeStartInput = document.getElementById('date-range-start');
         this.dateRangeEndInput = document.getElementById('date-range-end');
         this.weatherToggle = document.getElementById('weather-toggle');
+        this.weatherSettingsToggle = document.getElementById('weather-settings-toggle');
         this.weatherSettings = document.getElementById('weather-settings');
         this.weatherApiKeyInput = document.getElementById('meteostat-api-key');
         this.weatherApiUsage = document.getElementById('weather-api-usage');
+        this.weatherStatusRow = document.getElementById('weather-status-row');
         this.weatherStatus = document.getElementById('weather-status');
+        this.weatherStationsButton = document.getElementById('weather-stations-button');
         this.floatingDataContext = document.getElementById('floating-data-context');
         this.floatingDataSource = document.getElementById('floating-data-source');
         this.floatingDataRange = document.getElementById('floating-data-range');
@@ -114,6 +117,7 @@ class MyBirdNETDashboard {
         this.languagePromise = this.loadPreferredLanguage();
         this.restorePromise = this.restorePersistedFile();
         this.stationCachePromise = this.loadStationCacheMetadata();
+        document.addEventListener('bird-i18n-change', () => this.refreshTranslatedInterface());
     }
 
     bindEvents() {
@@ -170,14 +174,16 @@ class MyBirdNETDashboard {
 
         // Weather is opt-in and uses a visitor-owned RapidAPI key stored only in this browser.
         this.weatherToggle.checked = this.weatherEnabled;
-        this.weatherSettings.hidden = !this.weatherEnabled;
+        this.weatherSettingsOpen = this.weatherEnabled && !localStorage.getItem('meteostatRapidApiKey');
         this.weatherApiKeyInput.value = localStorage.getItem('meteostatRapidApiKey') || '';
+        this.updateWeatherSettingsVisibility();
         this.restoreMeteostatApiUsage();
         this.weatherToggle.addEventListener('change', () => this.handleWeatherToggle());
+        this.weatherSettingsToggle.addEventListener('click', () => this.toggleWeatherSettings());
         document.getElementById('save-weather-key').addEventListener('click', () => this.saveWeatherKeyAndLoad());
         document.getElementById('refresh-weather').addEventListener('click', () => this.refreshWeatherNow());
         document.getElementById('clear-weather-cache').addEventListener('click', () => this.clearWeatherCache());
-        this.weatherStatus.addEventListener('click', () => this.openWeatherStationMap());
+        this.weatherStationsButton.addEventListener('click', () => this.openWeatherStationMap());
         document.getElementById('close-weather-map').addEventListener('click', () => this.closeWeatherStationMap());
         this.weatherMapModal.addEventListener('click', event => {
             if (event.target === this.weatherMapModal) this.closeWeatherStationMap();
@@ -267,8 +273,8 @@ class MyBirdNETDashboard {
             button.type = 'button';
             button.className = 'chart-snapshot-button';
             button.dataset.chartSnapshot = canvas.id;
-            button.title = 'Download chart as PNG';
-            button.setAttribute('aria-label', 'Download chart as PNG');
+            button.title = this.t('action.downloadChart');
+            button.setAttribute('aria-label', this.t('action.downloadChart'));
             button.innerHTML = '<i class="fa-solid fa-camera" aria-hidden="true"></i>';
             chartWrap.appendChild(button);
         });
@@ -278,6 +284,29 @@ class MyBirdNETDashboard {
             if (!button) return;
             this.downloadChartSnapshot(button.dataset.chartSnapshot);
         });
+    }
+
+    refreshTranslatedInterface() {
+        // Reapply static and dynamic dashboard text after the shared i18n catalog changes.
+        window.BirdI18n?.apply(document);
+        document.querySelectorAll('.chart-snapshot-button').forEach(button => {
+            button.title = this.t('action.downloadChart');
+            button.setAttribute('aria-label', this.t('action.downloadChart'));
+        });
+        if (this.stats) {
+            this.updateDatasetSummary();
+            this.updateDateRangeControl(
+                Number(this.dateRangeStartInput.value),
+                Number(this.dateRangeEndInput.value)
+            );
+            this.renderMetrics();
+            this.renderInsights();
+            this.renderCharts();
+            this.renderSpeciesTable();
+        }
+        if (this.weatherStationsButton && !this.weatherStationsButton.hidden) {
+            this.weatherStationsButton.title = this.t('weather.showStationsMap');
+        }
     }
 
     initializeWeatherIcons() {
@@ -301,7 +330,8 @@ class MyBirdNETDashboard {
         const exportWidth = Math.max(1200, sourceCanvas.width);
         const scale = exportWidth / sourceCanvas.width;
         const horizontalPadding = 64;
-        const headerHeight = 170;
+        const contextLines = this.getSnapshotDataContextLines();
+        const headerHeight = 188 + contextLines.length * 28;
         const exportHeight = Math.ceil(sourceCanvas.height * scale) + headerHeight + 48;
         const output = document.createElement('canvas');
         output.width = exportWidth + horizontalPadding * 2;
@@ -328,6 +358,11 @@ class MyBirdNETDashboard {
             32,
             2
         );
+        context.fillStyle = mutedColor;
+        context.font = '600 21px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+        contextLines.forEach((line, index) => {
+            context.fillText(line, horizontalPadding, 170 + index * 28, exportWidth);
+        });
         context.drawImage(
             sourceCanvas,
             horizontalPadding,
@@ -354,10 +389,31 @@ class MyBirdNETDashboard {
             : '';
         return {
             title: nestedTitle || cardTitle || 'Bird observations',
-            description: [cardDescription, selectedSpecies ? `Species: ${selectedSpecies}` : '']
+            description: [cardDescription, selectedSpecies ? `${this.t('common.species')}: ${selectedSpecies}` : '']
                 .filter(Boolean)
                 .join(' ')
         };
+    }
+
+    getSnapshotDataContextLines() {
+        // Copy the visible floating source and range context into chart exports without showing it on every card.
+        const source = this.floatingDataSource?.textContent?.trim();
+        const range = this.floatingDataRange?.textContent?.trim();
+        if (source || range) return [source, range].filter(Boolean);
+
+        const sourcePrefix = this.importKind === 'birdweather' ? this.t('dataset.station') : this.t('dataset.local');
+        const startKey = this.availableDateKeys[Number(this.dateRangeStartInput?.value)];
+        const endKey = this.availableDateKeys[Number(this.dateRangeEndInput?.value)];
+        const rangeLabel = startKey && endKey
+            ? this.t('dataset.range', {
+                start: this.formatShortDate(new Date(`${startKey}T00:00:00`)),
+                end: this.formatShortDate(new Date(`${endKey}T00:00:00`))
+            })
+            : this.t('dataset.rangeUnavailable');
+        return [
+            `${sourcePrefix}: ${this.datasetName || this.t('dashboard.observations')}`,
+            rangeLabel
+        ];
     }
 
     drawWrappedCanvasText(context, text, x, y, maxWidth, lineHeight, maxLines) {
@@ -427,6 +483,7 @@ class MyBirdNETDashboard {
         };
         document.getElementById('inherited-language').textContent =
             `${this.t('nav.language')}: ${languageNames[this.currentLanguage] || this.currentLanguage}`;
+        this.refreshTranslatedInterface();
         if (this.currentLanguage === 'en') return;
 
         try {
@@ -453,19 +510,21 @@ class MyBirdNETDashboard {
 
         const compressedFile = /\.g(?:z|zip)$/i.test(file.name)
             || ['application/gzip', 'application/x-gzip'].includes(file.type);
-        this.setStatus(`${compressedFile ? 'Decompressing' : 'Reading'} ${file.name}...`);
+        this.setStatus(this.t(compressedFile ? 'import.decompressingFile' : 'import.readingFile', {
+            file: file.name
+        }));
 
         try {
             // Finish taxonomy loading before normalization so category statistics are deterministic.
             await Promise.all([this.taxonomyPromise, this.languagePromise]);
             const text = await this.readTextFile(file);
-            this.setStatus(`Parsing observations from ${file.name}...`);
+            this.setStatus(this.t('import.parsingFile', { file: file.name }));
             // Give the browser one frame to paint the parsing status before processing a large export.
             await new Promise(resolve => requestAnimationFrame(resolve));
             const parsed = this.parseObservations(text);
 
             if (parsed.observations.length === 0) {
-                throw new Error('No valid observations were found in this file.');
+                throw new Error(this.t('import.noValidObservations'));
             }
 
             this.observations = this.applyPreferredNames(parsed.observations);
@@ -478,14 +537,16 @@ class MyBirdNETDashboard {
             this.birdWeatherLimitReached = false;
             this.savedFileDataset = this.createDatasetSnapshot();
             this.updateSavedFileControls();
-            this.setStatus(`Saving ${parsed.observations.length.toLocaleString()} observations in this browser...`);
+            this.setStatus(this.t('import.savingObservations', {
+                count: this.formatNumber(parsed.observations.length)
+            }));
             await this.persistUploadedFile(this.savedFileDataset);
             this.stats = this.calculateStatistics(this.filteredObservations);
             this.renderDashboard(file.name);
             this.setStatus('');
         } catch (error) {
             console.error(error);
-            this.setStatus(error.message || 'The file could not be imported.', true);
+            this.setStatus(error.message || this.t('import.fileImportFailed'), true);
         } finally {
             // Reset the input so selecting the same file again still triggers change.
             this.fileInput.value = '';
@@ -943,14 +1004,16 @@ class MyBirdNETDashboard {
 
         if (preview) {
             document.getElementById('date-range-result-count').textContent =
-                'Release the handle to apply this time window';
+                this.t('dashboard.releaseToApply');
         } else {
             const selectedDetections = this.filteredObservations.reduce(
                 (total, observation) => total + observation.count,
                 0
             );
             document.getElementById('date-range-result-count').textContent =
-                `${this.formatNumber(selectedDetections)} observations in selected window`;
+                this.t('dashboard.selectedWindowCount', {
+                    count: this.formatNumber(selectedDetections)
+                });
         }
     }
 
@@ -1078,18 +1141,18 @@ class MyBirdNETDashboard {
             database.close();
         } catch (error) {
             console.warn('The uploaded file could not be persisted:', error);
-            this.setStatus('Statistics loaded, but this browser could not persist the uploaded file.', true);
+            this.setStatus(this.t('import.persistFailed'), true);
         }
     }
 
     async deleteSavedUploadedFile() {
         // Remove the persisted upload and close it when it is the dataset currently shown.
         if (!this.savedFileDataset) {
-            this.setStatus('There is no saved uploaded file to delete.');
+            this.setStatus(this.t('import.noSavedFileToDelete'));
             return;
         }
         const fileName = this.savedFileDataset.name || 'uploaded BirdNET-Pi file';
-        if (!window.confirm(`Delete "${fileName}" and its observations from this browser?`)) return;
+        if (!window.confirm(this.t('import.confirmDeleteSavedFile', { file: fileName }))) return;
 
         try {
             const database = await this.openDashboardDatabase();
@@ -1104,10 +1167,10 @@ class MyBirdNETDashboard {
             this.savedFileDataset = null;
             // Deleting the uploaded source returns My BirdNET to a completely fresh initial state.
             this.resetDashboardState();
-            this.setStatus(`Deleted ${fileName} from this browser.`);
+            this.setStatus(this.t('import.deletedSavedFile', { file: fileName }));
         } catch (error) {
             console.error(error);
-            this.setStatus('The saved uploaded file could not be deleted.', true);
+            this.setStatus(this.t('import.deleteSavedFileFailed'), true);
         }
     }
 
@@ -1162,7 +1225,7 @@ class MyBirdNETDashboard {
         const topSpeciesThumbnail = document.getElementById('top-species-thumbnail');
         if (topSpeciesThumbnail) {
             topSpeciesThumbnail.src = this.placeholderImage();
-            topSpeciesThumbnail.alt = 'Most observed bird';
+            topSpeciesThumbnail.alt = this.t('chart.mostObservedBird');
         }
 
         this.fileInput.value = '';
@@ -1342,10 +1405,10 @@ class MyBirdNETDashboard {
             database.close();
             entries.forEach(([key]) => this.stationCacheMetadata.delete(key));
             this.refreshStationCacheTags();
-            this.setStatus(`Deleted locally saved BirdWeather data for station ${stationId}.`);
+            this.setStatus(this.t('station.cacheDeleted', { id: stationId }));
         } catch (error) {
             console.error(error);
-            this.setStatus(`Could not delete cached data for station ${stationId}.`, true);
+            this.setStatus(this.t('station.cacheDeleteFailed', { id: stationId }), true);
         }
     }
 
@@ -1368,14 +1431,14 @@ class MyBirdNETDashboard {
         const entries = this.getStationCacheEntries(stationId);
         if (!entries.length) return '';
         const label = currentCache
-            ? `Saved locally: ${currentCache.periodLabel}`
-            : `${entries.length} saved period${entries.length === 1 ? '' : 's'}`;
+            ? this.t('station.savedLocallyPeriod', { period: currentCache.periodLabel })
+            : this.t('station.savedPeriods', { count: entries.length });
         return `
             <button
                 class="station-cache-tag ${map ? 'map-cache-tag' : ''}"
                 type="button"
                 data-delete-station-cache="${this.escapeHTML(stationId)}"
-                title="Delete all locally saved data for this station">
+                title="${this.escapeHTML(this.t('station.deleteLocalCacheTitle'))}">
                 <i class="fa-solid fa-database" aria-hidden="true"></i>
                 ${this.escapeHTML(label)}
                 <i class="fa-solid fa-xmark" aria-hidden="true"></i>
@@ -1425,7 +1488,9 @@ class MyBirdNETDashboard {
         const id = String(station.id);
         if (this.favouriteStations.has(id)) {
             this.favouriteStations.delete(id);
-            this.setStatus(`Removed ${station.name || `station ${id}`} from favourites.`);
+            this.setStatus(this.t('station.removedFavourite', {
+                station: station.name || this.t('station.stationWithId', { id })
+            }));
         } else {
             this.favouriteStations.set(id, {
                 id: station.id,
@@ -1438,7 +1503,9 @@ class MyBirdNETDashboard {
                 coords: station.coords,
                 distance: station.distance
             });
-            this.setStatus(`Added ${station.name || `station ${id}`} to favourites.`);
+            this.setStatus(this.t('station.addedFavourite', {
+                station: station.name || this.t('station.stationWithId', { id })
+            }));
         }
         this.persistFavouriteStations();
         this.refreshFavouriteStationViews();
@@ -1472,8 +1539,8 @@ class MyBirdNETDashboard {
         this.stationViewMode = 'favourites';
         this.renderStationResults(favourites);
         this.setStatus(favourites.length
-            ? `${favourites.length} favourite station${favourites.length === 1 ? '' : 's'}.`
-            : 'No favourite stations yet. Use the star beside a station to add one.');
+            ? this.t('station.favouriteCount', { count: favourites.length })
+            : this.t('station.noFavourites'));
     }
 
     renderFavouriteButton(stationId, { map = false } = {}) {
@@ -1484,8 +1551,8 @@ class MyBirdNETDashboard {
                 class="station-favourite-button ${favourite ? 'active' : ''} ${map ? 'map-favourite-button' : ''}"
                 type="button"
                 data-toggle-station-favourite="${this.escapeHTML(stationId)}"
-                aria-label="${favourite ? 'Remove station from favourites' : 'Add station to favourites'}"
-                title="${favourite ? 'Remove from favourites' : 'Add to favourites'}">
+                aria-label="${this.escapeHTML(favourite ? this.t('station.removeFavourite') : this.t('station.addFavourite'))}"
+                title="${this.escapeHTML(favourite ? this.t('station.removeFavouriteShort') : this.t('station.addFavouriteShort'))}">
                 <i class="${favourite ? 'fa-solid' : 'fa-regular'} fa-star" aria-hidden="true"></i>
             </button>
         `;
@@ -1495,7 +1562,7 @@ class MyBirdNETDashboard {
         // Reopen the persisted private dataset without reparsing or discarding a visited BirdWeather station.
         if (!this.savedFileDataset?.observations?.length) {
             this.showImportPanel();
-            this.setStatus('Upload a BirdNET-Pi file first.', true);
+            this.setStatus(this.t('import.uploadFirst'), true);
             return;
         }
 
@@ -1525,7 +1592,7 @@ class MyBirdNETDashboard {
 
     async findNearbyStations() {
         // Browser geolocation is requested only after a user action and is not persisted locally.
-        this.setStatus('Requesting your location...');
+        this.setStatus(this.t('station.requestingLocation'));
         this.stationResults.innerHTML = '';
 
         try {
@@ -1538,7 +1605,7 @@ class MyBirdNETDashboard {
 
     async chooseStationFromMap() {
         // Open a viewport-driven map; its station query intentionally ignores the nearby-list radius.
-        this.setStatus('Preparing the station map...');
+        this.setStatus(this.t('map.preparingStationMap'));
         try {
             const location = await this.getCurrentLocation();
             this.currentMapLocation = location;
@@ -1553,7 +1620,7 @@ class MyBirdNETDashboard {
         // Wrap browser geolocation in a promise shared by list and map station discovery.
         return new Promise((resolve, reject) => {
             if (!navigator.geolocation) {
-                reject(new Error('This browser does not provide location access. Enter a BirdWeather station ID instead.'));
+                reject(new Error(this.t('station.locationUnsupported')));
                 return;
             }
             navigator.geolocation.getCurrentPosition(
@@ -1563,8 +1630,8 @@ class MyBirdNETDashboard {
                 }),
                 error => {
                     reject(new Error(error.code === error.PERMISSION_DENIED
-                        ? 'Location permission was declined. Enter a BirdWeather station ID instead.'
-                        : 'Your location could not be determined. Enter a BirdWeather station ID instead.'));
+                        ? this.t('station.locationDeclined')
+                        : this.t('station.locationUnavailable')));
                 },
                 { enableHighAccuracy: false, timeout: 12000, maximumAge: 300000 }
             );
@@ -1587,7 +1654,7 @@ class MyBirdNETDashboard {
             }
         `;
 
-        this.setStatus(`Looking for public stations within ${radius} km...`);
+        this.setStatus(this.t('station.searchingWithin', { radius }));
 
         try {
             const stationNodes = [];
@@ -1618,21 +1685,21 @@ class MyBirdNETDashboard {
             this.stationViewMode = 'nearby';
             this.currentMapLocation = { latitude, longitude, radius };
             this.renderStationResults(stations.slice(0, 8));
-            this.setStatus(stations.length ? '' : `No active BirdWeather stations were found within ${radius} km.`);
+            this.setStatus(stations.length ? '' : this.t('station.noneWithin', { radius }));
         } catch (error) {
             console.error(error);
-            this.setStatus(error.message || 'BirdWeather stations could not be loaded.', true);
+            this.setStatus(error.message || this.t('station.loadFailed'), true);
         }
     }
 
     openStationMap() {
         // Build a muted Leaflet map whose visible bounds determine the BirdWeather station query.
         if (typeof L === 'undefined') {
-            this.setStatus('The map library could not be loaded. Use the station list or station ID instead.', true);
+            this.setStatus(this.t('map.libraryFailed'), true);
             return;
         }
         if (!this.currentMapLocation) {
-            this.setStatus('Your location is needed to open the station map.', true);
+            this.setStatus(this.t('map.locationNeeded'), true);
             return;
         }
 
@@ -1663,7 +1730,7 @@ class MyBirdNETDashboard {
             weight: 3,
             fillColor: '#2678d8',
             fillOpacity: 1
-        }).bindTooltip('Your approximate location').addTo(this.stationMapLayer);
+        }).bindTooltip(this.t('map.yourApproximateLocation')).addTo(this.stationMapLayer);
         setTimeout(() => {
             this.stationMap.invalidateSize();
             this.loadStationsInMapViewport();
@@ -1704,13 +1771,13 @@ class MyBirdNETDashboard {
             if (this.mapPlaceInput.value.trim() !== query) return;
             this.mapSearchResults = results;
             document.getElementById('map-search-attribution').textContent =
-                `Place recommendations provided by ${provider}.`;
+                this.t('map.recommendationsProvider', { provider });
             this.renderMapPlaceRecommendations();
         } catch (error) {
             if (error.name !== 'AbortError') {
                 console.warn('Map place search failed:', error);
                 this.mapPlaceRecommendations.innerHTML =
-                    '<div class="map-place-empty">Place search is unavailable from both providers. Check your connection and try again.</div>';
+                    `<div class="map-place-empty">${this.escapeHTML(this.t('map.placeSearchUnavailable'))}</div>`;
                 this.showMapPlaceRecommendations();
             }
         } finally {
@@ -1801,7 +1868,7 @@ class MyBirdNETDashboard {
             context: [...new Set(context)].join(', '),
             latitude,
             longitude,
-            type: 'Place'
+            type: this.t('map.placeType')
         };
     }
 
@@ -1809,7 +1876,7 @@ class MyBirdNETDashboard {
         // Render keyboard-accessible recommendations and select a place without closing the map.
         if (!this.mapSearchResults.length) {
             this.mapPlaceRecommendations.innerHTML =
-                '<div class="map-place-empty">No matching places found.</div>';
+                `<div class="map-place-empty">${this.escapeHTML(this.t('map.noMatchingPlaces'))}</div>`;
             this.showMapPlaceRecommendations();
             return;
         }
@@ -1895,7 +1962,7 @@ class MyBirdNETDashboard {
         const stations = [];
         let cursor = null;
         let hasNextPage = true;
-        document.getElementById('station-map-status').textContent = 'Loading stations in the visible map area...';
+        document.getElementById('station-map-status').textContent = this.t('station.loadingVisibleArea');
 
         try {
             while (hasNextPage) {
@@ -1909,7 +1976,7 @@ class MyBirdNETDashboard {
                 hasNextPage = Boolean(data.stations?.pageInfo?.hasNextPage);
                 cursor = data.stations?.pageInfo?.endCursor || null;
                 document.getElementById('station-map-status').textContent =
-                    `Loading visible stations: ${this.formatNumber(stations.length)} found...`;
+                    this.t('station.loadingVisibleCount', { count: this.formatNumber(stations.length) });
                 if (!cursor) break;
             }
             if (requestId !== this.mapStationRequestId || controller.signal.aborted) return;
@@ -1917,13 +1984,13 @@ class MyBirdNETDashboard {
             this.stationViewMode = 'map';
             this.renderMapStations(stations);
             document.getElementById('station-map-status').textContent = stations.length
-                ? `${this.formatNumber(stations.length)} stations in the visible area. Click a marker to select it.`
-                : 'No BirdWeather stations are present in the visible area.';
+                ? this.t('station.visibleAreaCount', { count: this.formatNumber(stations.length) })
+                : this.t('station.noneInVisibleArea');
         } catch (error) {
             if (error.name !== 'AbortError') {
                 console.error(error);
                 document.getElementById('station-map-status').textContent =
-                    'Stations could not be loaded for this map area.';
+                    this.t('station.visibleAreaLoadFailed');
             }
         } finally {
             if (this.mapStationController === controller) this.mapStationController = null;
@@ -1940,7 +2007,7 @@ class MyBirdNETDashboard {
             weight: 3,
             fillColor: '#2678d8',
             fillOpacity: 1
-        }).bindTooltip('Your approximate location').addTo(this.stationMapLayer);
+        }).bindTooltip(this.t('map.yourApproximateLocation')).addTo(this.stationMapLayer);
 
         stations.forEach(station => {
             if (!Number.isFinite(station.coords?.lat) || !Number.isFinite(station.coords?.lon)) return;
@@ -1955,15 +2022,15 @@ class MyBirdNETDashboard {
                     iconSize: favourite ? [30, 30] : [24, 24],
                     iconAnchor: favourite ? [15, 15] : [12, 24]
                 }),
-                title: station.name || `Station ${station.id}`
+                title: station.name || this.t('station.stationWithId', { id: station.id })
             });
             const place = [station.location, station.state, station.country].filter(Boolean).join(', ');
             marker.bindTooltip(`
                 <div class="map-tooltip-content">
                     <div>
-                        <strong>${this.escapeHTML(station.name || `Station ${station.id}`)}</strong>
-                        <span>Station ID: ${this.escapeHTML(station.id)}</span>
-                        <span>Type: ${this.escapeHTML(this.getStationTypeLabel(station.type))}</span>
+                        <strong>${this.escapeHTML(station.name || this.t('station.stationWithId', { id: station.id }))}</strong>
+                        <span>${this.escapeHTML(this.t('station.idLabel'))}: ${this.escapeHTML(station.id)}</span>
+                        <span>${this.escapeHTML(this.t('station.typeLabel'))}: ${this.escapeHTML(this.getStationTypeLabel(station.type))}</span>
                         ${this.renderFavouriteButton(station.id, { map: true })}
                     </div>
                     <div>
@@ -1971,7 +2038,7 @@ class MyBirdNETDashboard {
                         ${place ? `<span>${this.escapeHTML(place)}</span>` : ''}
                         ${this.renderStationCacheTag(station.id, { map: true })}
                     </div>
-                    <b>Click to select</b>
+                    <b>${this.escapeHTML(this.t('station.clickToSelect'))}</b>
                 </div>
             `, {
                 direction: 'top',
@@ -2004,21 +2071,21 @@ class MyBirdNETDashboard {
             const place = [station.location, station.state, station.country].filter(Boolean).join(', ');
             const activity = this.getStationActivity(station.latestDetectionAt);
             const distanceLabel = Number.isFinite(station.distance)
-                ? `${station.distance.toFixed(1)} km away${place ? ` • ${place}` : ''}`
-                : place || 'Location unavailable';
+                ? `${this.t('station.distanceAway', { distance: station.distance.toFixed(1) })}${place ? ` - ${place}` : ''}`
+                : place || this.t('station.locationUnavailable');
             return `
                 <article class="station-result">
                     <div>
                         <div class="station-result-heading">
-                            <strong>${this.escapeHTML(station.name || `Station ${station.id}`)}</strong>
+                            <strong>${this.escapeHTML(station.name || this.t('station.stationWithId', { id: station.id }))}</strong>
                             <span class="station-status ${activity.statusClass}">
                                 <span class="station-status-dot" aria-hidden="true"></span>
                                 ${this.escapeHTML(activity.label)}
                             </span>
                             ${this.renderFavouriteButton(station.id)}
                         </div>
-                        <span class="station-id">Station ID: ${this.escapeHTML(station.id)}</span>
-                        <span class="station-type">Type: ${this.escapeHTML(this.getStationTypeLabel(station.type))}</span>
+                        <span class="station-id">${this.escapeHTML(this.t('station.idLabel'))}: ${this.escapeHTML(station.id)}</span>
+                        <span class="station-type">${this.escapeHTML(this.t('station.typeLabel'))}: ${this.escapeHTML(this.getStationTypeLabel(station.type))}</span>
                         <span>${this.escapeHTML(distanceLabel)}</span>
                         <span class="station-last-seen" title="${this.escapeHTML(activity.exact)}">
                             <i class="fa-regular fa-clock" aria-hidden="true"></i>
@@ -2026,7 +2093,7 @@ class MyBirdNETDashboard {
                         </span>
                         ${this.renderStationCacheTag(station.id)}
                     </div>
-                    <button class="primary-button" type="button" data-station-id="${this.escapeHTML(station.id)}">View statistics</button>
+                    <button class="primary-button" type="button" data-station-id="${this.escapeHTML(station.id)}">${this.escapeHTML(this.t('station.viewStatistics'))}</button>
                 </article>
             `;
         }).join('');
@@ -2045,9 +2112,9 @@ class MyBirdNETDashboard {
             return {
                 isOnline: false,
                 statusClass: 'inactive',
-                label: 'No recent activity',
-                lastSeen: 'Last detection unavailable',
-                exact: 'No detection timestamp is available'
+                label: this.t('station.noRecentActivity'),
+                lastSeen: this.t('station.lastDetectionUnavailable'),
+                exact: this.t('station.noDetectionTimestamp')
             };
         }
 
@@ -2056,9 +2123,9 @@ class MyBirdNETDashboard {
             return {
                 isOnline: false,
                 statusClass: 'inactive',
-                label: 'No recent activity',
-                lastSeen: 'Last detection unavailable',
-                exact: 'No detection timestamp is available'
+                label: this.t('station.noRecentActivity'),
+                lastSeen: this.t('station.lastDetectionUnavailable'),
+                exact: this.t('station.noDetectionTimestamp')
             };
         }
 
@@ -2075,30 +2142,32 @@ class MyBirdNETDashboard {
             let elapsedMonths = (now.getFullYear() - latest.getFullYear()) * 12
                 + now.getMonth() - latest.getMonth();
             if (now.getDate() < latest.getDate()) elapsedMonths -= 1;
-            relativeTime = `${Math.max(6, elapsedMonths)} months since last detection`;
+            relativeTime = this.t('station.monthsSinceLastDetection', {
+                count: Math.max(6, elapsedMonths)
+            });
         } else if (elapsedMinutes < 1) {
-            relativeTime = 'just now';
+            relativeTime = this.t('time.justNow');
         } else if (elapsedMinutes < 60) {
-            relativeTime = `${elapsedMinutes} minute${elapsedMinutes === 1 ? '' : 's'} ago`;
+            relativeTime = this.t('time.minutesAgo', { count: elapsedMinutes });
         } else {
             const elapsedHours = Math.floor(elapsedMinutes / 60);
             if (elapsedHours < 48) {
-                relativeTime = `${elapsedHours} hour${elapsedHours === 1 ? '' : 's'} ago`;
+                relativeTime = this.t('time.hoursAgo', { count: elapsedHours });
             } else {
                 const elapsedDays = Math.floor(elapsedHours / 24);
-                relativeTime = `${elapsedDays} day${elapsedDays === 1 ? '' : 's'} ago`;
+                relativeTime = this.t('time.daysAgo', { count: elapsedDays });
             }
         }
 
         return {
             isOnline,
             statusClass: isStale ? 'stale' : isOnline ? 'online' : 'inactive',
-            label: isStale ? 'Inactive 6+ months' : isOnline ? 'Online' : 'Not recently active',
-            lastSeen: isStale ? relativeTime : `Last detection ${relativeTime}`,
-            exact: `Last detection: ${new Intl.DateTimeFormat(undefined, {
+            label: isStale ? this.t('map.inactiveSixMonths') : isOnline ? this.t('common.online') : this.t('map.notRecentlyActive'),
+            lastSeen: isStale ? relativeTime : this.t('station.lastDetectionRelative', { time: relativeTime }),
+            exact: this.t('station.lastDetectionExact', { date: new Intl.DateTimeFormat(this.currentLanguage.replace('_', '-'), {
                 dateStyle: 'medium',
                 timeStyle: 'short'
-            }).format(latest)}`
+            }).format(latest) })
         };
     }
 
@@ -2107,10 +2176,10 @@ class MyBirdNETDashboard {
         const labels = {
             birdnetpi: 'BirdNET-Pi',
             puc: 'BirdWeather PUC',
-            stream_audio: 'Audio stream',
-            stream_youtube: 'YouTube stream'
+            stream_audio: this.t('station.typeAudioStream'),
+            stream_youtube: this.t('station.typeYoutubeStream')
         };
-        return labels[type] || String(type || 'Unknown').replaceAll('_', ' ');
+        return labels[type] || String(type || this.t('common.unknown')).replaceAll('_', ' ');
     }
 
     async loadStationById() {
@@ -2118,7 +2187,7 @@ class MyBirdNETDashboard {
         const stationIdInput = document.getElementById('birdweather-station-id');
         const id = this.normalizeStationId(stationIdInput.value);
         if (!id) {
-            this.setStatus('Enter a station ID such as 15888, ID15888, or #15888.', true);
+            this.setStatus(this.t('station.enterStationId'), true);
             return;
         }
         stationIdInput.value = id;
@@ -2132,14 +2201,14 @@ class MyBirdNETDashboard {
             }
         `;
 
-        this.setStatus(`Finding BirdWeather station ${id}...`);
+        this.setStatus(this.t('station.findingById', { id }));
         try {
             const data = await this.birdWeatherQuery(query, { id });
-            if (!data.station) throw new Error(`BirdWeather station ${id} was not found.`);
+            if (!data.station) throw new Error(this.t('station.notFoundById', { id }));
             await this.loadBirdWeatherStation(data.station);
         } catch (error) {
             console.error(error);
-            this.setStatus(error.message || 'The BirdWeather station could not be loaded.', true);
+            this.setStatus(error.message || this.t('station.stationLoadFailed'), true);
         }
     }
 
@@ -2174,7 +2243,9 @@ class MyBirdNETDashboard {
                     true
                 );
                 this.setStatus(
-                    `Loaded ${this.formatNumber(cached.observationCount || observations.length)} observations from local storage.`
+                    this.t('station.loadedFromLocalStorage', {
+                        count: this.formatNumber(cached.observationCount || observations.length)
+                    })
                 );
                 return;
             }
@@ -2246,17 +2317,21 @@ class MyBirdNETDashboard {
                 .map(detection => this.normalizeBirdWeatherDetection(detection))
                 .filter(Boolean));
             if (!observations.length) {
-                throw new Error(`No bird observations were found at this station during the ${period.label.toLowerCase()}.`);
+                throw new Error(this.t('station.noObservationsForPeriod', {
+                    period: period.label.toLowerCase()
+                }));
             }
 
             document.getElementById('fetch-progress-message').textContent =
-                `Saving ${this.formatNumber(observations.length)} observations in this browser...`;
-            document.getElementById('fetch-progress-eta').textContent = 'Creating local station cache...';
+                this.t('import.savingObservations', {
+                    count: this.formatNumber(observations.length)
+                });
+            document.getElementById('fetch-progress-eta').textContent = this.t('station.creatingLocalCache');
             try {
                 await this.persistStationCache(station, period, observations);
             } catch (cacheError) {
                 console.warn('BirdWeather observations could not be cached:', cacheError);
-                this.setStatus('Observations loaded, but this browser could not save them locally.', true);
+                this.setStatus(this.t('station.cacheSaveFailed'), true);
             }
             this.openBirdWeatherObservations(station, period, observations, reportedTotal, false);
             this.hideFetchProgress();
@@ -2264,10 +2339,10 @@ class MyBirdNETDashboard {
         } catch (error) {
             this.hideFetchProgress();
             if (error.name === 'AbortError') {
-                this.setStatus('BirdWeather import cancelled.');
+                this.setStatus(this.t('import.birdweatherCancelled'));
             } else {
                 console.error(error);
-                this.setStatus(error.message || 'BirdWeather observations could not be loaded.', true);
+                this.setStatus(error.message || this.t('import.birdweatherObservationsFailed'), true);
             }
         } finally {
             if (this.activeBirdWeatherController === controller) {
@@ -2283,7 +2358,9 @@ class MyBirdNETDashboard {
             ? { lat: station.coords.lat, lon: station.coords.lon, source: 'BirdWeather station' }
             : null;
         this.importKind = 'birdweather';
-        this.datasetDetail = `${period.label} public station history${fromCache ? ' • saved locally' : ''}`;
+        this.datasetDetail = this.t(fromCache ? 'dataset.publicStationHistoryCached' : 'dataset.publicStationHistory', {
+            period: period.label
+        });
         this.datasetName = station.name || `BirdWeather station ${station.id}`;
         this.activeDatasetKey = `birdweather:${station.id}:${period.count}:${period.unit}`;
         this.initializeDateRange();
@@ -2297,10 +2374,10 @@ class MyBirdNETDashboard {
         const [countValue, unit = 'day'] = this.birdWeatherPeriod.value.split(':');
         const count = Math.max(1, Number.parseInt(countValue, 10) || 1);
         const label = unit === 'month'
-            ? `Last ${count} months`
+            ? this.t('period.lastMonths', { count })
             : count === 1
-                ? 'Last 24 hours'
-                : `Last ${count} days`;
+                ? this.t('period.last24Hours')
+                : this.t('period.lastDays', { count });
         return { count, unit, label };
     }
 
@@ -2309,10 +2386,10 @@ class MyBirdNETDashboard {
         document.getElementById('fetch-progress-title').textContent =
             station.name || `BirdWeather station ${station.id}`;
         document.getElementById('fetch-progress-message').textContent =
-            `Loading observations from the ${period.label.toLowerCase()}...`;
+            this.t('import.loadingPeriod', { period: period.label.toLowerCase() });
         document.getElementById('fetch-progress-percent').textContent = '0%';
-        document.getElementById('fetch-progress-count').textContent = 'Waiting for the first page...';
-        document.getElementById('fetch-progress-eta').textContent = 'Calculating time remaining...';
+        document.getElementById('fetch-progress-count').textContent = this.t('import.waitingFirstPage');
+        document.getElementById('fetch-progress-eta').textContent = this.t('import.calculatingTime');
         document.getElementById('fetch-progress-fill').style.width = '0%';
         document.getElementById('fetch-progress-bar').setAttribute('aria-valuenow', '0');
         this.fetchProgressModal.hidden = false;
@@ -2328,17 +2405,21 @@ class MyBirdNETDashboard {
         const rate = completed / elapsedSeconds;
         const remainingSeconds = rate > 0 ? Math.max(0, (importTotal - completed) / rate) : null;
         const cappedLabel = availableTotal > maximumDetections
-            ? `; ${this.formatNumber(availableTotal)} available at this station`
+            ? this.t('import.availableAtStationSuffix', { count: this.formatNumber(availableTotal) })
             : '';
 
         document.getElementById('fetch-progress-percent').textContent = `${percentage}%`;
         document.getElementById('fetch-progress-count').textContent =
-            `${this.formatNumber(completed)} of ${this.formatNumber(importTotal)} observations${cappedLabel}`;
+            this.t('import.progressCount', {
+                loaded: this.formatNumber(completed),
+                total: this.formatNumber(importTotal),
+                suffix: cappedLabel
+            });
         document.getElementById('fetch-progress-eta').textContent = remainingSeconds === null
-            ? 'Calculating time remaining...'
+            ? this.t('import.calculatingTime')
             : remainingSeconds < 2
-                ? 'Finishing...'
-                : `Approximately ${this.formatDuration(remainingSeconds)} remaining`;
+                ? this.t('import.finishing')
+                : this.t('import.timeRemaining', { duration: this.formatDuration(remainingSeconds) });
         document.getElementById('fetch-progress-fill').style.width = `${percentage}%`;
         document.getElementById('fetch-progress-bar').setAttribute('aria-valuenow', String(percentage));
     }
@@ -2346,15 +2427,15 @@ class MyBirdNETDashboard {
     formatDuration(seconds) {
         // Keep the estimated time compact enough for the progress modal on narrow screens.
         const roundedSeconds = Math.max(1, Math.round(seconds));
-        if (roundedSeconds < 60) return `${roundedSeconds} second${roundedSeconds === 1 ? '' : 's'}`;
+        if (roundedSeconds < 60) return this.t('duration.seconds', { count: roundedSeconds });
         const minutes = Math.ceil(roundedSeconds / 60);
-        return `${minutes} minute${minutes === 1 ? '' : 's'}`;
+        return this.t('duration.minutes', { count: minutes });
     }
 
     cancelBirdWeatherFetch() {
         // Abort the active GraphQL page request and leave any previously loaded dashboard untouched.
         if (!this.activeBirdWeatherController) return;
-        document.getElementById('fetch-progress-message').textContent = 'Cancelling import...';
+        document.getElementById('fetch-progress-message').textContent = this.t('import.cancelling');
         document.getElementById('cancel-station-fetch').disabled = true;
         this.activeBirdWeatherController.abort();
     }
@@ -2446,7 +2527,8 @@ class MyBirdNETDashboard {
         // Persist the switch and load weather only when an active dataset and coordinates are available.
         this.weatherEnabled = this.weatherToggle.checked;
         localStorage.setItem('birdWeatherOverlayEnabled', String(this.weatherEnabled));
-        this.weatherSettings.hidden = !this.weatherEnabled;
+        this.weatherSettingsOpen = this.weatherEnabled && (!this.weatherApiKeyInput.value.trim() || this.weatherSettingsOpen);
+        this.updateWeatherSettingsVisibility();
 
         if (!this.weatherEnabled) {
             this.weatherLoadId += 1;
@@ -2454,6 +2536,7 @@ class MyBirdNETDashboard {
             this.activeMeteostatController = null;
             this.weatherData = new Map();
             this.weatherHourlyData = new Map();
+            this.weatherLocation = null;
             this.setWeatherStatus('');
             if (this.stats) this.renderCharts();
             return;
@@ -2466,20 +2549,40 @@ class MyBirdNETDashboard {
         // Store the visitor-owned RapidAPI key locally; it is never sent anywhere except Meteostat.
         const key = this.weatherApiKeyInput.value.trim();
         if (!key) {
-            this.setWeatherStatus('Enter your Meteostat RapidAPI key first.', true);
+            this.weatherSettingsOpen = true;
+            this.updateWeatherSettingsVisibility();
+            this.setWeatherStatus(this.t('weather.enterApiKey'), true);
             return;
         }
         localStorage.setItem('meteostatRapidApiKey', key);
         this.weatherToggle.checked = true;
         this.weatherEnabled = true;
         localStorage.setItem('birdWeatherOverlayEnabled', 'true');
+        this.weatherSettingsOpen = false;
+        this.updateWeatherSettingsVisibility();
         await this.loadWeatherForActiveDataset({ force: true });
+    }
+
+    toggleWeatherSettings() {
+        // Let visitors hide the API/help controls after weather has been configured.
+        this.weatherSettingsOpen = !this.weatherSettingsOpen;
+        this.updateWeatherSettingsVisibility();
+    }
+
+    updateWeatherSettingsVisibility() {
+        // The include-weather switch controls availability; the settings button controls panel expansion.
+        if (!this.weatherSettings || !this.weatherSettingsToggle) return;
+        const open = Boolean(this.weatherEnabled && this.weatherSettingsOpen);
+        this.weatherSettings.hidden = !open;
+        this.weatherSettingsToggle.disabled = !this.weatherEnabled;
+        this.weatherSettingsToggle.setAttribute('aria-expanded', String(open));
+        this.weatherSettingsToggle.classList.toggle('active', open);
     }
 
     async refreshWeatherNow() {
         // Explicit refresh bypasses both the active summary and station-year caches.
         if (!this.stats) {
-            this.setWeatherStatus('Load a BirdNET file or BirdWeather station first.', true);
+            this.setWeatherStatus(this.t('weather.loadDatasetFirst'), true);
             return;
         }
         await this.loadWeatherForActiveDataset({ force: true });
@@ -2503,7 +2606,7 @@ class MyBirdNETDashboard {
         return {
             lat: coordinates.reduce((sum, item) => sum + item.latitude, 0) / coordinates.length,
             lon: coordinates.reduce((sum, item) => sum + item.longitude, 0) / coordinates.length,
-            source: 'imported file'
+            source: this.t('dataset.importedFile')
         };
     }
 
@@ -2511,14 +2614,14 @@ class MyBirdNETDashboard {
         if (!this.weatherEnabled || !this.observations.length || !this.availableDateKeys.length) return;
         const location = this.getDatasetWeatherLocation();
         if (!location) {
-            this.setWeatherStatus('Weather needs latitude and longitude in the loaded observations.', true);
+            this.setWeatherStatus(this.t('weather.needsCoordinates'), true);
             return;
         }
 
         const apiKey = localStorage.getItem('meteostatRapidApiKey') || '';
         if (!apiKey) {
             this.weatherSettings.hidden = false;
-            this.setWeatherStatus('Add a Meteostat RapidAPI key to locate the nearest weather station.', true);
+            this.setWeatherStatus(this.t('weather.addApiKey'), true);
             return;
         }
 
@@ -2543,7 +2646,12 @@ class MyBirdNETDashboard {
                         (Date.now() - new Date(cached.savedAt).getTime()) / 86400000
                     ));
                     this.setWeatherStatus(
-                        `Weather loaded from local cache (${this.weatherData.size} days, updated ${ageDays === 0 ? 'today' : `${ageDays} day${ageDays === 1 ? '' : 's'} ago`}). Click to view stations.`
+                        this.t('weather.loadedFromCache', {
+                            days: this.weatherData.size,
+                            age: ageDays === 0
+                                ? this.t('common.today')
+                                : this.t('duration.daysAgo', { count: ageDays })
+                        })
                     );
                     this.renderCharts();
                     this.ensureSelectedHourlyWeather();
@@ -2558,7 +2666,10 @@ class MyBirdNETDashboard {
         this.activeMeteostatController?.abort();
         const controller = new AbortController();
         this.activeMeteostatController = controller;
-        this.setWeatherStatus(`Finding the three nearest Meteostat stations for the ${location.source || 'dataset'} location...`);
+        this.meteostatBulkBlockedNotified = false;
+        this.setWeatherStatus(this.t('weather.findingStations', {
+            source: location.source || this.t('dataset.dataset')
+        }));
 
         try {
             const stations = await this.fetchNearestMeteostatStations(location, apiKey, controller.signal);
@@ -2577,7 +2688,7 @@ class MyBirdNETDashboard {
 
             if (selectedDays <= 2) {
                 // Short restored windows use targeted station-hour API requests instead of annual bulk files.
-                this.setWeatherStatus(`Loading hourly weather for the selected ${selectedDays}-day window...`);
+                this.setWeatherStatus(this.t('weather.loadingSelectedHourly', { days: selectedDays }));
                 for (const station of stationsWithMetadata) {
                     if (requestId !== this.weatherLoadId || controller.signal.aborted) return;
                     const hourly = await this.fetchMeteostatStationHourly(
@@ -2595,7 +2706,10 @@ class MyBirdNETDashboard {
                 const lastYear = Number(end.slice(0, 4));
                 for (let year = firstYear; year <= lastYear; year += 1) {
                     if (requestId !== this.weatherLoadId) return;
-                    this.setWeatherStatus(`Loading ${year} weather from ${stationsWithMetadata.length} nearby stations...`);
+                    this.setWeatherStatus(this.t('weather.loadingYear', {
+                        year,
+                        count: stationsWithMetadata.length
+                    }));
                     const annualResults = await Promise.all(stationsWithMetadata.map(async station => ({
                         station,
                         records: await this.fetchMeteostatBulkYear(station.id, year, { forceRefresh: force }),
@@ -2635,7 +2749,7 @@ class MyBirdNETDashboard {
                 date => date >= start && date <= end && !records.has(date)
             );
             if (missingDates.length) {
-                this.setWeatherStatus(`Filling ${missingDates.length} missing weather dates through the Meteostat API...`);
+                this.setWeatherStatus(this.t('weather.fillingMissingDates', { count: missingDates.length }));
                 const pointRecords = await this.fetchMeteostatPointDaily(
                     location,
                     start,
@@ -2665,14 +2779,17 @@ class MyBirdNETDashboard {
                 console.warn('Meteostat weather could not be cached locally:', error);
             }
             this.setWeatherStatus(
-                `Weather ready: ${records.size} days averaged from ${stationsWithMetadata.length} nearby Meteostat station${stationsWithMetadata.length === 1 ? '' : 's'}. Click to view them on the map.`
+                this.t('weather.ready', {
+                    days: records.size,
+                    count: stationsWithMetadata.length
+                })
             );
             this.renderCharts();
             this.ensureSelectedHourlyWeather();
         } catch (error) {
             if (error.name === 'AbortError') return;
             console.error('Meteostat weather loading failed:', error);
-            this.setWeatherStatus(error.message || 'Weather data could not be loaded.', true);
+            this.setWeatherStatus(error.message || this.t('weather.loadFailed'), true);
         } finally {
             if (this.activeMeteostatController === controller) {
                 this.activeMeteostatController = null;
@@ -2909,8 +3026,14 @@ class MyBirdNETDashboard {
             return cached.records;
         }
 
-        // Annual daily station files are free, gzip-compressed, and may legitimately be unavailable.
-        const response = await fetch(`https://data.meteostat.net/daily/${year}/${encodeURIComponent(stationId)}.csv.gz`);
+        // Annual daily station files are free, gzip-compressed, and may be blocked by privacy tools.
+        let response;
+        try {
+            response = await fetch(`https://data.meteostat.net/daily/${year}/${encodeURIComponent(stationId)}.csv.gz`);
+        } catch (error) {
+            if (this.handleMeteostatBulkFetchError(error, 'daily', year)) return [];
+            throw error;
+        }
         if (response.status === 404) return [];
         if (!response.ok) throw new Error(`Meteostat bulk data for ${year} returned HTTP ${response.status}.`);
         const compressed = new Uint8Array(await response.arrayBuffer());
@@ -2955,9 +3078,15 @@ class MyBirdNETDashboard {
             return new Map(cached.records.map(record => [record.time, record]));
         }
 
-        const response = await fetch(
-            `https://data.meteostat.net/hourly/${year}/${encodeURIComponent(stationId)}.csv.gz`
-        );
+        let response;
+        try {
+            response = await fetch(
+                `https://data.meteostat.net/hourly/${year}/${encodeURIComponent(stationId)}.csv.gz`
+            );
+        } catch (error) {
+            if (this.handleMeteostatBulkFetchError(error, 'hourly', year)) return new Map();
+            throw error;
+        }
         if (response.status === 404) return new Map();
         if (!response.ok) throw new Error(`Meteostat hourly bulk data for ${year} returned HTTP ${response.status}.`);
         const compressed = new Uint8Array(await response.arrayBuffer());
@@ -2988,6 +3117,18 @@ class MyBirdNETDashboard {
         });
         cacheDatabase.close();
         return new Map(records.map(record => [record.time, record]));
+    }
+
+    handleMeteostatBulkFetchError(error, type, year) {
+        // Browser extensions report blocked bulk downloads as a generic fetch TypeError.
+        if (error?.name === 'AbortError') return false;
+        if (!(error instanceof TypeError)) return false;
+        console.warn(`Meteostat ${type} bulk data for ${year} could not be fetched; using API fallback where possible:`, error);
+        if (!this.meteostatBulkBlockedNotified) {
+            this.meteostatBulkBlockedNotified = true;
+            this.setWeatherStatus(this.t('weather.bulkBlockedFallback'), true);
+        }
+        return true;
     }
 
     normalizeMeteostatHourlyRecord(row) {
@@ -3170,7 +3311,10 @@ class MyBirdNETDashboard {
         const coveredHours = labels.filter(label => this.weatherHourlyData.has(label)).length;
         if (coveredHours >= labels.length * 0.9) {
             this.setWeatherStatus(
-                `Hourly weather ready: ${coveredHours} of ${labels.length} hours available. Click to view stations.`
+                this.t('weather.hourlyReadyAvailable', {
+                    available: coveredHours,
+                    total: labels.length
+                })
             );
             return;
         }
@@ -3188,7 +3332,10 @@ class MyBirdNETDashboard {
         const controller = new AbortController();
         this.activeHourlyWeatherController = controller;
         this.setWeatherStatus(
-            `Loading hourly weather for ${start}${start === end ? '' : ` to ${end}`}...`
+            this.t('weather.loadingHourlyRange', {
+                start,
+                end: start === end ? '' : this.t('common.toDate', { date: end })
+            })
         );
 
         try {
@@ -3211,14 +3358,18 @@ class MyBirdNETDashboard {
             this.persistActiveWeatherCache();
             const availableHours = labels.filter(label => this.weatherHourlyData.has(label)).length;
             this.setWeatherStatus(
-                `Hourly weather ready: ${availableHours} of ${labels.length} hours averaged from ${stationRecords.size} nearby station${stationRecords.size === 1 ? '' : 's'}. Click to view them on the map.`
+                this.t('weather.hourlyReadyAveraged', {
+                    available: availableHours,
+                    total: labels.length,
+                    count: stationRecords.size
+                })
             );
             this.renderCharts();
         } catch (error) {
             if (error.name === 'AbortError') return;
             this.hourlyWeatherSelectionKey = '';
             console.warn('Selected hourly Meteostat weather could not be loaded:', error);
-            this.setWeatherStatus(error.message || 'Hourly weather could not be loaded.', true);
+            this.setWeatherStatus(error.message || this.t('weather.hourlyLoadFailed'), true);
         } finally {
             if (this.activeHourlyWeatherController === controller) {
                 this.activeHourlyWeatherController = null;
@@ -3283,11 +3434,11 @@ class MyBirdNETDashboard {
         }
 
         if (response.status === 401) {
-            return 'The Meteostat RapidAPI key is invalid. Check the key copied from your RapidAPI application.';
+            return this.t('weather.errorInvalidKey');
         }
         if (response.status === 403) {
-            const detail = providerMessage ? ` RapidAPI says: ${providerMessage}` : '';
-            return `RapidAPI denied Meteostat access.${detail} Confirm that the selected RapidAPI application is subscribed to Meteostat and that this exact key belongs to that application.`;
+            const detail = providerMessage ? this.t('weather.rapidApiSays', { message: providerMessage }) : '';
+            return this.t('weather.errorDenied', { detail });
         }
         if (response.status === 429) {
             const retryAfter = response.headers.get('retry-after');
@@ -3295,17 +3446,23 @@ class MyBirdNETDashboard {
                 || response.headers.get('x-ratelimit-rapid-free-plans-hard-limit-remaining');
             const quotaMessage = providerMessage.toLowerCase();
             if (quotaMessage.includes('monthly') || quotaMessage.includes('quota exceeded')) {
-                return `The Meteostat RapidAPI monthly quota has been reached.${providerMessage ? ` RapidAPI says: ${providerMessage}` : ''}`;
+                return this.t('weather.errorMonthlyQuota', {
+                    detail: providerMessage ? this.t('weather.rapidApiSays', { message: providerMessage }) : ''
+                });
             }
             const retryText = retryAfter
-                ? ` Retry after approximately ${retryAfter} second${retryAfter === '1' ? '' : 's'}.`
-                : ' Wait briefly and try again.';
-            const remainingText = remaining !== null ? ` Monthly requests remaining: ${remaining}.` : '';
-            return `Meteostat temporarily rate-limited rapid requests.${retryText}${remainingText}${providerMessage ? ` RapidAPI says: ${providerMessage}` : ''}`;
+                ? this.t('weather.retryAfter', { seconds: retryAfter })
+                : this.t('weather.waitBriefly');
+            const remainingText = remaining !== null ? this.t('weather.monthlyRemaining', { count: remaining }) : '';
+            return this.t('weather.errorRateLimited', {
+                retry: retryText,
+                remaining: remainingText,
+                detail: providerMessage ? this.t('weather.rapidApiSays', { message: providerMessage }) : ''
+            });
         }
 
         const detail = providerMessage ? ` ${providerMessage}` : '';
-        return `Meteostat ${operation} returned HTTP ${response.status}.${detail}`;
+        return this.t('weather.errorHttp', { operation, status: response.status, detail });
     }
 
     async clearWeatherCache() {
@@ -3330,7 +3487,7 @@ class MyBirdNETDashboard {
         this.weatherData = new Map();
         this.weatherHourlyData = new Map();
         this.weatherLocation = null;
-        this.setWeatherStatus('Weather cache cleared.');
+        this.setWeatherStatus(this.t('weather.cacheCleared'));
         if (this.stats) this.renderCharts();
     }
 
@@ -3338,12 +3495,15 @@ class MyBirdNETDashboard {
         if (!this.weatherStatus) return;
         this.weatherStatus.textContent = message;
         this.weatherStatus.classList.toggle('error', isError);
-        const hasMappableStations = !isError
+        if (this.weatherStatusRow) this.weatherStatusRow.hidden = !message;
+        const hasMappableStations = Boolean(message) && !isError
             && this.weatherLocation?.stations?.some(station =>
                 Number.isFinite(station.latitude) && Number.isFinite(station.longitude)
             );
-        this.weatherStatus.disabled = !hasMappableStations;
-        this.weatherStatus.title = hasMappableStations ? 'Show weather stations on map' : '';
+        if (this.weatherStationsButton) {
+            this.weatherStationsButton.hidden = !hasMappableStations;
+            this.weatherStationsButton.title = hasMappableStations ? this.t('weather.showStationsMap') : '';
+        }
     }
 
     openWeatherStationMap() {
@@ -3377,7 +3537,9 @@ class MyBirdNETDashboard {
             iconAnchor: [14, 14]
         });
         L.marker(source, { icon: sourceIcon })
-            .bindTooltip(`${this.weatherLocation.source || 'BirdNET data'} location`)
+            .bindTooltip(this.t('map.sourceLocationTooltip', {
+                source: this.weatherLocation.source || 'BirdNET data'
+            }))
             .addTo(this.weatherStationMap);
 
         const bounds = L.latLngBounds([source]);
@@ -3393,7 +3555,9 @@ class MyBirdNETDashboard {
                 .bindTooltip(
                     `<strong>${this.escapeHTML(station.name || station.id)}</strong><br>`
                     + `ID: ${this.escapeHTML(station.id)}<br>`
-                    + `${(station.distance / 1000).toFixed(1)} km from source`
+                    + this.escapeHTML(this.t('map.distanceFromSource', {
+                        distance: (station.distance / 1000).toFixed(1)
+                    }))
                 )
                 .addTo(this.weatherStationMap);
             L.polyline([source, point], {
@@ -3547,8 +3711,8 @@ class MyBirdNETDashboard {
         this.updateFloatingDataContext();
         this.updateSavedFileControls();
         this.changeStationButton.innerHTML = this.importKind === 'birdweather'
-            ? '<i class="fa-solid fa-location-dot" aria-hidden="true"></i> Change station or location'
-            : '<i class="fa-solid fa-location-dot" aria-hidden="true"></i> Explore nearby stations';
+            ? `<i class="fa-solid fa-location-dot" aria-hidden="true"></i> <span>${this.escapeHTML(this.t('action.changeStationLocation'))}</span>`
+            : `<i class="fa-solid fa-location-dot" aria-hidden="true"></i> <span>${this.escapeHTML(this.t('action.exploreNearbyStations'))}</span>`;
 
         this.updateDatasetSummary();
 
@@ -3568,37 +3732,44 @@ class MyBirdNETDashboard {
         const endKey = this.availableDateKeys[Number(this.dateRangeEndInput.value)];
         const resolvedStart = startDate || (startKey ? new Date(`${startKey}T00:00:00`) : null);
         const resolvedEnd = endDate || (endKey ? new Date(`${endKey}T00:00:00`) : null);
-        const sourcePrefix = this.importKind === 'birdweather' ? 'Station' : 'Local';
+        const sourcePrefix = this.importKind === 'birdweather' ? this.t('dataset.station') : this.t('dataset.local');
         this.floatingDataSource.textContent = `${sourcePrefix}: ${this.datasetName || this.t('dashboard.observations')}`;
         this.floatingDataRange.textContent = resolvedStart && resolvedEnd
-            ? `Range: ${this.formatShortDate(resolvedStart)} – ${this.formatShortDate(resolvedEnd)}`
-            : 'Range unavailable';
+            ? this.t('dataset.range', {
+                start: this.formatShortDate(resolvedStart),
+                end: this.formatShortDate(resolvedEnd)
+            })
+            : this.t('dataset.rangeUnavailable');
         this.floatingDataContext.hidden = false;
     }
 
     updateDatasetSummary() {
         // Describe the source and currently selected date-window total in the dataset toolbar.
         const formatLabel = this.importKind === 'ebird'
-            ? 'Aggregated BirdNET-Pi eBird checklist'
+            ? this.t('dataset.aggregatedChecklist')
             : this.importKind === 'birdweather'
-                ? `Public BirdWeather data${this.datasetDetail ? ` • ${this.datasetDetail}` : ''}`
-                : 'Full detection export';
+                ? this.t('dataset.publicBirdweather', { detail: this.datasetDetail ? ` • ${this.datasetDetail}` : '' })
+                : this.t('dataset.fullDetectionExport');
         const limitLabel = this.birdWeatherLimitReached
-            ? ' • showing the latest 500,000 observations'
+            ? this.t('dataset.limitSuffix')
             : '';
         document.getElementById('dataset-summary').textContent =
-            `${formatLabel} • ${this.formatNumber(this.stats.totalDetections)} observations${limitLabel}`;
+            this.t('dataset.summary', {
+                source: formatLabel,
+                count: this.formatNumber(this.stats.totalDetections),
+                suffix: limitLabel
+            });
     }
 
     renderMetrics() {
         const stats = this.stats;
         const metrics = [
-            [this.t('common.detections'), this.formatNumber(stats.totalDetections), this.importKind === 'ebird' ? 'Aggregated records' : 'All imported records'],
-            [this.t('common.species'), this.formatNumber(stats.uniqueSpecies), 'Unique imported species'],
-            ['Active days', this.formatNumber(stats.activeDays), `${stats.spanDays} calendar-day span`],
-            ['Per active day', stats.detectionsPerActiveDay.toFixed(1), 'Average detections'],
-            ['Average confidence', stats.averageConfidence === null ? 'N/A' : `${(stats.averageConfidence * 100).toFixed(1)}%`, 'Across scored detections'],
-            ['Date range', stats.firstDate ? this.formatShortDate(stats.firstDate) : 'N/A', stats.lastDate ? `to ${this.formatShortDate(stats.lastDate)}` : '']
+            [this.t('common.detections'), this.formatNumber(stats.totalDetections), this.importKind === 'ebird' ? this.t('metric.aggregatedRecords') : this.t('metric.allImportedRecords')],
+            [this.t('common.species'), this.formatNumber(stats.uniqueSpecies), this.t('metric.uniqueImportedSpecies')],
+            [this.t('metric.activeDays'), this.formatNumber(stats.activeDays), this.t('metric.calendarDaySpan', { count: stats.spanDays })],
+            [this.t('metric.perActiveDay'), stats.detectionsPerActiveDay.toFixed(1), this.t('metric.averageDetections')],
+            [this.t('metric.averageConfidence'), stats.averageConfidence === null ? this.t('common.notAvailable') : `${(stats.averageConfidence * 100).toFixed(1)}%`, this.t('metric.acrossScoredDetections')],
+            [this.t('metric.dateRange'), stats.firstDate ? this.formatShortDate(stats.firstDate) : this.t('common.notAvailable'), stats.lastDate ? this.t('common.toDate', { date: this.formatShortDate(stats.lastDate) }) : '']
         ];
 
         this.metricGrid.innerHTML = metrics.map(([label, value, detail]) => `
@@ -3618,14 +3789,14 @@ class MyBirdNETDashboard {
         const rareSpecies = this.stats.speciesList.filter(item => item.count === 1).length;
 
         const insights = [
-            ['fa-crown', 'Most observed', topSpecies?.commonName || 'N/A', topSpecies ? `${this.formatNumber(topSpecies.count)} detections` : '', true],
-            ['fa-clock', 'Peak activity', `${String(peakHour).padStart(2, '0')}:00–${String((peakHour + 1) % 24).padStart(2, '0')}:00`, `${this.formatNumber(this.stats.hour[peakHour])} detections`],
-            ['fa-calendar-days', 'Busiest month', this.monthNames()[peakMonth], `${this.formatNumber(this.stats.month[peakMonth])} detections`],
-            ['fa-chart-pie', 'Largest category', category?.[0] || 'Unknown', category ? `${this.percent(category[1] / this.stats.totalDetections)} of detections` : ''],
-            ['fa-binoculars', 'Single appearances', this.formatNumber(rareSpecies), 'Species detected once'],
-            ['fa-seedling', 'Taxonomy matched', this.formatNumber(this.stats.speciesList.filter(item => item.category !== 'Unknown').length), 'Species assigned a category'],
-            ['fa-sun', 'Daytime share', this.percent(this.sum(this.stats.hour.slice(6, 18)) / this.stats.totalDetections), '06:00–17:59'],
-            ['fa-moon', 'Night share', this.percent((this.sum(this.stats.hour.slice(18)) + this.sum(this.stats.hour.slice(0, 6))) / this.stats.totalDetections), '18:00–05:59']
+            ['fa-crown', this.t('insight.mostObserved'), topSpecies?.commonName || this.t('common.notAvailable'), topSpecies ? this.t('common.detectionCount', { count: this.formatNumber(topSpecies.count) }) : '', true],
+            ['fa-clock', this.t('insight.peakActivity'), `${String(peakHour).padStart(2, '0')}:00–${String((peakHour + 1) % 24).padStart(2, '0')}:00`, this.t('common.detectionCount', { count: this.formatNumber(this.stats.hour[peakHour]) })],
+            ['fa-calendar-days', this.t('insight.busiestMonth'), this.monthNames()[peakMonth], this.t('common.detectionCount', { count: this.formatNumber(this.stats.month[peakMonth]) })],
+            ['fa-chart-pie', this.t('insight.largestCategory'), category?.[0] || this.t('common.unknown'), category ? this.t('common.percentOfDetections', { percent: this.percent(category[1] / this.stats.totalDetections) }) : ''],
+            ['fa-binoculars', this.t('insight.singleAppearances'), this.formatNumber(rareSpecies), this.t('chart.detectedOnce')],
+            ['fa-seedling', this.t('insight.taxonomyMatched'), this.formatNumber(this.stats.speciesList.filter(item => item.category !== 'Unknown').length), this.t('insight.speciesAssignedCategory')],
+            ['fa-sun', this.t('insight.daytimeShare'), this.percent(this.sum(this.stats.hour.slice(6, 18)) / this.stats.totalDetections), '06:00-17:59'],
+            ['fa-moon', this.t('insight.nightShare'), this.percent((this.sum(this.stats.hour.slice(18)) + this.sum(this.stats.hour.slice(0, 6))) / this.stats.totalDetections), '18:00-05:59']
         ];
 
         this.insightGrid.innerHTML = insights.map(([icon, label, value, detail, hasThumbnail]) => `
@@ -3636,7 +3807,7 @@ class MyBirdNETDashboard {
                         src="${this.placeholderImage()}"
                         data-scientific-name="${this.escapeHTML(topSpecies?.scientificName || '')}"
                         data-common-name="${this.escapeHTML(topSpecies?.commonName || '')}"
-                        alt="${this.escapeHTML(topSpecies?.commonName || 'Most observed bird')}">
+                        alt="${this.escapeHTML(topSpecies?.commonName || this.t('chart.mostObservedBird'))}">
                 ` : ''}
                 <i class="fa-solid ${icon}" aria-hidden="true"></i>
                 <span>${this.escapeHTML(label)}</span>
@@ -3659,7 +3830,7 @@ class MyBirdNETDashboard {
         image.src = this.placeholderImage();
         image.dataset.scientificName = topSpecies.scientificName || '';
         image.dataset.commonName = topSpecies.commonName || '';
-        image.alt = topSpecies.commonName || 'Most observed bird';
+        image.alt = topSpecies.commonName || this.t('chart.mostObservedBird');
         this.loadThumbnailForImage(image);
     }
 
@@ -3700,19 +3871,19 @@ class MyBirdNETDashboard {
                 : `${Math.max(330, visibleSingleSpecies.length * 24 + 70)}px`;
         }
         document.getElementById('single-species-description').textContent = hiddenSingleSpeciesCount
-            ? `Showing 30 most recent one-off species; ${hiddenSingleSpeciesCount} more are listed in the table`
-            : 'Each bar names a species observed exactly once';
+            ? this.t('chart.detectedOnceLimited', { count: hiddenSingleSpeciesCount })
+            : this.t('chart.detectedOnceDescription');
         const timelineDescription = document.getElementById('timeline-chart-description');
         if (timelineDescription) {
             timelineDescription.textContent = useHourlyTimeline
-                ? 'Hourly detection activity for the selected two-day-or-shorter window'
-                : 'Detection activity by day';
+                ? this.t('chart.timelineHourlyDescription')
+                : this.t('chart.timelineDescription');
         }
         const speciesTimelineDescription = document.getElementById('species-timeline-description');
         if (speciesTimelineDescription) {
             speciesTimelineDescription.textContent = useHourlyTimeline
-                ? 'Hourly detections over the selected window'
-                : 'Daily detections over the selected window';
+                ? this.t('chart.speciesHourlyDescription')
+                : this.t('chart.speciesDailyDescription');
         }
 
         const timelineWeatherDatasets = this.getWeatherChartDatasets(timelineLabels, timelineGranularity);
@@ -3741,8 +3912,8 @@ class MyBirdNETDashboard {
                 interaction: { mode: 'nearest', intersect: true },
                 plugins: {
                     tooltip: this.speciesTooltipOptions(topSpecies, species => [
-                        `${this.formatNumber(species.count)} detections`,
-                        `${this.percent(species.share)} of all observations`,
+                        this.t('common.detectionCount', { count: this.formatNumber(species.count) }),
+                        this.t('common.percentOfObservations', { percent: this.percent(species.share) }),
                         species.category
                     ])
                 }
@@ -3790,7 +3961,7 @@ class MyBirdNETDashboard {
                 labels: selectedSpeciesLabels,
                 datasets: [
                     this.dataset(
-                        selectedSpeciesActivity.species?.commonName || 'Detections',
+                        selectedSpeciesActivity.species?.commonName || this.t('common.detections'),
                         selectedSpeciesDetections,
                         colors[4],
                         style !== 'bars'
@@ -3808,7 +3979,7 @@ class MyBirdNETDashboard {
             data: {
                 labels: Array.from({ length: 24 }, (_, hour) => `${String(hour).padStart(2, '0')}:00`),
                 datasets: [this.dataset(
-                    selectedSpeciesActivity.species?.commonName || 'Detections',
+                    selectedSpeciesActivity.species?.commonName || this.t('common.detections'),
                     selectedSpeciesActivity.hour,
                     colors[2],
                     style === 'lines'
@@ -3832,7 +4003,7 @@ class MyBirdNETDashboard {
                 labels: visibleSingleSpecies.map(item => item.commonName),
                 datasets: [{
                     ...this.dataset(
-                        'Observation date',
+                        this.t('chart.observationDate'),
                         visibleSingleSpecies.map(() => 1),
                         colors[5],
                         false
@@ -3845,9 +4016,9 @@ class MyBirdNETDashboard {
                 plugins: {
                     legend: { display: false },
                     tooltip: this.speciesTooltipOptions(visibleSingleSpecies, species => [
-                        `Seen ${this.formatShortDate(species.firstSeen)}`,
+                        this.t('common.seenDate', { date: this.formatShortDate(species.firstSeen) }),
                         species.category,
-                        species.scientificName || 'Scientific name unavailable'
+                        species.scientificName || this.t('table.scientificNameUnavailable')
                     ])
                 },
                 interaction: { mode: 'nearest', intersect: true },
@@ -4057,12 +4228,10 @@ class MyBirdNETDashboard {
             }
             return source.get(label)?.prcp ?? null;
         });
-        const periodLabel = granularity === 'weekly' ? 'Weekly' : granularity === 'hourly' ? 'Hourly' : 'Daily';
-
         const datasets = [
             {
                 type: 'line',
-                label: granularity === 'weekly' ? 'Average temperature (°C)' : 'Temperature (°C)',
+                label: this.t(granularity === 'weekly' ? 'weather.averageTemperature' : 'weather.temperature'),
                 data: temperatures,
                 yAxisID: 'temperature',
                 borderColor: '#d65a31',
@@ -4074,7 +4243,7 @@ class MyBirdNETDashboard {
             },
             {
                 type: 'line',
-                label: granularity === 'weekly' ? 'Average dew point (°C)' : 'Dew point (°C)',
+                label: this.t(granularity === 'weekly' ? 'weather.averageDewPoint' : 'weather.dewPoint'),
                 data: dewPoints,
                 yAxisID: 'temperature',
                 borderColor: '#2474c6',
@@ -4086,7 +4255,7 @@ class MyBirdNETDashboard {
             },
             {
                 type: 'line',
-                label: granularity === 'weekly' ? 'Average humidity (%)' : 'Relative humidity (%)',
+                label: this.t(granularity === 'weekly' ? 'weather.averageHumidity' : 'weather.relativeHumidity'),
                 data: humidity,
                 yAxisID: 'humidity',
                 borderColor: '#29a3a3',
@@ -4098,7 +4267,7 @@ class MyBirdNETDashboard {
             },
             {
                 type: 'bar',
-                label: granularity === 'weekly' ? 'Precipitation total (mm)' : 'Precipitation (mm)',
+                label: this.t(granularity === 'weekly' ? 'weather.precipitationTotal' : 'weather.precipitation'),
                 data: precipitation,
                 yAxisID: 'precipitation',
                 backgroundColor: 'rgba(55, 139, 196, 0.24)',
@@ -4108,7 +4277,7 @@ class MyBirdNETDashboard {
             },
             {
                 type: 'line',
-                label: granularity === 'weekly' ? 'Average pressure (hPa)' : 'Pressure (hPa)',
+                label: this.t(granularity === 'weekly' ? 'weather.averagePressure' : 'weather.pressure'),
                 data: pressure,
                 yAxisID: 'pressure',
                 borderColor: '#7d57a5',
@@ -4119,7 +4288,7 @@ class MyBirdNETDashboard {
             },
             {
                 type: 'line',
-                label: granularity === 'weekly' ? 'Average wind speed (km/h)' : 'Wind speed (km/h)',
+                label: this.t(granularity === 'weekly' ? 'weather.averageWindSpeed' : 'weather.windSpeed'),
                 data: windSpeed,
                 yAxisID: 'windSpeed',
                 borderColor: '#3f8f68',
@@ -4130,7 +4299,7 @@ class MyBirdNETDashboard {
             },
             {
                 type: 'line',
-                label: granularity === 'weekly' ? 'Peak gust (km/h)' : 'Wind gust (km/h)',
+                label: this.t(granularity === 'weekly' ? 'weather.peakGust' : 'weather.windGust'),
                 data: windGust,
                 yAxisID: 'windSpeed',
                 borderColor: '#d0812b',
@@ -4142,7 +4311,7 @@ class MyBirdNETDashboard {
             },
             {
                 type: 'line',
-                label: granularity === 'weekly' ? 'Average wind direction' : 'Wind direction',
+                label: this.t(granularity === 'weekly' ? 'weather.averageWindDirection' : 'weather.windDirection'),
                 data: windDirection.map(direction => Number.isFinite(direction) ? 0.9 : null),
                 windDirections: windDirection,
                 yAxisID: 'windDirectionBand',
@@ -4157,7 +4326,9 @@ class MyBirdNETDashboard {
             },
             {
                 type: 'line',
-                label: `${periodLabel} weather condition (CoCo)`,
+                label: this.t('weather.conditionCoco', {
+                    period: this.t(granularity === 'weekly' ? 'weather.weekly' : granularity === 'hourly' ? 'weather.hourly' : 'weather.daily')
+                }),
                 data: conditions,
                 yAxisID: 'condition',
                 borderColor: '#6b7280',
@@ -4342,7 +4513,7 @@ class MyBirdNETDashboard {
                     callback: value => `${value}°C`
                 },
                 grid: { drawOnChartArea: false },
-                title: { display: true, text: 'Temperature', color: axisColor }
+                title: { display: true, text: this.t('weather.temperatureAxis'), color: axisColor }
             },
             precipitation: {
                 type: 'linear',
@@ -4354,7 +4525,7 @@ class MyBirdNETDashboard {
                     callback: value => `${value} mm`
                 },
                 grid: { drawOnChartArea: false },
-                title: { display: true, text: 'Precipitation', color: axisColor }
+                title: { display: true, text: this.t('weather.precipitationAxis'), color: axisColor }
             },
             pressure: {
                 type: 'linear',
@@ -4785,7 +4956,10 @@ class MyBirdNETDashboard {
     }
 
     monthNames() {
-        return ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        return Array.from({ length: 12 }, (_, month) =>
+            new Intl.DateTimeFormat(this.currentLanguage.replace('_', '-'), { month: 'long' })
+                .format(new Date(2020, month, 1))
+        );
     }
 
     sum(values) {

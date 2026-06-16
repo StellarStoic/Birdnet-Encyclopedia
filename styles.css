@@ -453,6 +453,32 @@ body[data-theme="paper"] {
     font-weight: 700;
 }
 
+.iucn-translate-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin: 0 13px 10px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--primary) 10%, var(--surface-solid));
+    color: var(--primary);
+    cursor: pointer;
+    padding: 7px 11px;
+    font-size: 0.78rem;
+    font-weight: 800;
+}
+
+.iucn-translate-button:hover,
+.iucn-translate-button:focus-visible {
+    border-color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 16%, var(--surface-solid));
+}
+
+.iucn-translate-button:disabled {
+    cursor: wait;
+    opacity: 0.72;
+}
+
 .iucn-detail-block p,
 .iucn-detail-block ul {
     margin: 0;
@@ -1457,8 +1483,8 @@ body[data-theme="midnight"] .dropdown-toggle.active .menu-bird-open {
 .dropdown-toggle {
     background: #4c86209c;
     border: none;
-    width: 54px;
-    height: 54px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     cursor: pointer;
     display: flex;
@@ -1495,8 +1521,8 @@ body[data-theme="midnight"] .dropdown-toggle.active .menu-bird-open {
 
 .menu-bird {
     position: absolute;
-    width: 38px;
-    height: 38px;
+    width: 35px;
+    height: 35px;
     object-fit: contain;
     transition: opacity 0.25s ease, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -2138,6 +2164,17 @@ body[data-theme="midnight"] .dropdown-toggle.active .menu-bird-open {
     color: #9a6700;
 }
 
+.english-source-label {
+    margin-top: 1rem;
+    font-weight: 800;
+}
+
+.english-source-text {
+    border-left: 3px solid var(--border);
+    padding-left: 12px;
+    color: var(--muted);
+}
+
 .modal-sound {
     margin-top: 1.5rem;
     padding-top: 1.5rem;
@@ -2234,7 +2271,7 @@ body[data-theme="midnight"] .dropdown-toggle.active .menu-bird-open {
     color: white;
     border-radius: 50%;
     border-style: none;
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
     cursor: pointer;

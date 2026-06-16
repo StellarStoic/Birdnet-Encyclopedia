@@ -85,6 +85,7 @@ body[data-theme="paper"] {
 body {
     margin: 0;
     min-height: 100vh;
+    max-width: 100%;
     overflow-x: hidden;
     background:
         radial-gradient(circle at top right, color-mix(in srgb, var(--secondary) 22%, transparent), transparent 38%),
@@ -164,6 +165,7 @@ input {
 .toolbar-actions {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 10px;
 }
 
@@ -190,6 +192,8 @@ select,
 }
 
 main {
+    width: 100%;
+    min-width: 0;
     max-width: 1500px;
     margin: 0 auto;
     padding: 0 34px 50px;
@@ -219,6 +223,14 @@ main {
     align-items: center;
     justify-content: space-between;
     gap: 20px;
+}
+
+.weather-heading-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 10px;
 }
 
 .weather-panel-heading h2,
@@ -275,6 +287,16 @@ main {
     transform: translateX(22px);
 }
 
+.weather-settings-toggle {
+    margin: 0;
+    white-space: nowrap;
+}
+
+.weather-settings-toggle.active {
+    border-color: var(--primary);
+    color: var(--primary-strong);
+}
+
 .weather-settings {
     display: grid;
     grid-template-columns: minmax(220px, 1fr) repeat(3, auto);
@@ -301,11 +323,21 @@ main {
 
 .weather-help,
 .weather-api-usage,
-.weather-status {
+.weather-status-row {
     grid-column: 1 / -1;
     margin: 2px 0 0;
     color: var(--muted);
     font-size: 0.8rem;
+}
+
+.weather-status-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
 }
 
 .weather-api-usage {
@@ -316,20 +348,20 @@ main {
 }
 
 .weather-status {
-    padding: 0;
-    border: 0;
-    background: transparent;
-    text-align: left;
-}
-
-.weather-status:not(:disabled) {
-    color: var(--primary);
-    cursor: pointer;
-    text-decoration: underline;
+    flex: 1 1 260px;
+    margin: 0;
+    color: var(--muted);
 }
 
 .weather-status.error {
     color: #c43c3c;
+}
+
+.weather-stations-button {
+    margin: 0;
+    padding: 11px 16px;
+    font-size: 0.92rem;
+    font-weight: 850;
 }
 
 .floating-data-context {
@@ -550,6 +582,7 @@ main {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
+    min-width: 0;
     gap: 12px;
     border: 1px solid var(--border);
     border-radius: 12px;
@@ -557,9 +590,15 @@ main {
     background: var(--surface-solid);
 }
 
+.station-result > div {
+    min-width: 0;
+}
+
 .station-result strong,
 .station-result span {
     display: block;
+    max-width: 100%;
+    overflow-wrap: anywhere;
 }
 
 .station-result-heading {
@@ -676,8 +715,10 @@ main {
 
 .station-cache-tag {
     width: fit-content;
+    max-width: 100%;
     display: inline-flex !important;
     align-items: center;
+    flex-wrap: wrap;
     gap: 5px;
     margin-top: 7px !important;
     border: 1px solid color-mix(in srgb, var(--primary) 30%, var(--border));
@@ -688,6 +729,8 @@ main {
     padding: 5px 8px;
     font-size: 0.7rem !important;
     font-weight: 800;
+    line-height: 1.25;
+    white-space: normal;
 }
 
 .station-cache-tag:hover {
@@ -707,7 +750,9 @@ main {
 
 .station-result > .primary-button {
     margin: 0;
+    max-width: 100%;
     padding: 9px 12px;
+    white-space: normal;
 }
 
 .source-attribution a {
@@ -1178,6 +1223,7 @@ button:disabled {
 
 .dashboard {
     display: grid;
+    min-width: 0;
     gap: 22px;
 }
 
@@ -1187,7 +1233,17 @@ button:disabled {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex-wrap: wrap;
     gap: 20px;
+}
+
+/* Prevent long station names, cached-period tags, and chart canvases from widening the dashboard. */
+.dashboard > *,
+.source-grid > *,
+.metric-grid > *,
+.insight-grid > *,
+.chart-grid > * {
+    min-width: 0;
 }
 
 .dataset-toolbar h2,
@@ -1486,6 +1542,7 @@ button:disabled {
     min-width: 0;
     height: 330px;
     margin-top: 14px;
+    overflow: hidden;
 }
 
 .chart-snapshot-button {
@@ -1515,6 +1572,8 @@ button:disabled {
 }
 
 .chart-wrap canvas {
+    width: 100% !important;
+    height: 100% !important;
     max-width: 100%;
 }
 
@@ -1727,6 +1786,7 @@ tbody tr:hover {
     .date-range-heading,
     .date-range-footer,
     .weather-panel-heading,
+    .weather-heading-actions,
     .toolbar-actions,
     .species-heading,
     .species-explorer-heading {

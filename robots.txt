@@ -1,0 +1,6 @@
+# Allows search engines to crawl the public static pages and discover the sitemap.
+User-agent: *
+Allow: /
+Disallow: /test.html
+
+Sitemap: https://birdnet.woopod.com/sitemap.xml

@@ -1,0 +1,18 @@
+{
+  "name": "BirdNET-Pi Encyclopedia",
+  "short_name": "BirdNET Birds",
+  "description": "A multilingual BirdNET-Pi bird encyclopedia and observation statistics dashboard.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f3f8ef",
+  "theme_color": "#4c8620",
+  "icons": [
+    {
+      "src": "/img/origami_bird_B-ICO.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

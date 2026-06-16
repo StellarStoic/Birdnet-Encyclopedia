@@ -61,6 +61,12 @@
         root.querySelectorAll?.('[data-i18n-aria-label]').forEach(element => {
             element.setAttribute('aria-label', t(element.dataset.i18nAriaLabel));
         });
+        root.querySelectorAll?.('[data-i18n-alt]').forEach(element => {
+            element.setAttribute('alt', t(element.dataset.i18nAlt));
+        });
+        root.querySelectorAll?.('[data-i18n-title-attr]').forEach(element => {
+            element.setAttribute('title', t(element.dataset.i18nTitleAttr));
+        });
         const titleKey = document.documentElement.dataset.i18nTitle;
         if (titleKey) document.title = t(titleKey);
     }

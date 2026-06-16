@@ -14,15 +14,70 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
 <!DOCTYPE html>
-<html lang="en" data-i18n-title="app.encyclopedia">
+<html lang="en" data-i18n-title="page.encyclopediaTitle">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BirdNET-pi Encyclopedia</title>
+    <meta name="description" content="Explore a multilingual BirdNET-Pi bird encyclopedia with localized bird names, Wikipedia descriptions, IUCN conservation status, photos, sounds, and BirdNET observation tools.">
+    <meta name="keywords" content="BirdNET-Pi, BirdNET, bird encyclopedia, bird identification, bird names, bird translations, IUCN bird status, bird conservation, bird observations, BirdWeather">
+    <meta name="author" content="StellarStoic">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="theme-color" content="#4c8620">
+    <link rel="canonical" href="https://birdnet.woopod.com/">
+    <link rel="alternate" href="https://birdnet.woopod.com/" hreflang="x-default">
+    <title>BirdNET-Pi Encyclopedia | Multilingual Bird Guide and Conservation Status</title>
+    <!-- Open Graph metadata gives search engines and social previews a concise page summary. -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="BirdNET-Pi Encyclopedia">
+    <meta property="og:title" content="BirdNET-Pi Encyclopedia">
+    <meta property="og:description" content="Discover BirdNET-Pi species in many languages with photos, descriptions, sounds, IUCN conservation status, and observation analytics.">
+    <meta property="og:url" content="https://birdnet.woopod.com/">
+    <meta property="og:image" content="https://birdnet.woopod.com/img/origami_bird_B-ICO.png">
+    <meta property="og:image:alt" content="Origami bird icon for the BirdNET-Pi Encyclopedia">
+    <!-- Twitter/X cards reuse the same static preview image for link sharing. -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="BirdNET-Pi Encyclopedia">
+    <meta name="twitter:description" content="A multilingual BirdNET-Pi encyclopedia with bird names, descriptions, conservation status, media, and observation tools.">
+    <meta name="twitter:image" content="https://birdnet.woopod.com/img/origami_bird_B-ICO.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" href="/img/origami_bird_B-ICO.png">
+    <link rel="manifest" href="/site.webmanifest">
     <script src="i18n.js"></script>
+    <!-- Structured data describes the static encyclopedia entry point for search engines. -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            "name": "BirdNET-Pi Encyclopedia",
+            "url": "https://birdnet.woopod.com/",
+            "applicationCategory": "ReferenceApplication",
+            "operatingSystem": "Any",
+            "description": "A multilingual BirdNET-Pi bird encyclopedia with localized bird names, bird descriptions, media, IUCN conservation status, and observation tools.",
+            "image": "https://birdnet.woopod.com/img/origami_bird_B-ICO.png",
+            "isAccessibleForFree": true,
+            "inLanguage": "en",
+            "creator": {
+                "@type": "Person",
+                "name": "StellarStoic"
+            },
+            "about": [
+                {
+                    "@type": "Thing",
+                    "name": "BirdNET-Pi"
+                },
+                {
+                    "@type": "Thing",
+                    "name": "Bird encyclopedia"
+                },
+                {
+                    "@type": "Thing",
+                    "name": "Bird conservation"
+                }
+            ]
+        }
+    </script>
     <!-- Public Pollinations app identity; visitor-scoped secret keys are never embedded in source. -->
     <script>
         window.BIRD_ENCYCLOPEDIA_CONFIG = {
@@ -66,12 +121,12 @@
                                 <hr class="categories-divider">
                                 <details class="iucn-filter-details">
                                     <summary>
-                                        <span><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> IUCN status</span>
+                                        <span><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> <span data-i18n="iucn.menuTitle">IUCN status</span></span>
                                         <i class="fa-solid fa-chevron-down iucn-filter-chevron" aria-hidden="true"></i>
                                     </summary>
                                     <div class="iucn-filter-intro">
-                                        <strong>International Union for Conservation of Nature</strong>
-                                        <p>
+                                        <strong data-i18n="iucn.fullName">International Union for Conservation of Nature</strong>
+                                        <p data-i18n="iucn.menuIntro">
                                             The IUCN Red List measures a species' global risk of extinction.
                                             Select a category to show birds from the locally generated official
                                             IUCN dataset.
@@ -79,36 +134,36 @@
                                     </div>
                                     <div class="iucn-filter-options">
                                         <button class="iucn-filter-option" type="button" data-iucn-filter="lc">
-                                            <strong><span class="iucn-code status-lc">LC</span> Least Concern</strong>
-                                            <small>Evaluated and currently at low risk of extinction.</small>
+                                            <strong><span class="iucn-code status-lc">LC</span> <span data-i18n="iucn.lc.label">Least Concern</span></strong>
+                                            <small data-i18n="iucn.lc.description">Evaluated and currently at low risk of extinction.</small>
                                         </button>
                                         <button class="iucn-filter-option" type="button" data-iucn-filter="nt">
-                                            <strong><span class="iucn-code status-nt">NT</span> Near Threatened</strong>
-                                            <small>Close to qualifying for a threatened category.</small>
+                                            <strong><span class="iucn-code status-nt">NT</span> <span data-i18n="iucn.nt.label">Near Threatened</span></strong>
+                                            <small data-i18n="iucn.nt.description">Close to qualifying for a threatened category.</small>
                                         </button>
                                         <button class="iucn-filter-option" type="button" data-iucn-filter="vu">
-                                            <strong><span class="iucn-code status-vu">VU</span> Vulnerable</strong>
-                                            <small>Facing a high risk of extinction in the wild.</small>
+                                            <strong><span class="iucn-code status-vu">VU</span> <span data-i18n="iucn.vu.label">Vulnerable</span></strong>
+                                            <small data-i18n="iucn.vu.description">Facing a high risk of extinction in the wild.</small>
                                         </button>
                                         <button class="iucn-filter-option" type="button" data-iucn-filter="en">
-                                            <strong><span class="iucn-code status-en">EN</span> Endangered</strong>
-                                            <small>Facing a very high risk of extinction in the wild.</small>
+                                            <strong><span class="iucn-code status-en">EN</span> <span data-i18n="iucn.en.label">Endangered</span></strong>
+                                            <small data-i18n="iucn.en.description">Facing a very high risk of extinction in the wild.</small>
                                         </button>
                                         <button class="iucn-filter-option" type="button" data-iucn-filter="cr">
-                                            <strong><span class="iucn-code status-cr">CR</span> Critically Endangered</strong>
-                                            <small>Facing an extremely high risk of extinction in the wild.</small>
+                                            <strong><span class="iucn-code status-cr">CR</span> <span data-i18n="iucn.cr.label">Critically Endangered</span></strong>
+                                            <small data-i18n="iucn.cr.description">Facing an extremely high risk of extinction in the wild.</small>
                                         </button>
                                         <button class="iucn-filter-option" type="button" data-iucn-filter="ew">
-                                            <strong><span class="iucn-code status-ew">EW</span> Extinct in the Wild</strong>
-                                            <small>Survives only in captivity or outside its former range.</small>
+                                            <strong><span class="iucn-code status-ew">EW</span> <span data-i18n="iucn.ew.label">Extinct in the Wild</span></strong>
+                                            <small data-i18n="iucn.ew.description">Survives only in captivity or outside its former range.</small>
                                         </button>
                                         <button class="iucn-filter-option" type="button" data-iucn-filter="ex">
-                                            <strong><span class="iucn-code status-ex">EX</span> Extinct</strong>
-                                            <small>No reasonable doubt that the last individual has died.</small>
+                                            <strong><span class="iucn-code status-ex">EX</span> <span data-i18n="iucn.ex.label">Extinct</span></strong>
+                                            <small data-i18n="iucn.ex.description">No reasonable doubt that the last individual has died.</small>
                                         </button>
                                         <button class="iucn-filter-option" type="button" data-iucn-filter="dd">
-                                            <strong><span class="iucn-code status-dd">DD</span> Data Deficient</strong>
-                                            <small>Available information is insufficient to assess extinction risk.</small>
+                                            <strong><span class="iucn-code status-dd">DD</span> <span data-i18n="iucn.dd.label">Data Deficient</span></strong>
+                                            <small data-i18n="iucn.dd.description">Available information is insufficient to assess extinction risk.</small>
                                         </button>
                                     </div>
                                 </details>
@@ -125,7 +180,7 @@
                         <div class="submenu-panel" id="language-submenu">
                             <div id="language-options">
                                 <!-- Language options will be dynamically inserted here. -->
-                                <div class="dropdown-loading">Loading languages...</div>
+                                <div class="dropdown-loading" data-i18n="language.loading">Loading languages...</div>
                             </div>
                         </div>
                     </div>
@@ -175,7 +230,7 @@
         </header>
         
         <div class="bird-grid" id="bird-grid">
-            <div class="loading">Loading bird data...</div>
+            <div class="loading" data-i18n="encyclopedia.loadingBirdData">Loading bird data...</div>
         </div>
 
         <div class="cross-language-container" id="cross-language-container"></div>
@@ -213,7 +268,7 @@
             <div class="modal-body" id="modal-body">
                 <div class="modal-loading">
                     <div class="spinner"></div>
-                    <p>Loading bird details...</p>
+                    <p data-i18n="modal.loadingBirdDetails">Loading bird details...</p>
                 </div>
             </div>
         </div>
@@ -222,48 +277,49 @@
     <!-- Explain optional AI translation costs and collect a browser-safe Pollinations key. -->
     <div class="ai-consent-modal" id="ai-consent-modal" role="dialog" aria-modal="true" aria-labelledby="ai-consent-title" hidden>
         <div class="ai-consent-card">
-            <button class="ai-consent-close" id="ai-consent-close" type="button" aria-label="Close AI translation settings">&times;</button>
+            <button class="ai-consent-close" id="ai-consent-close" type="button" aria-label="Close AI translation settings" data-i18n-aria-label="ai.closeSettings">&times;</button>
             <div class="ai-consent-icon" aria-hidden="true">
                 <i class="fa-solid fa-language"></i>
             </div>
             <h2 id="ai-consent-title" data-i18n="modal.aiTitle">Optional AI bird descriptions</h2>
-            <p>
+            <p data-i18n="ai.descriptionIntro">
                 Bird names may be available in your selected language while their descriptions are still only
-                available in English. Pollinations AI can translate those descriptions for you.
+                available in English. Pollinations AI can translate missing Wikipedia descriptions automatically,
+                and IUCN sections only when you click Translate.
             </p>
-            <p>
+            <p data-i18n="ai.costNotice">
                 AI requests have a cost, so the website operator cannot provide automatic translations for every
                 visitor. You can choose whether to use your own Pollinations account or continue without AI.
             </p>
             <div class="ai-consent-info">
-                <strong>How it works</strong>
-                <span>Your key stays in this browser. Bird descriptions and IUCN assessment text are cached locally to reduce repeated requests.</span>
+                <strong data-i18n="ai.howItWorksTitle">How it works</strong>
+                <span data-i18n="ai.howItWorksText">Your key stays in this browser. Bird description translations and clicked IUCN section translations are cached locally to reduce repeated requests.</span>
             </div>
             <!-- Let visitors choose an AI language independently while presetting the encyclopedia language. -->
             <label class="ai-language-field" for="ai-preferred-language">
-                <span>Preferred translation language</span>
+                <span data-i18n="ai.preferredLanguage">Preferred translation language</span>
                 <select id="ai-preferred-language"></select>
-                <small>The currently selected encyclopedia language is used as the initial choice. You can change it here.</small>
+                <small data-i18n="ai.preferredLanguageHelp">The currently selected encyclopedia language is used as the initial choice. You can change it here.</small>
             </label>
             <!-- Load Pollinations text models dynamically and display their token capacity and recent usage. -->
             <label class="ai-language-field" for="ai-text-model">
-                <span>Text translation model</span>
+                <span data-i18n="ai.textModel">Text translation model</span>
                 <select id="ai-text-model">
                     <option value="openai-fast">openai-fast</option>
                 </select>
-                <strong class="ai-model-recommendation">If in doubt, leave this unchanged on openai-fast.</strong>
-                <small id="ai-model-context">Loading available text models...</small>
+                <strong class="ai-model-recommendation" data-i18n="ai.modelRecommendation">If in doubt, leave this unchanged on openai-fast.</strong>
+                <small id="ai-model-context" data-i18n="ai.loadingModels">Loading available text models...</small>
             </label>
             <div class="ai-token-usage" id="ai-token-usage">
-                <strong>Last translation usage</strong>
-                <span id="ai-token-usage-value">No AI translation request recorded yet.</span>
+                <strong data-i18n="ai.lastUsageTitle">Last translation usage</strong>
+                <span id="ai-token-usage-value" data-i18n="ai.noUsage">No AI translation request recorded yet.</span>
             </div>
-            <p class="ai-connection-help">
+            <p class="ai-connection-help" data-i18n="ai.connectionHelp">
                 Pollinations will open its secure app-authorization page. Sign in, review the access request,
                 and approve it to connect your account. Your account remains in control of its budget and access.
             </p>
             <a class="ai-balance-link" href="https://enter.pollinations.ai/" target="_blank" rel="noopener noreferrer">
-                Manage Pollinations account or balance
+                <span data-i18n="ai.manageAccount">Manage Pollinations account or balance</span>
                 <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
             </a>
             <p class="ai-key-error" id="ai-key-error" role="alert" hidden></p>
@@ -271,7 +327,7 @@
                 <button class="ai-secondary-button" id="ai-disable-button" type="button" data-i18n="action.continueWithoutAi">Continue without AI</button>
                 <button class="ai-primary-button" id="ai-enable-button" type="button">
                     <i class="fa-solid fa-link" aria-hidden="true"></i>
-                    <span data-i18n="action.connectPollinations">Connect Pollinations</span>
+                    <span data-i18n="action.setupAiTranslation">Set up AI translation</span>
                 </button>
             </div>
         </div>
@@ -280,23 +336,23 @@
     <!-- Credit the open projects, services, and creators which make the encyclopedia possible. -->
     <div class="ai-consent-modal credits-modal" id="credits-modal" role="dialog" aria-modal="true" aria-labelledby="credits-title" hidden>
         <div class="ai-consent-card credits-card">
-            <button class="ai-consent-close" id="credits-close" type="button" aria-label="Close credits">&times;</button>
+            <button class="ai-consent-close" id="credits-close" type="button" aria-label="Close credits" data-i18n-aria-label="credits.close">&times;</button>
             <div class="ai-consent-icon" aria-hidden="true">
                 <i class="fa-solid fa-heart"></i>
             </div>
             <h2 id="credits-title" data-i18n="modal.creditsTitle">Credits and acknowledgements</h2>
-            <p>This website is possible because of open-source projects, community data, and creative contributors.</p>
+            <p data-i18n="credits.intro">This website is possible because of open-source projects, community data, and creative contributors.</p>
 
             <section class="credits-highlight">
                 <h3>BirdNET-Pi</h3>
                 <p>
-                    The biggest credit goes to
+                    <span data-i18n="credits.birdnetMainPrefix">The biggest credit goes to</span>
                     <a href="https://github.com/mcguirepr89/BirdNET-Pi" target="_blank" rel="noopener noreferrer">mcguirepr89/BirdNET-Pi</a>,
-                    which made BirdNET-Pi possible. Special kudos go to
+                    <span data-i18n="credits.birdnetMainMiddle">which made BirdNET-Pi possible. Special kudos go to</span>
                     <a href="https://github.com/Nachtzuster/BirdNET-Pi" target="_blank" rel="noopener noreferrer">Nachtzuster/BirdNET-Pi</a>
-                    for continuing and expanding that work.
+                    <span data-i18n="credits.birdnetMainSuffix">for continuing and expanding that work.</span>
                 </p>
-                <p>
+                <p data-i18n="credits.birdnetTranslations">
                     The encyclopedia bird names and translations are based on the BirdNET-Pi localization files
                     maintained by Nachtzuster.
                 </p>
@@ -305,43 +361,43 @@
             <div class="credits-grid">
                 <a class="credit-link" href="https://www.flaticon.com/free-icons/bird" target="_blank" rel="noopener noreferrer">
                     <i class="fa-solid fa-dove" aria-hidden="true"></i>
-                    <span><strong>Origami bird icon</strong><small>Bird icons created by Freepik - Flaticon</small></span>
+                    <span><strong data-i18n="credits.origamiTitle">Origami bird icon</strong><small data-i18n="credits.origamiText">Bird icons created by Freepik - Flaticon</small></span>
                 </a>
                 <a class="credit-link" href="https://www.wikipedia.org/" target="_blank" rel="noopener noreferrer">
                     <i class="fa-brands fa-wikipedia-w" aria-hidden="true"></i>
-                    <span><strong>Wikipedia</strong><small>Bird descriptions and reference articles</small></span>
+                    <span><strong>Wikipedia</strong><small data-i18n="credits.wikipediaText">Bird descriptions and reference articles</small></span>
                 </a>
                 <a class="credit-link" href="https://commons.wikimedia.org/" target="_blank" rel="noopener noreferrer">
                     <i class="fa-regular fa-images" aria-hidden="true"></i>
-                    <span><strong>Wikimedia Commons</strong><small>Open media and supporting resources</small></span>
+                    <span><strong>Wikimedia Commons</strong><small data-i18n="credits.wikimediaText">Open media and supporting resources</small></span>
                 </a>
                 <a class="credit-link" href="https://ebird.org/" target="_blank" rel="noopener noreferrer">
                     <i class="fa-solid fa-feather" aria-hidden="true"></i>
-                    <span><strong>eBird</strong><small>Taxonomy, species references, and observation resources</small></span>
+                    <span><strong>eBird</strong><small data-i18n="credits.ebirdText">Taxonomy, species references, and observation resources</small></span>
                 </a>
                 <a class="credit-link" href="https://www.inaturalist.org/" target="_blank" rel="noopener noreferrer">
                     <i class="fa-solid fa-leaf" aria-hidden="true"></i>
-                    <span><strong>iNaturalist</strong><small>Bird photographs, taxa, and observations</small></span>
+                    <span><strong>iNaturalist</strong><small data-i18n="credits.inaturalistText">Bird photographs, taxa, and observations</small></span>
                 </a>
                 <a class="credit-link" href="https://www.birdlife.org/" target="_blank" rel="noopener noreferrer">
                     <i class="fa-solid fa-earth-europe" aria-hidden="true"></i>
-                    <span><strong>BirdLife International</strong><small>Bird conservation knowledge and resources</small></span>
+                    <span><strong>BirdLife International</strong><small data-i18n="credits.birdlifeText">Bird conservation knowledge and resources</small></span>
                 </a>
                 <a class="credit-link" href="https://www.iucnredlist.org/" target="_blank" rel="noopener noreferrer">
                     <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
-                    <span><strong>IUCN Red List</strong><small>Global conservation assessments, population, habitats, and threats</small></span>
+                    <span><strong>IUCN Red List</strong><small data-i18n="credits.iucnText">Global conservation assessments, population, habitats, and threats</small></span>
                 </a>
                 <a class="credit-link" href="https://pollinations.ai/" target="_blank" rel="noopener noreferrer">
                     <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
-                    <span><strong>Pollinations AI</strong><small>Optional user-authorized description translations</small></span>
+                    <span><strong>Pollinations AI</strong><small data-i18n="credits.pollinationsText">Optional user-authorized description translations</small></span>
                 </a>
                 <a class="credit-link" href="https://www.birdweather.com/" target="_blank" rel="noopener noreferrer">
                     <i class="fa-solid fa-tower-broadcast" aria-hidden="true"></i>
-                    <span><strong>BirdWeather</strong><small>Public BirdNET station and detection data</small></span>
+                    <span><strong>BirdWeather</strong><small data-i18n="credits.birdweatherText">Public BirdNET station and detection data</small></span>
                 </a>
                 <a class="credit-link" href="https://dev.meteostat.net/" target="_blank" rel="noopener noreferrer">
                     <i class="fa-solid fa-cloud-sun" aria-hidden="true"></i>
-                    <span><strong>Meteostat</strong><small>Historical weather observations</small></span>
+                    <span><strong>Meteostat</strong><small data-i18n="credits.meteostatText">Historical weather observations</small></span>
                 </a>
             </div>
         </div>
@@ -369,6 +425,7 @@
             this.localIucnDetails = new Map(); // Detailed official records loaded by scientific-name bucket
             this.loadedIucnDetailBuckets = new Set(); // Prevents repeated detail-file requests
             this.iucnDetailBucketPromises = new Map(); // Shares concurrent requests for the same letter
+            this.iucnTranslationSections = new Map(); // Stores modal IUCN text blocks that can be translated on demand
 
             this.currentLanguage = 'en'; // Default to English
             this.availableLanguages = {};
@@ -562,20 +619,6 @@
                 });
             });
 
-            document.getElementById('scrollToTopBtn').addEventListener('click', () => {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
-
-            // Show/hide button based on scroll position
-            window.addEventListener('scroll', () => {
-                const btn = document.getElementById('scrollToTopBtn');
-                if (window.scrollY > 300) {
-                    btn.style.display = 'block';
-                } else {
-                    btn.style.display = 'none';
-                }
-            });
-            
             // Set up load more button
             if (this.loadMoreButton) {
                 this.loadMoreButton.addEventListener('click', () => this.handleLoadMore());
@@ -591,6 +634,11 @@
                     if (e.target === this.modal) this.closeModal();
                 });
             }
+
+            this.modalBody.addEventListener('click', (event) => {
+                const button = event.target.closest('[data-iucn-translate-section]');
+                if (button) this.handleIucnSectionTranslate(button);
+            });
 
             // Let visitors review or change their optional AI translation preference at any time.
             this.setupAiTranslationConsent();
@@ -656,7 +704,7 @@
                     // ... error handling
                 }
                 
-                this.showError('Failed to load bird data. Please try again later.');
+                this.showError(this.t('encyclopedia.loadFailed'));
                 console.error('Error loading bird data:', error);
             }
         }
@@ -788,7 +836,7 @@
                 
             } catch (error) {
                 console.error('Error loading languages:', error);
-                this.languageContainer.innerHTML = '<div class="dropdown-loading">Error loading languages</div>';
+                this.languageContainer.innerHTML = `<div class="dropdown-loading">${this.escapeHtml(this.t('language.loadingFailed'))}</div>`;
             }
         }
 
@@ -1063,7 +1111,7 @@
 
         renderLanguageOptions() {
             if (Object.keys(this.availableLanguages).length === 0) {
-                this.languageContainer.innerHTML = '<div class="dropdown-loading">No language files found</div>';
+                this.languageContainer.innerHTML = `<div class="dropdown-loading">${this.escapeHtml(this.t('language.noneFound'))}</div>`;
                 return;
             }
             
@@ -1096,7 +1144,7 @@
             if (langCode === this.currentLanguage) return;
 
             try {
-                this.languageContainer.innerHTML = '<div class="dropdown-loading">Loading...</div>';
+                this.languageContainer.innerHTML = `<div class="dropdown-loading">${this.escapeHtml(this.t('action.loading'))}</div>`;
 
                 // First: Load the original English data completely
                 await this.loadBirdData('en'); // Reset to English first
@@ -1131,7 +1179,7 @@
 
             } catch (error) {
                 console.error('Error changing language:', error);
-                this.languageContainer.innerHTML = '<div class="dropdown-loading">Error loading</div>';
+                this.languageContainer.innerHTML = `<div class="dropdown-loading">${this.escapeHtml(this.t('language.loadingFailed'))}</div>`;
                 setTimeout(() => this.renderLanguageOptions(), 1500);
             }
         }
@@ -1309,8 +1357,8 @@
             
             if (langCode === 'en') {
                 header.innerHTML = `
-                    <h3>English Reference</h3>
-                    <p class="translation-stats">Complete species database</p>
+                    <h3>${this.escapeHtml(this.t('encyclopedia.translationReferenceTitle'))}</h3>
+                    <p class="translation-stats">${this.escapeHtml(this.t('encyclopedia.translationReferenceStats'))}</p>
                 `;
             } else {
                 // For other languages, we'll show stats after analyzing the file
@@ -1326,10 +1374,11 @@
         }
 
         analyzeAndShowStatsAsync(langCode, headerElement) {
+            const languageName = this.languageMap[langCode]?.name || langCode;
             // Show loading state first
             headerElement.innerHTML = `
-                <h3>${this.languageMap[langCode]?.name || langCode} Translation</h3>
-                <p class="translation-stats">Analyzing translation completeness...</p>
+                <h3>${this.escapeHtml(this.t('encyclopedia.translationLoadingTitle', { language: languageName }))}</h3>
+                <p class="translation-stats">${this.escapeHtml(this.t('encyclopedia.translationLoadingStats'))}</p>
             `;
             
             // Analyze in background without blocking UI
@@ -1340,16 +1389,20 @@
                     const stats = this.analyzeTranslationCompleteness(data, langCode);
                     
                     headerElement.innerHTML = `
-                        <h3>${this.languageMap[langCode]?.name || langCode} has...</h3>
+                        <h3>${this.escapeHtml(this.t('encyclopedia.translationSummaryTitle', { language: languageName }))}</h3>
                         <p class="translation-stats">
-                            ${stats.translated} of ${stats.total} species translated (${stats.percentage}%)
+                            ${this.escapeHtml(this.t('encyclopedia.translationSummaryStats', {
+                                translated: this.formatInterfaceNumber(stats.translated),
+                                total: this.formatInterfaceNumber(stats.total),
+                                percentage: this.formatInterfaceNumber(stats.percentage)
+                            }))}
                         </p>
                     `;
                     
                 } catch (error) {
                     headerElement.innerHTML = `
-                        <h3>${this.languageMap[langCode]?.name || langCode}</h3>
-                        <p class="translation-stats">Translation analysis failed</p>
+                        <h3>${this.escapeHtml(languageName)}</h3>
+                        <p class="translation-stats">${this.escapeHtml(this.t('encyclopedia.translationFailedStats'))}</p>
                     `;
                 }
             }, 100);
@@ -1361,7 +1414,7 @@
             // Debug: log all subtitle elements
             console.log('All subtitle elements:', document.querySelectorAll('.subtitle'));
             // Update page title or other static text based on language
-            document.title = window.BirdI18n?.t('app.encyclopedia') || 'BirdNET-Pi Encyclopedia';
+            document.title = window.BirdI18n?.t('page.encyclopediaTitle') || 'BirdNET-Pi Encyclopedia | Multilingual Bird Guide and Conservation Status';
 
             // Update subtitle
             const subtitle = document.querySelector('.subtitle');
@@ -2060,20 +2113,23 @@
             const model = this.pollinationsTextModels.find(item => item.id === selectedModel);
             if (this.aiModelContext) {
                 this.aiModelContext.textContent = model?.context_length
-                    ? `Maximum context window: ${Number(model.context_length).toLocaleString()} tokens.`
-                    : 'Pollinations does not currently list a context-token limit for this model.';
+                    ? this.t('ai.contextWindow', { tokens: Number(model.context_length).toLocaleString() })
+                    : this.t('ai.noContextLimit');
             }
 
             if (this.aiTokenUsageValue) {
                 try {
                     const usage = JSON.parse(localStorage.getItem('birdAiLastTokenUsage') || 'null');
                     this.aiTokenUsageValue.textContent = usage
-                        ? `${usage.model}: ${Number(usage.totalTokens || 0).toLocaleString()} total tokens `
-                            + `(${Number(usage.promptTokens || 0).toLocaleString()} input + `
-                            + `${Number(usage.completionTokens || 0).toLocaleString()} output).`
-                        : 'No AI translation request recorded yet.';
+                        ? this.t('ai.tokenUsage', {
+                            model: usage.model,
+                            total: Number(usage.totalTokens || 0).toLocaleString(),
+                            input: Number(usage.promptTokens || 0).toLocaleString(),
+                            output: Number(usage.completionTokens || 0).toLocaleString()
+                        })
+                        : this.t('ai.noUsage');
                 } catch (error) {
-                    this.aiTokenUsageValue.textContent = 'No AI translation request recorded yet.';
+                    this.aiTokenUsageValue.textContent = this.t('ai.noUsage');
                 }
             }
         }
@@ -2083,8 +2139,8 @@
             const aiEnabled = localStorage.getItem('birdAiTranslationPreference') === 'enabled'
                 && this.getPollinationsApiKey().startsWith('sk_');
             return aiEnabled
-                ? 'A translated description is unavailable in your selected language, so the English source is shown.'
-                : 'A translated description is unavailable in your selected language, so the English source is shown. Enable AI translations from the menu to translate descriptions into your selected language.';
+                ? this.t('ai.englishFallback')
+                : this.t('ai.englishFallbackWithAi');
         }
 
         // Connect the AI settings controls and persist the visitor's explicit translation choice.
@@ -2123,7 +2179,7 @@
                     // Existing BYOP keys may only permit the model chosen during their authorization.
                     localStorage.removeItem('pollinationsUserApiKey');
                     localStorage.removeItem('birdAiTranslationPreference');
-                    this.aiKeyError.textContent = 'The model changed. Reconnect Pollinations to authorize this text model.';
+                    this.aiKeyError.textContent = this.t('ai.modelChangedReconnect');
                     this.aiKeyError.hidden = false;
                 }
             });
@@ -2182,12 +2238,16 @@
         }
 
         // Display the Pollinations introduction before redirecting to the official authorization page.
-        openAiTranslationConsent({ settingsOnly = false } = {}) {
+        openAiTranslationConsent({ settingsOnly = false, messageKey = '' } = {}) {
             this.aiKeyError.hidden = true;
             this.populateAiLanguageOptions();
             this.populateAiTextModels();
             this.aiConsentModal.hidden = false;
             document.body.classList.add('ai-consent-open');
+            if (messageKey && this.aiKeyError) {
+                this.aiKeyError.textContent = this.t(messageKey);
+                this.aiKeyError.hidden = false;
+            }
 
             if (settingsOnly) {
                 this.pollinationsConsentResolver = null;
@@ -2322,7 +2382,7 @@
                         messages: [
                             {
                                 role: 'system',
-                                content: `Translate bird encyclopedia descriptions into ${targetLanguage}. Preserve every fact and the complete meaning. Return only the translated description as plain text, without headings, notes, Markdown, or added facts.`
+                                content: `Translate only the supplied bird encyclopedia text into ${targetLanguage}. The topic is a bird species; treat common names, scientific names, places, behaviours, habitats, and conservation facts in that bird context only. Do not reinterpret any word as a surname, person, brand, or unrelated topic. Preserve every fact and the complete meaning. Return only the translated description as plain text, without headings, notes, Markdown, or added facts.`
                             },
                             {
                                 role: 'user',
@@ -2441,53 +2501,98 @@
             return (hash >>> 0).toString(36);
         }
 
-        // Translate all IUCN narrative fields for one species in one request and cache the structured result.
-        async getTranslatedIucnAssessment(scientificName, assessment, languageCode) {
-            if (!assessment || languageCode === 'en') return assessment;
+        async handleIucnSectionTranslate(button) {
+            // Translate only the chosen IUCN detail block so AI tokens are spent intentionally.
+            const sectionId = button.dataset.iucnTranslateSection;
+            const section = this.iucnTranslationSections.get(sectionId);
+            if (!section) return;
 
-            const sourceText = {
-                abstract: assessment.documentation?.abstract || '',
-                population: assessment.documentation?.population || '',
-                populationTrend: assessment.documentation?.populationTrend || '',
-                geographicRange: assessment.geographicRange?.narrative || '',
-                habitatAndEcology: assessment.documentation?.habitatAndEcology || '',
-                threats: assessment.documentation?.threats || '',
-                conservationMeasures: assessment.documentation?.conservationMeasures || '',
-                useAndTrade: assessment.documentation?.useAndTrade || '',
-                taxonomicNotes: assessment.documentation?.taxonomicNotes || '',
-                habitats: Array.isArray(assessment.habitats)
-                    ? assessment.habitats.map(item => ({
-                        name: item.name || '',
-                        description: item.description || ''
-                    }))
-                    : []
-            };
-            const containsText = Object.entries(sourceText).some(([key, value]) => (
-                key === 'habitats'
-                    ? value.some(item => item.name || item.description)
-                    : Boolean(value)
-            ));
-            if (!containsText) return assessment;
+            const targetLanguage = this.currentLanguage || 'en';
+            if (targetLanguage === 'en') return;
 
-            const cacheKey = [
-                'iucn-v1',
-                scientificName.toLowerCase(),
-                languageCode,
-                this.getAiTextModel(),
-                this.fingerprintTranslationSource(sourceText)
-            ].join('|');
-            const cachedTranslation = await this.getCachedAiTranslation(cacheKey);
+            const cachedTranslation = await this.getCachedAiTranslation(
+                this.buildIucnSectionCacheKey(section.scientificName, section.title, section.text, targetLanguage)
+            );
             if (cachedTranslation) {
-                return this.applyIucnTranslation(assessment, cachedTranslation, languageCode);
+                this.applyIucnSectionTranslation(button, cachedTranslation, targetLanguage);
+                return;
             }
 
+            if (!this.hasEnabledPollinationsApiKey()) {
+                this.openAiTranslationConsent({
+                    settingsOnly: true,
+                    messageKey: 'ai.setupRequiredForIucn'
+                });
+                return;
+            }
+
+            const originalLabel = button.textContent;
+            button.disabled = true;
+            button.textContent = this.t('action.translating');
+
+            try {
+                const translatedText = await this.translateIucnSectionWithPollinations(
+                    section.scientificName,
+                    section.title,
+                    section.text,
+                    targetLanguage
+                );
+                if (!translatedText) return;
+                this.applyIucnSectionTranslation(button, translatedText, targetLanguage);
+            } finally {
+                button.disabled = false;
+                button.textContent = originalLabel;
+            }
+        }
+
+        applyIucnSectionTranslation(button, translatedText, targetLanguage) {
+            // Replace only the selected IUCN narrative with the cached or newly returned AI translation.
+            const block = button.closest('.iucn-detail-block');
+            const target = block?.querySelector('.iucn-detail-text');
+            if (target) {
+                target.textContent = translatedText;
+                target.insertAdjacentHTML('beforebegin', `
+                    <small class="iucn-translation-note">
+                        ${this.escapeHtml(this.t('ai.iucnTranslatedBy', {
+                            language: this.languageMap[targetLanguage]?.name || targetLanguage
+                        }))}
+                    </small>
+                `);
+            }
+            button.hidden = true;
+        }
+
+        hasEnabledPollinationsApiKey() {
+            // Require an explicitly enabled scoped Pollinations user key before making translation requests.
+            return localStorage.getItem('birdAiTranslationPreference') === 'enabled'
+                && this.getPollinationsApiKey().startsWith('sk_');
+        }
+
+        buildIucnSectionCacheKey(scientificName, title, text, languageCode) {
+            // Keep the IUCN section cache key stable across button clicks and page reloads.
+            return [
+                'iucn-section-v1',
+                scientificName.toLowerCase(),
+                title.toLowerCase(),
+                languageCode,
+                this.getAiTextModel(),
+                this.fingerprintTranslationSource(text)
+            ].join('|');
+        }
+
+        async translateIucnSectionWithPollinations(scientificName, title, text, languageCode) {
+            // Translate one visible IUCN narrative only after the visitor clicks its section button.
+            if (!text || languageCode === 'en') return '';
+            const selectedModel = this.getAiTextModel();
+            const cacheKey = this.buildIucnSectionCacheKey(scientificName, title, text, languageCode);
+            const cachedTranslation = await this.getCachedAiTranslation(cacheKey);
+            if (cachedTranslation) return cachedTranslation;
+
             const apiKey = await this.requestPollinationsApiKey();
-            if (!apiKey) return assessment;
+            if (!apiKey) return '';
 
             const targetLanguage = this.languageMap[languageCode]?.name || languageCode;
-            const selectedModel = this.getAiTextModel();
             try {
-                // Request matching JSON keys so translated narratives can be restored to their original sections.
                 const response = await fetch('https://gen.pollinations.ai/v1/chat/completions', {
                     method: 'POST',
                     headers: {
@@ -2499,57 +2604,27 @@
                         messages: [
                             {
                                 role: 'system',
-                                content: `Translate every non-empty string in the supplied JSON into ${targetLanguage}. Preserve scientific names, measurements, facts, list structure, and JSON keys. Return only valid JSON with exactly the same structure and no Markdown.`
+                                content: `Translate only this IUCN Red List bird conservation section into ${targetLanguage}. The topic is a bird species conservation assessment; treat all names, places, habitats, threats, population details, and scientific terms in that bird and conservation context only. Do not reinterpret any word as a surname, person, brand, or unrelated topic. Preserve measurements, scientific names, facts, and meaning exactly. Return only plain translated text, without headings, notes, Markdown, or added facts.`
                             },
                             {
                                 role: 'user',
-                                content: JSON.stringify(sourceText)
+                                content: `${title}\n\n${text}`
                             }
                         ]
                     })
                 });
 
-                if (!response.ok) {
-                    throw new Error(`Pollinations returned HTTP ${response.status}`);
-                }
-
+                if (!response.ok) throw new Error(`Pollinations returned HTTP ${response.status}`);
                 const data = await response.json();
-                // Keep the last real token count visible in AI settings.
                 this.recordAiTokenUsage(data.usage, selectedModel);
-                const rawTranslation = data.choices?.[0]?.message?.content?.trim() || '';
-                const jsonText = rawTranslation.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '');
-                const translation = JSON.parse(jsonText);
-                await this.setCachedAiTranslation(cacheKey, translation);
-                return this.applyIucnTranslation(assessment, translation, languageCode);
+                const translatedText = data.choices?.[0]?.message?.content?.trim() || '';
+                if (!translatedText) throw new Error('Pollinations returned an empty translation');
+                await this.setCachedAiTranslation(cacheKey, translatedText);
+                return translatedText;
             } catch (error) {
-                console.warn('Pollinations IUCN translation failed:', error);
-                return assessment;
+                console.warn('Pollinations IUCN section translation failed:', error);
+                return '';
             }
-        }
-
-        // Apply cached or newly translated IUCN text without mutating the generated source record.
-        applyIucnTranslation(assessment, translation, languageCode) {
-            const translatedAssessment = JSON.parse(JSON.stringify(assessment));
-            translatedAssessment.documentation = translatedAssessment.documentation || {};
-            translatedAssessment.geographicRange = translatedAssessment.geographicRange || {};
-            translatedAssessment.documentation.abstract = translation.abstract || assessment.documentation?.abstract;
-            translatedAssessment.documentation.population = translation.population || assessment.documentation?.population;
-            translatedAssessment.documentation.populationTrend = translation.populationTrend || assessment.documentation?.populationTrend;
-            translatedAssessment.geographicRange.narrative = translation.geographicRange || assessment.geographicRange?.narrative;
-            translatedAssessment.documentation.habitatAndEcology = translation.habitatAndEcology || assessment.documentation?.habitatAndEcology;
-            translatedAssessment.documentation.threats = translation.threats || assessment.documentation?.threats;
-            translatedAssessment.documentation.conservationMeasures = translation.conservationMeasures || assessment.documentation?.conservationMeasures;
-            translatedAssessment.documentation.useAndTrade = translation.useAndTrade || assessment.documentation?.useAndTrade;
-            translatedAssessment.documentation.taxonomicNotes = translation.taxonomicNotes || assessment.documentation?.taxonomicNotes;
-            if (Array.isArray(translation.habitats) && Array.isArray(translatedAssessment.habitats)) {
-                translatedAssessment.habitats = translatedAssessment.habitats.map((item, index) => ({
-                    ...item,
-                    name: translation.habitats[index]?.name || item.name,
-                    description: translation.habitats[index]?.description || item.description
-                }));
-            }
-            translatedAssessment.aiTranslationLanguage = languageCode;
-            return translatedAssessment;
         }
 
         // Resolve the best full description: localized Wikipedia first, then an AI translation of English.
@@ -2564,6 +2639,7 @@
                 const englishWikipedia = await this.fetchWikipediaDetails(bird.latin, 'en', englishName || bird.name);
                 return {
                     text: englishWikipedia?.extract || details.description || 'No description available.',
+                    englishText: '',
                     sourceUrl: englishWikipedia?.content_urls?.desktop?.page || '',
                     isAiTranslation: false,
                     isFallbackEnglish: false
@@ -2575,6 +2651,7 @@
                 if (localizedWikipedia?.extract) {
                     return {
                         text: localizedWikipedia.extract,
+                        englishText: '',
                         sourceUrl: localizedWikipedia.content_urls?.desktop?.page || '',
                         isAiTranslation: false,
                         isFallbackEnglish: false
@@ -2592,6 +2669,7 @@
 
             return {
                 text: translatedDescription || englishDescription || 'No description available.',
+                englishText: translatedDescription ? englishDescription : '',
                 sourceUrl: englishWikipedia?.content_urls?.desktop?.page || '',
                 isAiTranslation: Boolean(translatedDescription),
                 isFallbackEnglish: Boolean(englishDescription && !translatedDescription)
@@ -2755,11 +2833,11 @@
             const statusUrl = status.url || birdLifeUrl;
             return `
                 <div class="detail-group conservation-detail">
-                    <div class="detail-label">Global conservation status</div>
+                    <div class="detail-label">${this.escapeHtml(this.t('detail.globalConservationStatus'))}</div>
                     <div class="detail-value">
                         <a class="conservation-badge status-${this.escapeHtml(status.code)}"
                             href="${this.escapeHtml(statusUrl)}" target="_blank" rel="noopener noreferrer"
-                            title="View the conservation-status source">
+                            title="${this.escapeHtml(this.t('detail.viewConservationSource'))}">
                             <strong>${this.escapeHtml(status.code.toUpperCase())}</strong>
                             <span>${this.escapeHtml(status.label)}</span>
                         </a>
@@ -2771,62 +2849,63 @@
 
         renderIucnAssessmentDetails(scientificName, translatedAssessment = null) {
             // Render only populated official assessment fields to avoid empty headings for sparse records.
+            this.iucnTranslationSections = new Map();
             const assessment = translatedAssessment
                 || this.localIucnDetails.get(scientificName.toLowerCase());
             if (!assessment) return '';
 
             const scalarRows = [
-                ['Data source', assessment.source],
-                ['Last assessed', this.formatAssessmentDate(
+                [this.t('iucn.dataSource'), assessment.source],
+                [this.t('iucn.lastAssessed'), this.formatAssessmentDate(
                     assessment.assessmentDate || assessment.yearPublished
                 )],
-                ['Assessment scope', assessment.scope?.map(item => item.name).filter(Boolean).join(', ')],
-                ['Criteria', assessment.criteria, this.explainIucnCriteria(assessment.criteria)],
-                ['Order', assessment.taxonomy?.order],
-                ['Family', assessment.taxonomy?.family],
-                ['Population trend', assessment.populationTrend?.label || assessment.populationTrend?.code],
-                ['Mature population', this.formatMaturePopulation(
+                [this.t('iucn.assessmentScope'), this.formatIucnScope(assessment.scope)],
+                [this.t('iucn.criteria'), assessment.criteria, this.explainIucnCriteria(assessment.criteria)],
+                [this.t('iucn.order'), assessment.taxonomy?.order],
+                [this.t('iucn.family'), assessment.taxonomy?.family],
+                [this.t('iucn.populationTrend'), this.formatIucnPopulationTrend(assessment.populationTrend)],
+                [this.t('iucn.maturePopulation'), this.formatMaturePopulation(
                     assessment.population?.size
                 )],
-                ['Generation length', this.formatGenerationLength(
+                [this.t('iucn.generationLength'), this.formatGenerationLength(
                     assessment.population?.generationLength
                 )],
-                ['Movement pattern', assessment.movementPatterns],
-                ['Elevation range', this.formatIucnRange(
+                [this.t('iucn.movementPattern'), this.formatIucnMovementPattern(assessment.movementPatterns)],
+                [this.t('iucn.elevationRange'), this.formatIucnRange(
                     assessment.geographicRange?.lowerElevation,
                     assessment.geographicRange?.upperElevation,
                     'm'
                 )],
-                ['Depth range', this.formatIucnRange(
+                [this.t('iucn.depthRange'), this.formatIucnRange(
                     assessment.geographicRange?.lowerDepth,
                     assessment.geographicRange?.upperDepth,
                     'm'
                 )],
-                ['Area of occupancy', this.formatIucnArea(
+                [this.t('iucn.areaOfOccupancy'), this.formatIucnArea(
                     assessment.geographicRange?.estimatedAreaOfOccupancy
-                ), 'Area of Occupancy (AOO): the area within the species range that it actually occupies, measured in square kilometres.'],
-                ['Extent of occurrence', this.formatIucnArea(
+                ), this.t('iucn.areaOfOccupancyHelp')],
+                [this.t('iucn.extentOfOccurrence'), this.formatIucnArea(
                     assessment.geographicRange?.estimatedExtentOfOccurrence
-                ), 'Extent of Occurrence (EOO): the area inside the shortest continuous boundary encompassing the species known, inferred, or projected occurrence, measured in square kilometres.'],
-                ['Number of locations', assessment.population?.numberOfLocations],
-                ['Possibly extinct', assessment.possiblyExtinct === true ? 'Yes' : ''],
-                ['Possibly extinct in the wild', assessment.possiblyExtinctInTheWild === true ? 'Yes' : '']
+                ), this.t('iucn.extentOfOccurrenceHelp')],
+                [this.t('iucn.numberOfLocations'), assessment.population?.numberOfLocations],
+                [this.t('iucn.possiblyExtinct'), assessment.possiblyExtinct === true ? this.t('common.yes') : ''],
+                [this.t('iucn.possiblyExtinctWild'), assessment.possiblyExtinctInTheWild === true ? this.t('common.yes') : '']
             ].filter(([, value]) => value !== null && value !== undefined && value !== '');
 
             const narrativeSections = [
-                ['Assessment abstract', assessment.documentation?.abstract],
-                ['Population', assessment.documentation?.population],
-                ['Population trend details', assessment.documentation?.populationTrend],
-                ['Geographic range', assessment.geographicRange?.narrative],
-                ['Habitat and ecology', assessment.documentation?.habitatAndEcology],
-                ['Threat details', assessment.documentation?.threats],
-                ['Conservation measures', assessment.documentation?.conservationMeasures],
-                ['Use and trade', assessment.documentation?.useAndTrade],
-                ['Taxonomic notes', assessment.documentation?.taxonomicNotes]
+                [this.t('iucn.assessmentAbstract'), assessment.documentation?.abstract],
+                [this.t('iucn.population'), assessment.documentation?.population],
+                [this.t('iucn.populationTrendDetails'), assessment.documentation?.populationTrend],
+                [this.t('iucn.geographicRange'), assessment.geographicRange?.narrative],
+                [this.t('iucn.habitatEcology'), assessment.documentation?.habitatAndEcology],
+                [this.t('iucn.threatDetails'), assessment.documentation?.threats],
+                [this.t('iucn.conservationMeasures'), assessment.documentation?.conservationMeasures],
+                [this.t('iucn.useTrade'), assessment.documentation?.useAndTrade],
+                [this.t('iucn.taxonomicNotes'), assessment.documentation?.taxonomicNotes]
             ].filter(([, value]) => typeof value === 'string' && value.trim());
 
             const listSections = [
-                ['Habitats', assessment.habitats]
+                [this.t('iucn.habitats'), assessment.habitats]
             ].filter(([, items]) => Array.isArray(items) && items.length);
 
             if (!scalarRows.length && !narrativeSections.length && !listSections.length) return '';
@@ -2834,18 +2913,19 @@
                 <section class="iucn-assessment-section">
                     <div class="iucn-assessment-heading">
                         <div>
-                            <span class="iucn-eyebrow">IUCN Red List</span>
+                            <span class="iucn-eyebrow">${this.escapeHtml(this.t('iucn.redList'))}</span>
                             <h3>${this.escapeHtml(this.t('modal.conservation'))}</h3>
                             ${assessment.aiTranslationLanguage ? `
                                 <small class="iucn-translation-note">
-                                    AI translated by Pollinations into
-                                    ${this.escapeHtml(this.languageMap[assessment.aiTranslationLanguage]?.name || assessment.aiTranslationLanguage)}.
+                                    ${this.escapeHtml(this.t('ai.iucnTranslatedBy', {
+                                        language: this.languageMap[assessment.aiTranslationLanguage]?.name || assessment.aiTranslationLanguage
+                                    }))}
                                 </small>
                             ` : ''}
                         </div>
                         ${assessment.url ? `
                             <a href="${this.escapeHtml(assessment.url)}" target="_blank" rel="noopener noreferrer">
-                                Full assessment
+                                ${this.escapeHtml(this.t('iucn.fullAssessment'))}
                             </a>
                         ` : ''}
                     </div>
@@ -2861,19 +2941,33 @@
                             `).join('')}
                         </div>
                     ` : ''}
-                    ${narrativeSections.map(([title, text]) => `
+                    ${narrativeSections.map(([title, text], index) => {
+                        const sectionId = `${scientificName}-${index}`;
+                        this.iucnTranslationSections.set(sectionId, {
+                            scientificName,
+                            title,
+                            text
+                        });
+                        return `
                         <details class="iucn-detail-block">
                             <summary>${this.escapeHtml(title)}</summary>
-                            <p>${this.escapeHtml(text)}</p>
+                            ${this.currentLanguage !== 'en' ? `
+                                <button class="iucn-translate-button" type="button"
+                                    data-iucn-translate-section="${this.escapeHtml(sectionId)}">
+                                    <i class="fa-solid fa-language" aria-hidden="true"></i>
+                                    ${this.escapeHtml(this.t('action.translate'))}
+                                </button>
+                            ` : ''}
+                            <p class="iucn-detail-text">${this.escapeHtml(text)}</p>
                         </details>
-                    `).join('')}
+                    `}).join('')}
                     ${listSections.map(([title, items]) => `
                         <details class="iucn-detail-block">
                             <summary>${this.escapeHtml(title)} (${items.length})</summary>
                             <ul>
                                 ${items.map(item => `
                                     <li>
-                                        <strong>${this.escapeHtml(item.name || item.description || item.code || 'Recorded item')}</strong>
+                                        <strong>${this.escapeHtml(item.name || item.description || item.code || this.t('iucn.recordedItem'))}</strong>
                                         ${item.description ? `<span>${this.escapeHtml(item.description)}</span>` : ''}
                                     </li>
                                 `).join('')}
@@ -2887,9 +2981,13 @@
         formatIucnRange(lower, upper, unit) {
             // Format one-sided and two-sided numeric assessment ranges without inventing missing bounds.
             if (lower === null || lower === undefined) {
-                return upper === null || upper === undefined ? '' : `Up to ${upper} ${unit}`;
+                return upper === null || upper === undefined ? '' : this.t('iucn.upToValue', {
+                    value: `${upper} ${unit}`
+                });
             }
-            if (upper === null || upper === undefined) return `From ${lower} ${unit}`;
+            if (upper === null || upper === undefined) return this.t('iucn.fromValue', {
+                value: `${lower} ${unit}`
+            });
             return `${lower}-${upper} ${unit}`;
         }
 
@@ -2899,7 +2997,36 @@
             const text = String(value).trim();
             if (!text) return '';
             if (/\byears?\b/i.test(text)) return text;
-            return `${text} ${Number(text) === 1 ? 'year' : 'years'}`;
+            return this.t(Number(text) === 1 ? 'iucn.yearValue' : 'iucn.yearsValue', { value: text });
+        }
+
+        formatIucnScope(scope) {
+            // Translate controlled IUCN assessment scopes while preserving unknown custom values.
+            const values = scope?.map(item => item.name).filter(Boolean) || [];
+            return values.map(value => this.translateIucnControlledTerm('scope', value)).join(', ');
+        }
+
+        formatIucnPopulationTrend(trend) {
+            // Translate controlled IUCN population trend values from the generated dataset.
+            const value = trend?.label || trend?.code || '';
+            return value ? this.translateIucnControlledTerm('trend', value) : '';
+        }
+
+        formatIucnMovementPattern(value) {
+            // Translate controlled IUCN movement-pattern values from the generated dataset.
+            return value ? this.translateIucnControlledTerm('movement', value) : '';
+        }
+
+        translateIucnControlledTerm(namespace, value) {
+            // Fall back to the source value if a future IUCN controlled term has no catalog entry yet.
+            const key = `iucn.${namespace}.${this.toIucnTermKey(value)}`;
+            const translated = this.t(key);
+            return translated === key ? value : translated;
+        }
+
+        toIucnTermKey(value) {
+            // Convert fixed IUCN vocabulary such as "Full Migrant" into locale key fragments.
+            return String(value || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
         }
 
         formatMaturePopulation(value) {
@@ -2931,15 +3058,15 @@
             if (!criteria) return '';
             const text = String(criteria).toUpperCase();
             const explanations = [];
-            if (/\bA/.test(text)) explanations.push('A: population reduction');
-            if (/\bB/.test(text)) explanations.push('B: restricted geographic range');
-            if (/\bC/.test(text)) explanations.push('C: small population size and continuing decline');
-            if (/\bD/.test(text)) explanations.push('D: very small or geographically restricted population');
-            if (/\bE/.test(text)) explanations.push('E: quantitative extinction-risk analysis');
-            if (/C2/.test(text)) explanations.push('C2: a continuing decline in mature individuals is observed, estimated, projected, or inferred');
-            if (/A\(I\)/.test(text)) explanations.push('a(i): no subpopulation exceeds the category-specific mature-individual threshold');
-            if (/A\(II\)/.test(text)) explanations.push('a(ii): most mature individuals occur in one subpopulation');
-            if (/\bB\b/.test(text) && /C2/.test(text)) explanations.push('b: extreme fluctuations in mature individuals');
+            if (/\bA/.test(text)) explanations.push(this.t('iucn.criteriaA'));
+            if (/\bB/.test(text)) explanations.push(this.t('iucn.criteriaB'));
+            if (/\bC/.test(text)) explanations.push(this.t('iucn.criteriaC'));
+            if (/\bD/.test(text)) explanations.push(this.t('iucn.criteriaD'));
+            if (/\bE/.test(text)) explanations.push(this.t('iucn.criteriaE'));
+            if (/C2/.test(text)) explanations.push(this.t('iucn.criteriaC2'));
+            if (/A\(I\)/.test(text)) explanations.push(this.t('iucn.criteriaAi'));
+            if (/A\(II\)/.test(text)) explanations.push(this.t('iucn.criteriaAii'));
+            if (/\bB\b/.test(text) && /C2/.test(text)) explanations.push(this.t('iucn.criteriaBSub'));
             return explanations.join('. ');
         }
 
@@ -3014,7 +3141,7 @@
             this.modalBody.innerHTML = `
                 <div class="modal-loading">
                     <div class="spinner"></div>
-                    <p>Loading bird details...</p>
+                    <p>${this.escapeHtml(this.t('modal.loadingBirdDetails'))}</p>
                 </div>
             `;
             document.body.style.overflow = 'hidden';
@@ -3101,18 +3228,12 @@
                 const currentLanguageInfo = this.availableLanguages[displayLanguage];
                 const languageFlag = currentLanguageInfo ? currentLanguageInfo.flag : '';
 
-                // Use the visitor's preferred AI language independently of the encyclopedia interface language.
-                const aiTranslationLanguage = this.getAiTranslationLanguage();
+                // Use the selected encyclopedia language for localized Wikipedia and optional description fallback.
+                const descriptionLanguage = this.currentLanguage || 'en';
                 const birdDescription = await this.getBirdDescription(
                     bird,
                     details,
-                    aiTranslationLanguage
-                );
-                // Reuse a local IUCN translation before requesting a new species translation.
-                const displayedIucnAssessment = await this.getTranslatedIucnAssessment(
-                    details.scientific_name || bird.latin,
-                    iucnAssessment,
-                    aiTranslationLanguage
+                    descriptionLanguage
                 );
 
                 // Update modal content
@@ -3121,15 +3242,15 @@
                     ${carouselHTML}
                     <div class="modal-details">
                         <div class="detail-group">
-                            <div class="detail-label">Latin Name</div>
+                            <div class="detail-label">${this.escapeHtml(this.t('detail.latinName'))}</div>
                             <div class="detail-value">${details.scientific_name || bird.latin}</div>
                         </div>
                         <div class="detail-group">
-                            <div class="detail-label">Common Name</div>
-                            <div class="detail-value">${details.common_name || 'Not available'}</div>
+                            <div class="detail-label">${this.escapeHtml(this.t('detail.commonName'))}</div>
+                            <div class="detail-value">${details.common_name || this.t('common.notAvailable')}</div>
                         </div>
                         <div class="detail-group">
-                            <div class="detail-label">Local Name -
+                            <div class="detail-label">${this.escapeHtml(this.t('detail.localName'))} -
                                 ${languageFlag ? `<span class="name-language-flag">${languageFlag}</span>` : ''}
                             </div>
                             <div class="detail-value">${bird.name}</div>
@@ -3137,8 +3258,8 @@
                     ${eBirdDetails ?
                         `<div class="ebird-details">
                             <div class="detail-group">
-                                <div class="detail-label">Family</div>
-                                <div class="detail-value">${eBirdDetails.familyComName || 'Not available'}</div>
+                                <div class="detail-label">${this.escapeHtml(this.t('detail.family'))}</div>
+                                <div class="detail-value">${eBirdDetails.familyComName || this.t('common.notAvailable')}</div>
                             </div>
                     </div>`
                     : ''}
@@ -3152,16 +3273,20 @@
                     <div class="modal-description">
                         <h3>${this.escapeHtml(this.t('modal.description'))}</h3>
                         ${birdDescription.isAiTranslation
-                            ? '<p class="description-source">AI translation by Pollinations from the English source.</p>'
+                            ? `<p class="description-source">${this.escapeHtml(this.t('ai.descriptionTranslatedBy'))}</p>`
                             : ''}
                         ${birdDescription.isFallbackEnglish
                             ? `<p class="description-source description-warning">${this.getEnglishFallbackWarning()}</p>`
                             : ''}
                         <p>${this.escapeHtml(birdDescription.text)}</p>
+                        ${birdDescription.englishText ? `
+                            <p class="description-source english-source-label">${this.escapeHtml(this.t('ai.showEnglishSource'))}</p>
+                            <p class="english-source-text">${this.escapeHtml(birdDescription.englishText)}</p>
+                        ` : ''}
                     </div>
                     ${this.renderIucnAssessmentDetails(
                         details.scientific_name || bird.latin,
-                        displayedIucnAssessment
+                        iucnAssessment
                     )}
 
                     ${eBirdDetails ? `
@@ -3307,7 +3432,7 @@
             loadingDiv.className = 'loading-more';
             loadingDiv.innerHTML = `
                 <div class="loading-spinner"></div>
-                <p>Loading more birds...</p>
+                <p>${this.escapeHtml(this.t('encyclopedia.loadingMoreBirds'))}</p>
             `;
             this.birdGrid.appendChild(loadingDiv);
         }
@@ -3368,20 +3493,19 @@
             // Force scroll to top immediately
             window.scrollTo(0, 0);
 
-            // Add click handler
-            document.getElementById('scrollToTopBtn').addEventListener('click', () => {
+            const scrollToTopBtn = document.getElementById('scrollToTopBtn');
+
+            // Scroll smoothly back to the first results when the floating control is clicked.
+            scrollToTopBtn.addEventListener('click', () => {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             });
 
-            // Show/hide based on scroll position
-            window.addEventListener('scroll', () => {
-                const btn = document.getElementById('scrollToTopBtn');
-                if (window.scrollY > 300) {
-                    btn.style.display = 'block';
-                } else {
-                    btn.style.display = 'none';
-                }
-            });
+            // Keep the button hidden on first paint and reveal it only after the user scrolls down.
+            const updateScrollToTopVisibility = () => {
+                scrollToTopBtn.style.display = window.scrollY > 300 ? 'flex' : 'none';
+            };
+            updateScrollToTopVisibility();
+            window.addEventListener('scroll', updateScrollToTopVisibility, { passive: true });
         }
         
         // search method to include cross-language search
@@ -3731,6 +3855,11 @@
 
         getLanguageName(langCode) {
             return this.availableLanguages[langCode]?.name || langCode.toUpperCase();
+        }
+
+        // Format interface counts with the same locale selected for the application.
+        formatInterfaceNumber(value) {
+            return new Intl.NumberFormat(this.currentLanguage.replace('_', '-')).format(value);
         }
 
         createStatsHeader() {
