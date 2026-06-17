@@ -40,6 +40,8 @@
     <meta name="twitter:description" content="A multilingual BirdNET-Pi encyclopedia with bird names, descriptions, conservation status, media, and observation tools.">
     <meta name="twitter:image" content="https://birdnet.woopod.com/img/origami_bird_B-ICO.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet powers the optional diary map picker for personal observation locations. -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="apple-touch-icon" href="/img/origami_bird_B-ICO.png">
@@ -116,6 +118,7 @@
                                 <button class="dropdown-item" data-filter="song" data-i18n="nav.songbirds">Songbirds</button>
                                 <button class="dropdown-item" data-filter="parrot" data-i18n="nav.parrots">Parrots</button>
                                 <button class="dropdown-item" data-filter="game" data-i18n="nav.gamebirds">Gamebirds</button>
+                                <button class="dropdown-item" data-filter="observed" data-i18n="nav.birdsISaw">Birds I saw</button>
 
                                 <!-- Separate taxonomy categories from global IUCN conservation filters. -->
                                 <hr class="categories-divider">
@@ -213,6 +216,12 @@
                         <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
                     </a>
 
+                    <!-- Show all browser-local bird diary notes without leaving the encyclopedia. -->
+                    <button class="menu-page-link menu-action-button" id="my-diary-menu" type="button">
+                        <span><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="nav.myDiary">My diary</span></span>
+                        <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                    </button>
+
                     <!-- Open acknowledgements for the projects and data sources used by this website. -->
                     <button class="menu-page-link menu-action-button" id="credits-settings" type="button">
                         <span><i class="fa-solid fa-heart" aria-hidden="true"></i> <span data-i18n="nav.credits">Credits</span></span>
@@ -263,6 +272,10 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2 class="modal-title" id="modal-bird-name">Bird Name</h2>
+                <button class="modal-observation-toggle not-seen" id="modal-observation-toggle" type="button" hidden
+                    aria-label="Not yet observed" title="Not yet observed">
+                    <i class="fa-solid fa-binoculars" aria-hidden="true"></i>
+                </button>
                 <button class="modal-close" id="modal-close">&times;</button>
             </div>
             <div class="modal-body" id="modal-body">
@@ -272,6 +285,32 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Let visitors attach a private browser-only location to one diary observation. -->
+    <div class="diary-location-modal" id="diary-location-modal" role="dialog" aria-modal="true" aria-labelledby="diary-location-title" hidden>
+        <section class="diary-location-card">
+            <button class="diary-location-close" id="diary-location-close" type="button" aria-label="Close location picker" data-i18n-aria-label="diary.closeLocationPicker">&times;</button>
+            <div class="diary-location-header">
+                <h3 id="diary-location-title" data-i18n="diary.locationTitle">Add observation location</h3>
+                <p data-i18n="diary.locationIntro">Use GPS from this device or select a point on the map. Location stays in this browser.</p>
+            </div>
+            <div class="diary-location-actions">
+                <button class="diary-location-action" id="diary-location-gps" type="button">
+                    <i class="fa-solid fa-location-crosshairs" aria-hidden="true"></i>
+                    <span data-i18n="diary.useGps">Use GPS</span>
+                </button>
+                <button class="diary-location-action" id="diary-location-map-toggle" type="button">
+                    <i class="fa-solid fa-map-location-dot" aria-hidden="true"></i>
+                    <span data-i18n="diary.selectOnMap">Select on map</span>
+                </button>
+            </div>
+            <div class="diary-location-map" id="diary-location-map" hidden></div>
+            <p class="diary-location-status" id="diary-location-status" role="status"></p>
+            <div class="diary-location-footer">
+                <button class="diary-location-save" id="diary-location-save" type="button" disabled data-i18n="diary.saveLocation">Save location</button>
+            </div>
+        </section>
     </div>
 
     <!-- Explain optional AI translation costs and collect a browser-safe Pollinations key. -->
@@ -403,6 +442,8 @@
         </div>
     </div>
 
+<!-- Leaflet is loaded after the page markup so the diary map picker can initialize on demand. -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
     // Production-ready Birdnet-Pi Encyclopedia Application
     class BirdEncyclopedia {
@@ -419,6 +460,7 @@
             this.eBirdTaxonomy = null;   // will hold local taxonomy.json
             this.taxonomyBySciName = new Map(); // Fast scientific-name lookup for category filters
             this.englishNamesBySciName = new Map(); // Reliable fallback detection across language files
+            this.allBirdsBySciName = new Map(); // English master species list so observed birds survive language switching
             this.pollinationsConsentResolver = null; // Completes the pending description request after the consent modal closes
             this.activeIucnFilter = null; // Tracks the selected global conservation category
             this.localIucnStatuses = new Map(); // Authoritative statuses generated by the local maintenance script
@@ -426,6 +468,19 @@
             this.loadedIucnDetailBuckets = new Set(); // Prevents repeated detail-file requests
             this.iucnDetailBucketPromises = new Map(); // Shares concurrent requests for the same letter
             this.iucnTranslationSections = new Map(); // Stores modal IUCN text blocks that can be translated on demand
+            this.observationDiary = this.loadObservationDiary(); // Local seen-state and diary entries keyed by scientific name
+            this.openDiaryEntryId = null; // Keeps only the newly started diary note expanded after adding it
+            this.editingDiaryEntryId = null; // Shows the diary editor only for the entry being actively edited
+            this.openDiarySpeciesKey = null; // Scopes expanded diary entries to the species modal that owns them
+            this.editingDiarySpeciesKey = null; // Scopes draft editing so another bird modal cannot show that editor
+            this.activeDiaryOverview = false; // Stops normal bird infinite-scroll while My diary is displayed
+            this.diaryOverviewMap = null; // Leaflet map instance for the all-notes diary overview
+            this.diaryOverviewMarkers = []; // Markers that link diary locations back to bird modals
+            this.pendingDiaryLocationTarget = null; // Tracks which diary note receives the selected location
+            this.pendingDiaryLocation = null; // Holds the GPS or map coordinate before the visitor saves it
+            this.diaryLocationMap = null; // Leaflet map instance for the diary location picker
+            this.diaryLocationMarker = null; // Leaflet marker for the selected diary coordinate
+            this.searchRequestId = 0; // Prevents old background cross-language searches from updating newer results
 
             this.currentLanguage = 'en'; // Default to English
             this.availableLanguages = {};
@@ -445,7 +500,16 @@
             this.modal = document.getElementById('bird-modal');
             this.modalBody = document.getElementById('modal-body');
             this.modalBirdName = document.getElementById('modal-bird-name');
+            this.modalObservationToggle = document.getElementById('modal-observation-toggle');
             this.modalClose = document.getElementById('modal-close');
+            this.diaryLocationModal = document.getElementById('diary-location-modal');
+            this.diaryLocationClose = document.getElementById('diary-location-close');
+            this.diaryLocationGps = document.getElementById('diary-location-gps');
+            this.diaryLocationMapToggle = document.getElementById('diary-location-map-toggle');
+            this.diaryLocationMapElement = document.getElementById('diary-location-map');
+            this.diaryLocationStatus = document.getElementById('diary-location-status');
+            this.diaryLocationSave = document.getElementById('diary-location-save');
+            this.myDiaryMenu = document.getElementById('my-diary-menu');
             this.loadMoreButton = document.getElementById('load-more-button');
             this.aiTranslationSettings = document.getElementById('ai-translation-settings');
             this.aiConsentModal = document.getElementById('ai-consent-modal');
@@ -623,10 +687,28 @@
             if (this.loadMoreButton) {
                 this.loadMoreButton.addEventListener('click', () => this.handleLoadMore());
             }
+
+            if (this.myDiaryMenu) {
+                this.myDiaryMenu.addEventListener('click', () => {
+                    this.hideDropdown();
+                    this.showDiaryOverview();
+                });
+            }
             
             // Modal events
             if (this.modalClose) {
                 this.modalClose.addEventListener('click', () => this.closeModal());
+            }
+
+            if (this.modalObservationToggle) {
+                this.modalObservationToggle.addEventListener('click', () => {
+                    if (this.currentBirdId) {
+                        this.toggleSeenObservation(this.currentBirdId, {
+                            createEntry: true,
+                            collapseDiary: true
+                        });
+                    }
+                });
             }
 
             if (this.modal) {
@@ -640,9 +722,35 @@
                 if (button) this.handleIucnSectionTranslate(button);
             });
 
+            this.modalBody.addEventListener('click', (event) => {
+                // Route diary toolbar and observation buttons from dynamically rendered bird details.
+                this.handleObservationDiaryClick(event);
+            });
+
+            this.modalBody.addEventListener('input', (event) => {
+                // Update the diary preview while the visitor edits a note.
+                this.handleObservationDiaryInput(event);
+            });
+
+            this.birdGrid.addEventListener('click', event => {
+                // Route clicks from the browser-local diary overview back into the bird modal.
+                this.handleDiaryOverviewClick(event);
+            });
+
+            this.birdGrid.addEventListener('input', event => {
+                // Search the diary overview live without touching the main species search box.
+                this.handleDiaryOverviewInput(event);
+            });
+
+            this.birdGrid.addEventListener('change', event => {
+                // Sort the diary overview without involving the main bird search controls.
+                this.handleDiaryOverviewChange(event);
+            });
+
             // Let visitors review or change their optional AI translation preference at any time.
             this.setupAiTranslationConsent();
             this.setupCreditsModal();
+            this.setupDiaryLocationPicker();
 
             // Browser back/forward cache can restore controls while omitting dynamically created bird cards.
             window.addEventListener('pageshow', (event) => {
@@ -767,6 +875,8 @@
 
         renderBirdGridFromStart() {
             // Rebuild the first page deterministically after startup language changes or browser history restoration.
+            this.activeDiaryOverview = false;
+            this.destroyDiaryOverviewMap();
             this.birdGrid.innerHTML = '';
             this.displayedCount = 0;
             this.isLoading = false;
@@ -1531,6 +1641,23 @@
             this.dropdownToggle.classList.remove('active');
             this.dropdownToggle.setAttribute('aria-expanded', 'false');
             this.dropdownToggle.setAttribute('aria-label', 'Open navigation menu');
+            this.collapseMenuSubmenus();
+        }
+
+        collapseMenuSubmenus() {
+            // Reset nested menu panels whenever the root burger menu closes.
+            [
+                [this.languageSubmenu, this.languageSubmenuToggle],
+                [this.categoriesSubmenu, this.categoriesSubmenuToggle],
+                [this.themeSubmenu, this.themeSubmenuToggle]
+            ].forEach(([panel, toggle]) => {
+                panel?.classList.remove('show');
+                toggle?.classList.remove('active');
+                toggle?.setAttribute('aria-expanded', 'false');
+            });
+            this.dropdownMenu.querySelectorAll('.iucn-filter-details[open]').forEach(details => {
+                details.removeAttribute('open');
+            });
         }
 
         // Toggle the Language accordion and keep its accessibility state synchronized.
@@ -1569,12 +1696,16 @@
 
         handleCategoryFilter(filter) {
             console.log('Filtering by category:', filter);
+            this.activeDiaryOverview = false;
+            this.destroyDiaryOverviewMap();
             this.activeIucnFilter = null;
             this.updateIucnFilterSelection();
 
             this.filteredBirds = filter === 'all'
                 ? [...this.birds]
-                : this.birds.filter(bird => this.birdMatchesCategory(bird, filter));
+                : filter === 'observed'
+                    ? this.getObservedBirdsForCurrentLanguage()
+                    : this.birds.filter(bird => this.birdMatchesCategory(bird, filter));
             
             this.birdGrid.innerHTML = '';
             this.displayedCount = this.displayBirds(0, this.batchSize);
@@ -1583,6 +1714,8 @@
 
         handleIucnFilter(code) {
             // Filter only official records present in the generated local IUCN status file.
+            this.activeDiaryOverview = false;
+            this.destroyDiaryOverviewMap();
             this.activeIucnFilter = code;
             this.updateIucnFilterSelection();
 
@@ -1602,6 +1735,19 @@
                 this.displayedCount = this.displayBirds(0, this.batchSize);
             }
             this.updateLoadMoreButton();
+        }
+
+        getObservedBirdsForCurrentLanguage() {
+            // Build the observed category from diary records, not only from the translated visible species list.
+            const observedBirds = [];
+            Object.values(this.observationDiary || {}).forEach(record => {
+                if (!record?.seen) return;
+                const bird = this.getBirdByScientificName(record.scientificName);
+                if (bird) observedBirds.push(bird);
+            });
+            return observedBirds.sort((a, b) =>
+                String(a.name || a.latin).localeCompare(String(b.name || b.latin), this.currentLanguage.replace('_', '-'))
+            );
         }
 
         updateIucnFilterSelection() {
@@ -2237,6 +2383,157 @@
             this.creditsSettings?.focus();
         }
 
+        setupDiaryLocationPicker() {
+            // Wire the optional observation-location dialog once because diary entries are rendered dynamically.
+            this.diaryLocationClose?.addEventListener('click', () => this.closeDiaryLocationPicker());
+            this.diaryLocationGps?.addEventListener('click', () => this.useGpsForDiaryLocation());
+            this.diaryLocationMapToggle?.addEventListener('click', () => this.showDiaryLocationMap());
+            this.diaryLocationSave?.addEventListener('click', () => this.saveDiaryLocationSelection());
+            this.diaryLocationModal?.addEventListener('click', event => {
+                if (event.target === this.diaryLocationModal) this.closeDiaryLocationPicker();
+            });
+            document.addEventListener('keydown', event => {
+                if (event.key === 'Escape' && !this.diaryLocationModal?.hidden) {
+                    this.closeDiaryLocationPicker();
+                }
+            });
+        }
+
+        openDiaryLocationPicker(scientificName, entryId) {
+            // Open the location chooser for one diary entry and reset any previous unsaved coordinate.
+            this.pendingDiaryLocationTarget = { scientificName, entryId };
+            this.pendingDiaryLocation = null;
+            if (this.diaryLocationStatus) {
+                this.diaryLocationStatus.textContent = this.t('diary.locationChooseMethod');
+            }
+            if (this.diaryLocationSave) {
+                this.diaryLocationSave.disabled = true;
+            }
+            if (this.diaryLocationMapElement) {
+                this.diaryLocationMapElement.hidden = true;
+            }
+            if (this.diaryLocationModal) {
+                this.diaryLocationModal.hidden = false;
+                document.body.classList.add('ai-consent-open');
+                this.diaryLocationGps?.focus();
+            }
+        }
+
+        closeDiaryLocationPicker() {
+            // Close the location chooser and discard any coordinate that has not been saved to the diary note.
+            if (this.diaryLocationModal) this.diaryLocationModal.hidden = true;
+            document.body.classList.remove('ai-consent-open');
+            this.pendingDiaryLocationTarget = null;
+            this.pendingDiaryLocation = null;
+        }
+
+        useGpsForDiaryLocation() {
+            // Ask the browser for GPS only after the visitor explicitly chooses the GPS option.
+            if (!navigator.geolocation) {
+                if (this.diaryLocationStatus) {
+                    this.diaryLocationStatus.textContent = this.t('diary.locationUnsupported');
+                }
+                return;
+            }
+            if (this.diaryLocationStatus) {
+                this.diaryLocationStatus.textContent = this.t('diary.locationRequesting');
+            }
+            navigator.geolocation.getCurrentPosition(
+                position => {
+                    const location = {
+                        source: 'gps',
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude,
+                        accuracy: position.coords.accuracy || null,
+                        recordedAt: new Date().toISOString()
+                    };
+                    this.setPendingDiaryLocation(location);
+                    if (this.diaryLocationMap && this.diaryLocationMapElement && !this.diaryLocationMapElement.hidden) {
+                        this.diaryLocationMap.setView([location.lat, location.lng], 13);
+                        this.setDiaryLocationMarker(location);
+                    }
+                },
+                () => {
+                    if (this.diaryLocationStatus) {
+                        this.diaryLocationStatus.textContent = this.t('diary.locationFailed');
+                    }
+                },
+                { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 }
+            );
+        }
+
+        showDiaryLocationMap() {
+            // Show a Leaflet map so the visitor can select an approximate observation point manually.
+            if (!window.L || !this.diaryLocationMapElement) {
+                if (this.diaryLocationStatus) {
+                    this.diaryLocationStatus.textContent = this.t('diary.locationMapUnavailable');
+                }
+                return;
+            }
+            this.diaryLocationMapElement.hidden = false;
+            const initialLocation = this.pendingDiaryLocation || { lat: 46.1512, lng: 14.9955 };
+            if (!this.diaryLocationMap) {
+                this.diaryLocationMap = L.map(this.diaryLocationMapElement).setView([initialLocation.lat, initialLocation.lng], 7);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; OpenStreetMap contributors'
+                }).addTo(this.diaryLocationMap);
+                this.diaryLocationMap.on('click', event => {
+                    this.setPendingDiaryLocation({
+                        source: 'map',
+                        lat: event.latlng.lat,
+                        lng: event.latlng.lng,
+                        accuracy: null,
+                        recordedAt: new Date().toISOString()
+                    });
+                });
+            }
+            setTimeout(() => this.diaryLocationMap.invalidateSize(), 80);
+            this.diaryLocationMap.setView([initialLocation.lat, initialLocation.lng], this.pendingDiaryLocation ? 13 : 7);
+            if (this.pendingDiaryLocation) this.setDiaryLocationMarker(this.pendingDiaryLocation);
+            if (this.diaryLocationStatus && !this.pendingDiaryLocation) {
+                this.diaryLocationStatus.textContent = this.t('diary.locationMapHelp');
+            }
+        }
+
+        setPendingDiaryLocation(location) {
+            // Store one candidate coordinate and enable the save button after GPS or map selection succeeds.
+            this.pendingDiaryLocation = location;
+            this.setDiaryLocationMarker(location);
+            if (this.diaryLocationSave) this.diaryLocationSave.disabled = false;
+            if (this.diaryLocationStatus) {
+                this.diaryLocationStatus.textContent = this.t('diary.locationSelected', {
+                    lat: Number(location.lat).toFixed(5),
+                    lng: Number(location.lng).toFixed(5)
+                });
+            }
+        }
+
+        setDiaryLocationMarker(location) {
+            // Keep the picker marker aligned with the currently selected diary coordinate.
+            if (!this.diaryLocationMap || !location) return;
+            const coordinates = [location.lat, location.lng];
+            if (!this.diaryLocationMarker) {
+                this.diaryLocationMarker = L.marker(coordinates).addTo(this.diaryLocationMap);
+            } else {
+                this.diaryLocationMarker.setLatLng(coordinates);
+            }
+        }
+
+        saveDiaryLocationSelection() {
+            // Persist the selected coordinate to the targeted diary note without saving empty note text.
+            if (!this.pendingDiaryLocationTarget || !this.pendingDiaryLocation) return;
+            const { scientificName, entryId } = this.pendingDiaryLocationTarget;
+            this.updateObservationEntry(scientificName, entryId, {
+                location: this.pendingDiaryLocation
+            });
+            this.openDiaryEntryId = entryId;
+            this.editingDiaryEntryId = entryId;
+            this.openDiarySpeciesKey = this.observationKey(scientificName);
+            this.editingDiarySpeciesKey = this.observationKey(scientificName);
+            this.refreshObservationUi(scientificName);
+            this.closeDiaryLocationPicker();
+        }
+
         // Display the Pollinations introduction before redirecting to the official authorization page.
         openAiTranslationConsent({ settingsOnly = false, messageKey = '' } = {}) {
             this.aiKeyError.hidden = true;
@@ -2763,6 +3060,7 @@
                         ${realImg ? `data-src="${realImg}"` : ''}
                         alt="${this.escapeHtml(bird.name)}"
                         loading="lazy">
+                    ${this.renderObservationCardIndicator(bird.latin)}
                     ${this.renderConservationCardBadge(
                         bird.conservationStatus || bird.apiData?.conservation_status
                     )}
@@ -2779,6 +3077,855 @@
             // Add click event
             card.addEventListener('click', () => this.showBirdDetails(bird));
             return card;
+        }
+
+        renderObservationCardIndicator(scientificName) {
+            // Show a passive binocular marker on grid cards only after this species was observed.
+            const record = this.getObservationRecord(scientificName);
+            const isSeen = Boolean(record?.seen);
+            if (!isSeen) return '';
+            return `
+                <span class="observation-card-indicator" data-observation-card-indicator="${this.escapeHtml(scientificName)}"
+                    aria-label="${this.escapeHtml(this.t('diary.observed'))}"
+                    title="${this.escapeHtml(this.t('diary.observed'))}">
+                    <i class="fa-solid fa-binoculars" aria-hidden="true"></i>
+                </span>
+            `;
+        }
+
+        loadObservationDiary() {
+            // Restore visitor-owned observation notes from localStorage and tolerate old or malformed data.
+            try {
+                const parsed = JSON.parse(localStorage.getItem('birdObservationDiaryV1') || '{}');
+                return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+            } catch (error) {
+                console.warn('Could not read observation diary:', error);
+                return {};
+            }
+        }
+
+        saveObservationDiary() {
+            // Persist all seen-state and diary edits locally in the current browser.
+            localStorage.setItem('birdObservationDiaryV1', JSON.stringify(this.observationDiary));
+        }
+
+        observationKey(scientificName) {
+            // Use lower-case scientific names as stable local diary identifiers.
+            return String(scientificName || '').trim().toLowerCase();
+        }
+
+        getObservationRecord(scientificName) {
+            // Read one diary record without creating it.
+            return this.observationDiary[this.observationKey(scientificName)] || null;
+        }
+
+        ensureObservationRecord(scientificName) {
+            // Create the local diary container for a species when the visitor first marks it as seen.
+            const key = this.observationKey(scientificName);
+            if (!this.observationDiary[key]) {
+                this.observationDiary[key] = {
+                    scientificName,
+                    seen: false,
+                    observations: [],
+                    updatedAt: new Date().toISOString()
+                };
+            }
+            return this.observationDiary[key];
+        }
+
+        createObservationEntry(note = '') {
+            // Build one dated diary entry that can later be edited in the bird modal.
+            const now = new Date();
+            const date = this.toLocalDateTimeInput(now);
+            return {
+                id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+                date,
+                note,
+                name: '',
+                draft: true,
+                createdAt: now.toISOString(),
+                updatedAt: now.toISOString()
+            };
+        }
+
+        toggleSeenObservation(scientificName, options = {}) {
+            // Toggle the seen marker and optionally create the first diary entry from the modal header.
+            const record = this.ensureObservationRecord(scientificName);
+            record.seen = !record.seen;
+            if (options.collapseDiary) {
+                this.openDiaryEntryId = null;
+                this.editingDiaryEntryId = null;
+                this.openDiarySpeciesKey = null;
+                this.editingDiarySpeciesKey = null;
+            }
+            if (record.seen && options.createEntry && record.observations.length === 0) {
+                const entry = this.createObservationEntry();
+                entry.name = this.getObservationEntryName(scientificName, entry);
+                record.observations.unshift(entry);
+                if (!options.collapseDiary) {
+                    this.openDiaryEntryId = entry.id;
+                    this.editingDiaryEntryId = entry.id;
+                    this.openDiarySpeciesKey = this.observationKey(scientificName);
+                    this.editingDiarySpeciesKey = this.observationKey(scientificName);
+                }
+            }
+            record.updatedAt = new Date().toISOString();
+            this.saveObservationDiary();
+            this.refreshObservationUi(scientificName);
+        }
+
+        addObservationEntry(scientificName) {
+            // Add another dated diary entry for repeated observations of the same species.
+            const record = this.ensureObservationRecord(scientificName);
+            if (!record.seen && !window.confirm(this.t('diary.confirmMarkSeen'))) {
+                return;
+            }
+            const entry = this.createObservationEntry();
+            entry.name = this.getObservationEntryName(scientificName, entry);
+            record.seen = true;
+            record.observations.unshift(entry);
+            this.openDiaryEntryId = entry.id;
+            this.editingDiaryEntryId = entry.id;
+            this.openDiarySpeciesKey = this.observationKey(scientificName);
+            this.editingDiarySpeciesKey = this.observationKey(scientificName);
+            record.updatedAt = new Date().toISOString();
+            this.saveObservationDiary();
+            this.refreshObservationUi(scientificName);
+        }
+
+        deleteObservationEntry(scientificName, entryId) {
+            // Remove one diary entry while keeping the species marked as seen if other entries remain.
+            const record = this.ensureObservationRecord(scientificName);
+            record.observations = record.observations.filter(entry => entry.id !== entryId);
+            record.seen = record.observations.length > 0 ? record.seen : false;
+            if (this.openDiaryEntryId === entryId && this.openDiarySpeciesKey === this.observationKey(scientificName)) {
+                this.openDiaryEntryId = null;
+                this.openDiarySpeciesKey = null;
+            }
+            if (this.editingDiaryEntryId === entryId && this.editingDiarySpeciesKey === this.observationKey(scientificName)) {
+                this.editingDiaryEntryId = null;
+                this.editingDiarySpeciesKey = null;
+            }
+            record.updatedAt = new Date().toISOString();
+            this.saveObservationDiary();
+            this.refreshObservationUi(scientificName);
+        }
+
+        discardEmptyDraftObservations(record) {
+            // Drop unsaved empty draft notes so add/close cycles do not create blank diary entries.
+            if (!record?.observations) return;
+            const recordKey = this.observationKey(record.scientificName);
+            record.observations = record.observations.filter(entry =>
+                !entry.draft
+                    || String(entry.note || '').trim()
+                    || (entry.id === this.editingDiaryEntryId && recordKey === this.editingDiarySpeciesKey)
+            );
+        }
+
+        updateObservationEntry(scientificName, entryId, changes) {
+            // Persist date and Markdown note edits for a single observation entry.
+            const record = this.ensureObservationRecord(scientificName);
+            const entry = record.observations.find(item => item.id === entryId);
+            if (!entry) return;
+            Object.assign(entry, changes, { updatedAt: new Date().toISOString() });
+            entry.name = this.getObservationEntryName(scientificName, entry);
+            record.seen = true;
+            record.updatedAt = new Date().toISOString();
+            this.saveObservationDiary();
+        }
+
+        refreshObservationUi(scientificName) {
+            // Repaint grid indicators, modal header state, and the open modal diary after seen-state changes.
+            this.birdGrid.querySelectorAll('.bird-card').forEach(card => {
+                if (card.getAttribute('data-bird-id') !== scientificName) return;
+                const imageContainer = card.querySelector('.bird-image-container');
+                const indicator = card.querySelector('[data-observation-card-indicator]');
+                const record = this.getObservationRecord(scientificName);
+                const isSeen = Boolean(record?.seen);
+                if (indicator && !isSeen) indicator.remove();
+                if (imageContainer && isSeen && !indicator) {
+                    imageContainer.insertAdjacentHTML('beforeend', this.renderObservationCardIndicator(scientificName));
+                }
+            });
+
+            this.updateModalObservationToggle(scientificName);
+
+            const diaryPanel = this.modalBody.querySelector('[data-observation-diary-panel]');
+            if (diaryPanel?.dataset.scientificName === scientificName) {
+                diaryPanel.outerHTML = this.renderObservationDiarySection(scientificName);
+            }
+        }
+
+        updateModalObservationToggle(scientificName) {
+            // Keep the modal header binocular toggle aligned with the current bird's local observation state.
+            if (!this.modalObservationToggle || this.currentBirdId !== scientificName) return;
+            const isSeen = Boolean(this.getObservationRecord(scientificName)?.seen);
+            this.modalObservationToggle.hidden = false;
+            this.modalObservationToggle.classList.toggle('seen', isSeen);
+            this.modalObservationToggle.classList.toggle('not-seen', !isSeen);
+            this.modalObservationToggle.setAttribute('aria-label', this.t(isSeen ? 'diary.observed' : 'diary.notYetObserved'));
+            this.modalObservationToggle.setAttribute('title', this.t(isSeen ? 'diary.observed' : 'diary.notYetObserved'));
+        }
+
+        getBirdByScientificName(scientificName) {
+            // Resolve a saved diary record back to the currently loaded localized bird object.
+            const key = this.observationKey(scientificName);
+            return this.birds.find(bird => this.observationKey(bird.latin) === key)
+                || this.allBirdsBySciName.get(key)
+                || null;
+        }
+
+        getDiaryOverviewEntries(searchTerm = '', sortMode = 'date') {
+            // Flatten all saved diary notes into searchable cards for the My diary overview.
+            const normalizedSearch = String(searchTerm || '').trim().toLowerCase();
+            const entries = [];
+            Object.values(this.observationDiary || {}).forEach(record => {
+                if (!record?.observations?.length) return;
+                const bird = this.getBirdByScientificName(record.scientificName);
+                const scientificName = record.scientificName || bird?.latin || '';
+                const englishName = this.getEnglishBirdName(scientificName) || '';
+                const localName = bird?.name || '';
+                record.observations.forEach(entry => {
+                    if (!String(entry.note || '').trim()) return;
+                    const noteName = entry.name || this.getObservationEntryName(scientificName, entry);
+                    const searchable = [
+                        noteName,
+                        entry.note,
+                        scientificName,
+                        englishName,
+                        localName
+                    ].join(' ').toLowerCase();
+                    if (normalizedSearch && !searchable.includes(normalizedSearch)) return;
+                    entries.push({
+                        bird,
+                        scientificName,
+                        englishName,
+                        localName,
+                        entry,
+                        noteName
+                    });
+                });
+            });
+            return this.sortDiaryItems(entries, sortMode);
+        }
+
+        getDiaryObservedSpecies(searchTerm = '', sortMode = 'date') {
+            // Build a diary-only observed-species list so diary search never falls back to normal bird cards.
+            const normalizedSearch = String(searchTerm || '').trim().toLowerCase();
+            const species = [];
+            Object.values(this.observationDiary || {}).forEach(record => {
+                if (!record?.seen) return;
+                const bird = this.getBirdByScientificName(record.scientificName);
+                const scientificName = record.scientificName || bird?.latin || '';
+                const englishName = this.getEnglishBirdName(scientificName) || '';
+                const localName = bird?.name || '';
+                const searchable = [scientificName, englishName, localName].join(' ').toLowerCase();
+                if (normalizedSearch && !searchable.includes(normalizedSearch)) return;
+                species.push({
+                    bird,
+                    scientificName,
+                    englishName,
+                    localName,
+                    updatedAt: record.updatedAt || '',
+                    latestDate: this.getLatestObservationDate(record)
+                });
+            });
+            return this.sortDiaryItems(species, sortMode);
+        }
+
+        sortDiaryItems(items, sortMode) {
+            // Apply the diary overview sort without touching the main bird list order.
+            const sorted = [...items];
+            if (sortMode === 'name') {
+                sorted.sort((a, b) => {
+                    const aName = (a.localName || a.englishName || a.scientificName || '').toLowerCase();
+                    const bName = (b.localName || b.englishName || b.scientificName || '').toLowerCase();
+                    return aName.localeCompare(bName, this.currentLanguage.replace('_', '-'));
+                });
+            } else {
+                sorted.sort((a, b) => {
+                    const aDate = a.entry?.date || a.latestDate || a.updatedAt || '';
+                    const bDate = b.entry?.date || b.latestDate || b.updatedAt || '';
+                    return String(bDate).localeCompare(String(aDate));
+                });
+            }
+            return sorted;
+        }
+
+        getLatestObservationDate(record) {
+            // Use the newest note date for observed-species sorting, falling back to record update time.
+            const dates = (record?.observations || [])
+                .map(entry => entry.date || entry.updatedAt || entry.createdAt || '')
+                .filter(Boolean)
+                .sort((a, b) => String(b).localeCompare(String(a)));
+            return dates[0] || record?.updatedAt || '';
+        }
+
+        showDiaryOverview(searchTerm = '', sortMode = 'date') {
+            // Replace the grid with a searchable list and map of browser-local observation notes.
+            this.searchRequestId += 1;
+            this.activeDiaryOverview = true;
+            this.destroyDiaryOverviewMap();
+            const crossLangContainer = document.getElementById('cross-language-container');
+            if (crossLangContainer) crossLangContainer.innerHTML = '';
+            const entries = this.getDiaryOverviewEntries(searchTerm, sortMode);
+            const observedSpecies = this.getDiaryObservedSpecies(searchTerm, sortMode);
+            const mapEntries = entries.filter(item => item.entry.location);
+            this.birdGrid.innerHTML = `
+                <section class="diary-overview" data-diary-overview>
+                    <div class="diary-overview-header">
+                        <div>
+                            <p class="diary-overview-eyebrow">${this.escapeHtml(this.t('nav.myDiary'))}</p>
+                            <h2>${this.escapeHtml(this.t('diary.overviewTitle'))}</h2>
+                        </div>
+                        <div class="diary-overview-count">
+                            ${this.escapeHtml(this.t('diary.noteCount', { count: this.formatInterfaceNumber(entries.length) }))}
+                        </div>
+                    </div>
+                    <label class="diary-overview-search">
+                        <span>${this.escapeHtml(this.t('diary.searchLabel'))}</span>
+                        <input type="search" data-diary-search value="${this.escapeHtml(searchTerm)}"
+                            placeholder="${this.escapeHtml(this.t('diary.searchPlaceholder'))}">
+                    </label>
+                    <label class="diary-overview-sort">
+                        <span>${this.escapeHtml(this.t('diary.sortLabel'))}</span>
+                        <select data-diary-sort>
+                            <option value="date" ${sortMode === 'date' ? 'selected' : ''}>${this.escapeHtml(this.t('diary.sortDate'))}</option>
+                            <option value="name" ${sortMode === 'name' ? 'selected' : ''}>${this.escapeHtml(this.t('diary.sortName'))}</option>
+                        </select>
+                    </label>
+                    <div class="diary-overview-map" id="diary-overview-map">
+                        ${mapEntries.length ? '' : `<p>${this.escapeHtml(this.t('diary.noMappedNotes'))}</p>`}
+                    </div>
+                    <section class="diary-observed-section">
+                        <h3>${this.escapeHtml(this.t('diary.observedSpeciesTitle'))}</h3>
+                        <div class="diary-observed-list">
+                            ${observedSpecies.length ? observedSpecies.map(item => this.renderDiaryObservedSpecies(item)).join('') : `
+                                <p class="diary-overview-empty">${this.escapeHtml(this.t('diary.noObservedSpecies'))}</p>
+                            `}
+                        </div>
+                    </section>
+                    <div class="diary-overview-list">
+                        ${entries.length ? entries.map(item => this.renderDiaryOverviewCard(item)).join('') : `
+                            <p class="diary-overview-empty">${this.escapeHtml(this.t('diary.noNotes'))}</p>
+                        `}
+                    </div>
+                </section>
+            `;
+            this.displayedCount = 0;
+            this.updateLoadMoreButton();
+            if (this.loadMoreButton) this.loadMoreButton.style.display = 'none';
+            if (mapEntries.length) {
+                setTimeout(() => this.initializeDiaryOverviewMap(mapEntries), 50);
+            }
+        }
+
+        renderDiaryObservedSpecies(item) {
+            // Render a compact observed-species result that is separate from normal bird cards.
+            const displayName = item.localName || item.englishName || item.scientificName;
+            return `
+                <button class="diary-observed-species" type="button"
+                    data-diary-open-bird="${this.escapeHtml(item.scientificName)}">
+                    <i class="fa-solid fa-binoculars" aria-hidden="true"></i>
+                    <span>${this.escapeHtml(displayName)}</span>
+                    <small>${this.escapeHtml(item.scientificName)}</small>
+                </button>
+            `;
+        }
+
+        renderDiaryOverviewCard(item) {
+            // Render one saved note in the My diary overview with links back to the bird modal.
+            const dateLabel = this.formatObservationDate(item.entry.date);
+            const notePreview = this.truncateText(String(item.entry.note || '').replace(/[#*_~`>\[\]()]/g, ' '), 220);
+            const displayName = item.localName || item.englishName || item.scientificName;
+            const locationText = this.formatDiaryLocation(item.entry.location);
+            const imageUrl = item.bird?.apiData?.thumbnail || 'img/origami_bird_B.png';
+            return `
+                <article class="diary-overview-card">
+                    <button class="diary-overview-bird" type="button"
+                        data-diary-open-bird="${this.escapeHtml(item.scientificName)}">
+                        <span class="diary-overview-bird-text">
+                            <span>${this.escapeHtml(displayName)}</span>
+                            <small>${this.escapeHtml(item.scientificName)}</small>
+                        </span>
+                        <img class="diary-overview-bird-image"
+                            src="${this.escapeHtml(imageUrl)}"
+                            alt="${this.escapeHtml(displayName)}"
+                            loading="lazy">
+                    </button>
+                    <div class="diary-overview-note">
+                        <h3>${this.escapeHtml(item.noteName)}</h3>
+                        <p class="diary-overview-date">${this.escapeHtml(dateLabel)}</p>
+                        <p>${this.escapeHtml(notePreview)}</p>
+                        ${locationText ? `
+                            <p class="diary-overview-location">
+                                <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
+                                ${this.escapeHtml(locationText)}
+                            </p>
+                        ` : ''}
+                    </div>
+                </article>
+            `;
+        }
+
+        initializeDiaryOverviewMap(entries) {
+            // Plot saved diary locations and open the matching bird modal when a marker is clicked.
+            const mapElement = document.getElementById('diary-overview-map');
+            if (!window.L || !mapElement) return;
+            this.diaryOverviewMap = L.map(mapElement);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(this.diaryOverviewMap);
+            const bounds = [];
+            entries.forEach(item => {
+                const location = item.entry.location;
+                const coordinates = [Number(location.lat), Number(location.lng)];
+                if (!Number.isFinite(coordinates[0]) || !Number.isFinite(coordinates[1])) return;
+                const marker = L.marker(coordinates, {
+                    icon: this.createDiaryBirdMapIcon(item)
+                }).addTo(this.diaryOverviewMap);
+                const displayName = item.localName || item.englishName || item.scientificName;
+                marker.bindPopup(`
+                    <strong>${this.escapeHtml(displayName)}</strong><br>
+                    ${this.escapeHtml(item.noteName)}
+                `);
+                marker.on('mouseover', () => marker.openPopup());
+                marker.on('click', () => this.openBirdFromDiary(item.scientificName));
+                this.diaryOverviewMarkers.push(marker);
+                bounds.push(coordinates);
+            });
+            if (bounds.length === 1) {
+                this.diaryOverviewMap.setView(bounds[0], 12);
+            } else if (bounds.length > 1) {
+                this.diaryOverviewMap.fitBounds(bounds, { padding: [28, 28] });
+            }
+            setTimeout(() => this.diaryOverviewMap?.invalidateSize(), 80);
+        }
+
+        createDiaryBirdMapIcon(item) {
+            // Build a Leaflet marker shaped like a rounded bird photo with a pointer anchored to the observation.
+            const imageUrl = item.bird?.apiData?.thumbnail || 'img/origami_bird_B.png';
+            const displayName = item.localName || item.englishName || item.scientificName;
+            return L.divIcon({
+                className: 'diary-bird-map-icon',
+                html: `
+                    <div class="diary-bird-map-pin">
+                        <img src="${this.escapeHtml(imageUrl)}" alt="${this.escapeHtml(displayName)}">
+                    </div>
+                `,
+                iconSize: [58, 70],
+                iconAnchor: [29, 70],
+                popupAnchor: [0, -68]
+            });
+        }
+
+        destroyDiaryOverviewMap() {
+            // Tear down the overview map before replacing the grid to avoid stale Leaflet containers.
+            if (this.diaryOverviewMap) {
+                this.diaryOverviewMap.remove();
+                this.diaryOverviewMap = null;
+            }
+            this.diaryOverviewMarkers = [];
+        }
+
+        handleDiaryOverviewClick(event) {
+            // Open a species modal from diary overview cards.
+            const openButton = event.target.closest('[data-diary-open-bird]');
+            if (!openButton) return;
+            event.preventDefault();
+            this.openBirdFromDiary(openButton.dataset.diaryOpenBird);
+        }
+
+        handleDiaryOverviewInput(event) {
+            // Filter diary overview cards by note text, note name, and bird names.
+            const searchInput = event.target.closest('[data-diary-search]');
+            if (!searchInput) return;
+            const sortSelect = this.birdGrid.querySelector('[data-diary-sort]');
+            this.showDiaryOverview(searchInput.value, sortSelect?.value || 'date');
+            const nextInput = this.birdGrid.querySelector('[data-diary-search]');
+            if (nextInput) {
+                nextInput.focus();
+                nextInput.setSelectionRange(nextInput.value.length, nextInput.value.length);
+            }
+        }
+
+        handleDiaryOverviewChange(event) {
+            // Re-sort diary notes and observed species without running the main encyclopedia search.
+            const sortSelect = event.target.closest('[data-diary-sort]');
+            if (!sortSelect) return;
+            const searchInput = this.birdGrid.querySelector('[data-diary-search]');
+            this.showDiaryOverview(searchInput?.value || '', sortSelect.value);
+        }
+
+        openBirdFromDiary(scientificName) {
+            // Reuse the existing bird details modal from diary cards and map markers.
+            const bird = this.getBirdByScientificName(scientificName);
+            if (bird) this.showBirdDetails(bird);
+        }
+
+        truncateText(text, maxLength) {
+            // Keep diary overview cards compact while preserving enough note context.
+            const normalized = String(text || '').replace(/\s+/g, ' ').trim();
+            return normalized.length > maxLength
+                ? `${normalized.slice(0, maxLength - 1).trim()}…`
+                : normalized;
+        }
+
+        renderObservationDiarySection(scientificName) {
+            // Render the local seen marker and Markdown diary editor for the current modal species.
+            const record = this.getObservationRecord(scientificName) || {
+                scientificName,
+                seen: false,
+                observations: []
+            };
+            this.discardEmptyDraftObservations(record);
+            this.saveObservationDiary();
+            const isSeen = Boolean(record.seen);
+            const speciesKey = this.observationKey(scientificName);
+            const hasOpenEntryForSpecies = this.openDiarySpeciesKey === speciesKey && Boolean(this.openDiaryEntryId);
+            const entries = [...(record.observations || [])].sort((a, b) =>
+                String(b.date || '').localeCompare(String(a.date || ''))
+            );
+            return `
+                <details class="observation-diary-panel" data-observation-diary-panel data-scientific-name="${this.escapeHtml(scientificName)}" ${hasOpenEntryForSpecies ? 'open' : ''}>
+                    <summary class="observation-diary-heading">
+                        <div class="observation-diary-title">
+                            <i class="fa-solid fa-chevron-right observation-diary-chevron" aria-hidden="true"></i>
+                            <h3>${this.escapeHtml(this.t('diary.title'))} <span class="observation-diary-count">${this.escapeHtml(this.formatInterfaceNumber(entries.length))}</span></h3>
+                        </div>
+                        <div class="observation-diary-actions">
+                            <button class="observation-add-button" type="button"
+                                data-observation-add="${this.escapeHtml(scientificName)}">
+                                <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                                ${this.escapeHtml(this.t('diary.addObservation'))}
+                            </button>
+                        </div>
+                    </summary>
+                    ${entries.length ? `
+                        <div class="observation-entry-list">
+                            ${entries.map(entry => this.renderObservationEntry(scientificName, entry)).join('')}
+                        </div>
+                    ` : `
+                        <p class="observation-empty">${this.escapeHtml(this.t('diary.empty'))}</p>
+                    `}
+                </details>
+            `;
+        }
+
+        renderObservationEntry(scientificName, entry) {
+            // Render one diary note in read mode unless the visitor explicitly clicks Edit.
+            const renderedNote = this.renderDiaryMarkdown(entry.note || '');
+            const noteName = entry.name || this.getObservationEntryName(scientificName, entry);
+            const speciesKey = this.observationKey(scientificName);
+            const isOpen = entry.id === this.openDiaryEntryId && this.openDiarySpeciesKey === speciesKey;
+            const isEditing = entry.id === this.editingDiaryEntryId && this.editingDiarySpeciesKey === speciesKey;
+            const locationText = this.formatDiaryLocation(entry.location);
+            return `
+                <details class="observation-entry" data-observation-entry="${this.escapeHtml(entry.id)}" ${isOpen ? 'open' : ''}>
+                    <summary class="observation-entry-summary">
+                        <span class="observation-entry-title">
+                            <span>${this.escapeHtml(noteName)}</span>
+                            <span class="observation-entry-inline-actions">
+                                <button class="observation-edit-button" type="button"
+                                    aria-label="${this.escapeHtml(this.t('diary.edit'))}"
+                                    title="${this.escapeHtml(this.t('diary.edit'))}"
+                                    data-observation-edit="${this.escapeHtml(entry.id)}"
+                                    data-scientific-name="${this.escapeHtml(scientificName)}">
+                                    <i class="fa-solid fa-pencil" aria-hidden="true"></i>
+                                </button>
+                                <button class="observation-delete-button" type="button"
+                                    aria-label="${this.escapeHtml(this.t('diary.delete'))}"
+                                    title="${this.escapeHtml(this.t('diary.delete'))}"
+                                    data-observation-delete="${this.escapeHtml(entry.id)}"
+                                    data-scientific-name="${this.escapeHtml(scientificName)}">
+                                    <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                                </button>
+                            </span>
+                        </span>
+                        <small>${this.escapeHtml(this.t('diary.clickToOpen'))}</small>
+                    </summary>
+                    ${isEditing ? `
+                        <div class="observation-editor" data-observation-editor="${this.escapeHtml(entry.id)}">
+                            <label class="observation-date-editor">
+                                <span>${this.escapeHtml(this.t('diary.observedAt'))}</span>
+                                <input type="datetime-local" value="${this.escapeHtml(entry.date || '')}"
+                                    data-observation-date="${this.escapeHtml(entry.id)}"
+                                    data-scientific-name="${this.escapeHtml(scientificName)}">
+                            </label>
+                            <div class="observation-location-row">
+                                <button class="observation-location-button" type="button"
+                                    data-observation-location="${this.escapeHtml(entry.id)}"
+                                    data-scientific-name="${this.escapeHtml(scientificName)}">
+                                    <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
+                                    ${this.escapeHtml(this.t('diary.addLocation'))}
+                                </button>
+                                <span class="observation-location-value">
+                                    ${locationText ? this.escapeHtml(locationText) : this.escapeHtml(this.t('diary.noLocation'))}
+                                </span>
+                            </div>
+                            <div class="markdown-toolbar" role="toolbar" aria-label="${this.escapeHtml(this.t('diary.toolbarLabel'))}">
+                                ${this.renderMarkdownToolButton('bold', 'fa-bold', this.t('diary.bold'))}
+                                ${this.renderMarkdownToolButton('italic', 'fa-italic', this.t('diary.italic'))}
+                                ${this.renderMarkdownToolButton('underline', 'fa-underline', this.t('diary.underline'))}
+                                ${this.renderMarkdownToolButton('strike', 'fa-strikethrough', this.t('diary.strike'))}
+                                ${this.renderMarkdownToolButton('link', 'fa-link', this.t('diary.link'))}
+                            </div>
+                            <textarea class="observation-note-input"
+                                data-observation-note="${this.escapeHtml(entry.id)}"
+                                data-scientific-name="${this.escapeHtml(scientificName)}"
+                                placeholder="${this.escapeHtml(this.t('diary.placeholder'))}">${this.escapeHtml(entry.note || '')}</textarea>
+                            <div class="observation-save-row">
+                                <button class="observation-save-button" type="button"
+                                    data-observation-save="${this.escapeHtml(entry.id)}"
+                                    data-scientific-name="${this.escapeHtml(scientificName)}">
+                                    <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
+                                    ${this.escapeHtml(this.t('diary.saveNote'))}
+                                </button>
+                                <span class="observation-save-status" data-observation-save-status="${this.escapeHtml(entry.id)}"></span>
+                            </div>
+                        </div>
+                    ` : ''}
+                    <div class="observation-note-preview" data-observation-preview="${this.escapeHtml(entry.id)}">
+                        ${renderedNote || `<em>${this.escapeHtml(this.t('diary.previewEmpty'))}</em>`}
+                        ${locationText ? `
+                            <p class="observation-location-preview">
+                                <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
+                                ${this.escapeHtml(locationText)}
+                            </p>
+                        ` : ''}
+                    </div>
+                </details>
+            `;
+        }
+
+        formatDiaryLocation(location) {
+            // Convert a stored diary coordinate into a compact localized label for editor and preview views.
+            if (!location || !Number.isFinite(Number(location.lat)) || !Number.isFinite(Number(location.lng))) {
+                return '';
+            }
+            return this.t('diary.locationLabel', {
+                lat: Number(location.lat).toFixed(5),
+                lng: Number(location.lng).toFixed(5)
+            });
+        }
+
+        formatObservationDate(value) {
+            // Show diary note dates in the visitor's selected interface language.
+            if (!value) return this.t('common.notAvailable');
+            const normalized = String(value).includes('T') ? value : String(value).replace(' ', 'T');
+            const date = new Date(normalized);
+            if (Number.isNaN(date.getTime())) return value;
+            return new Intl.DateTimeFormat(this.currentLanguage.replace('_', '-'), {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            }).format(date);
+        }
+
+        renderMarkdownToolButton(format, icon, label) {
+            // Create one formatting button for the diary Markdown editor toolbar.
+            return `
+                <button type="button" class="markdown-tool-button" data-markdown-format="${this.escapeHtml(format)}" title="${this.escapeHtml(label)}">
+                    <i class="fa-solid ${this.escapeHtml(icon)}" aria-hidden="true"></i>
+                    <span>${this.escapeHtml(label)}</span>
+                </button>
+            `;
+        }
+
+        handleObservationDiaryClick(event) {
+            // Handle all diary clicks after modal content is rendered dynamically.
+            const addButton = event.target.closest('[data-observation-add]');
+            if (addButton) {
+                event.preventDefault();
+                event.stopPropagation();
+                this.addObservationEntry(addButton.dataset.observationAdd);
+                return;
+            }
+
+            const deleteButton = event.target.closest('[data-observation-delete]');
+            if (deleteButton) {
+                event.preventDefault();
+                event.stopPropagation();
+                if (!window.confirm(this.t('diary.confirmDeleteNote'))) return;
+                this.deleteObservationEntry(deleteButton.dataset.scientificName, deleteButton.dataset.observationDelete);
+                return;
+            }
+
+            const locationButton = event.target.closest('[data-observation-location]');
+            if (locationButton) {
+                event.preventDefault();
+                event.stopPropagation();
+                this.openDiaryLocationPicker(locationButton.dataset.scientificName, locationButton.dataset.observationLocation);
+                return;
+            }
+
+            const saveButton = event.target.closest('[data-observation-save]');
+            if (saveButton) {
+                event.preventDefault();
+                event.stopPropagation();
+                this.saveObservationEntryFromButton(saveButton);
+                return;
+            }
+
+            const editButton = event.target.closest('[data-observation-edit]');
+            if (editButton) {
+                event.preventDefault();
+                event.stopPropagation();
+                this.editingDiaryEntryId = editButton.dataset.observationEdit;
+                this.openDiaryEntryId = editButton.dataset.observationEdit;
+                this.editingDiarySpeciesKey = this.observationKey(editButton.dataset.scientificName);
+                this.openDiarySpeciesKey = this.observationKey(editButton.dataset.scientificName);
+                this.refreshObservationUi(editButton.dataset.scientificName);
+                return;
+            }
+
+            const formatButton = event.target.closest('[data-markdown-format]');
+            if (formatButton) {
+                event.preventDefault();
+                event.stopPropagation();
+                this.applyMarkdownFormat(formatButton);
+            }
+        }
+
+        handleObservationDiaryInput(event) {
+            // Update the live preview while leaving persistence to the explicit Save button.
+            const noteInput = event.target.closest('[data-observation-note]');
+            if (noteInput) {
+                this.updateObservationPreview(noteInput);
+                return;
+            }
+        }
+
+        saveObservationEntryFromButton(button) {
+            // Persist the currently edited diary note only when the visitor clicks Save.
+            const entry = button.closest('[data-observation-entry]');
+            const scientificName = button.dataset.scientificName;
+            const entryId = button.dataset.observationSave;
+            const textarea = entry?.querySelector(`[data-observation-note="${CSS.escape(entryId)}"]`);
+            const dateInput = entry?.querySelector(`[data-observation-date="${CSS.escape(entryId)}"]`);
+            if (!textarea || !dateInput) return;
+            if (!textarea.value.trim()) {
+                this.deleteObservationEntry(scientificName, entryId);
+                return;
+            }
+            this.updateObservationEntry(scientificName, entryId, {
+                note: textarea.value,
+                date: dateInput.value,
+                draft: false
+            });
+            this.openDiaryEntryId = entryId;
+            this.editingDiaryEntryId = null;
+            this.openDiarySpeciesKey = this.observationKey(scientificName);
+            this.editingDiarySpeciesKey = null;
+            const summaryLabel = entry.querySelector('.observation-entry-summary span');
+            if (summaryLabel) {
+                summaryLabel.textContent = this.getObservationEntryName(scientificName, {
+                    date: dateInput.value
+                });
+            }
+            this.refreshObservationUi(scientificName);
+        }
+
+        applyMarkdownFormat(button) {
+            // Wrap the selected diary text with the requested Markdown or HTML-compatible marker.
+            const entry = button.closest('[data-observation-entry]');
+            const textarea = entry?.querySelector('[data-observation-note]');
+            if (!textarea) return;
+            const format = button.dataset.markdownFormat;
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const selected = textarea.value.slice(start, end);
+            const fallbackText = this.t('diary.selectedText');
+            const selectedOrFallback = selected || fallbackText;
+            let replacement = selectedOrFallback;
+            if (format === 'bold') replacement = `**${selectedOrFallback}**`;
+            if (format === 'italic') replacement = `*${selectedOrFallback}*`;
+            if (format === 'underline') replacement = `<u>${selectedOrFallback}</u>`;
+            if (format === 'strike') replacement = `~~${selectedOrFallback}~~`;
+            if (format === 'link') {
+                const url = window.prompt(this.t('diary.linkPrompt'), 'https://');
+                if (!url) return;
+                replacement = `[${selectedOrFallback}](${url})`;
+            }
+            textarea.setRangeText(replacement, start, end, 'select');
+            textarea.dispatchEvent(new Event('input', { bubbles: true }));
+            textarea.focus();
+        }
+
+        updateObservationPreview(textarea) {
+            // Re-render the safe Markdown preview beside the edited observation note.
+            const entry = textarea.closest('[data-observation-entry]');
+            const preview = entry?.querySelector(`[data-observation-preview="${textarea.dataset.observationNote}"]`);
+            if (!preview) return;
+            const rendered = this.renderDiaryMarkdown(textarea.value);
+            preview.innerHTML = rendered || `<em>${this.escapeHtml(this.t('diary.previewEmpty'))}</em>`;
+        }
+
+        renderDiaryMarkdown(markdown) {
+            // Render common Markdown safely for local diary notes without allowing arbitrary HTML.
+            const text = String(markdown || '').replace(/\r\n/g, '\n').trim();
+            if (!text) return '';
+            const lines = this.escapeHtml(text).split('\n');
+            const html = [];
+            let listItems = [];
+            const flushList = () => {
+                if (listItems.length) {
+                    html.push(`<ul>${listItems.map(item => `<li>${this.renderInlineDiaryMarkdown(item)}</li>`).join('')}</ul>`);
+                    listItems = [];
+                }
+            };
+            lines.forEach(line => {
+                const trimmed = line.trim();
+                const listMatch = trimmed.match(/^[-*]\s+(.+)/);
+                if (listMatch) {
+                    listItems.push(listMatch[1]);
+                    return;
+                }
+                flushList();
+                if (!trimmed) return;
+                const heading = trimmed.match(/^(#{1,3})\s+(.+)/);
+                if (heading) {
+                    const level = heading[1].length + 3;
+                    html.push(`<h${level}>${this.renderInlineDiaryMarkdown(heading[2])}</h${level}>`);
+                    return;
+                }
+                if (trimmed.startsWith('&gt;')) {
+                    html.push(`<blockquote>${this.renderInlineDiaryMarkdown(trimmed.replace(/^&gt;\s?/, ''))}</blockquote>`);
+                    return;
+                }
+                html.push(`<p>${this.renderInlineDiaryMarkdown(trimmed)}</p>`);
+            });
+            flushList();
+            return html.join('');
+        }
+
+        renderInlineDiaryMarkdown(text) {
+            // Apply inline Markdown after the text has already been HTML-escaped.
+            return String(text || '')
+                .replace(/`([^`]+)`/g, '<code>$1</code>')
+                .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+                .replace(/&lt;u&gt;([\s\S]+?)&lt;\/u&gt;/g, '<u>$1</u>')
+                .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+                .replace(/~~([^~]+)~~/g, '<del>$1</del>')
+                .replace(/(^|[^*])\*([^*]+)\*/g, '$1<em>$2</em>');
+        }
+
+        toLocalDateTimeInput(date) {
+            // Format a Date for datetime-local inputs without timezone conversion surprises.
+            const pad = value => String(value).padStart(2, '0');
+            return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+        }
+
+        getObservationEntryName(scientificName, entry = {}) {
+            // Name saved diary notes as Latin-name plus timestamp without seconds.
+            const species = String(scientificName || 'bird').trim().replace(/[^\w]+/g, '_').replace(/^_|_$/g, '');
+            const timestamp = String(entry.date || this.toLocalDateTimeInput(new Date()))
+                .slice(0, 16)
+                .replace('T', '_')
+                .replace(':', '-');
+            return `${species || 'bird'}_${timestamp}`;
         }
 
         normalizeConservationStatus(status) {
@@ -3127,6 +4274,9 @@
         async showBirdDetails(bird) {
 
             // Set current bird and clear previous modal content
+            if (this.currentBirdId && this.currentBirdId !== bird.latin) {
+                this.clearActiveDiaryUiState();
+            }
             this.currentBirdId = bird.latin;
             this.stopCarouselInterval();
 
@@ -3138,6 +4288,7 @@
 
             this.modal.style.display = 'block';
             this.modalBirdName.textContent = this.t('action.loading');
+            this.updateModalObservationToggle(bird.latin);
             this.modalBody.innerHTML = `
                 <div class="modal-loading">
                     <div class="spinner"></div>
@@ -3238,8 +4389,10 @@
 
                 // Update modal content
                 this.modalBirdName.textContent = bird.name;
+                this.updateModalObservationToggle(bird.latin);
                 this.modalBody.innerHTML = `
                     ${carouselHTML}
+                    ${this.renderObservationDiarySection(bird.latin)}
                     <div class="modal-details">
                         <div class="detail-group">
                             <div class="detail-label">${this.escapeHtml(this.t('detail.latinName'))}</div>
@@ -3449,7 +4602,7 @@
         }
         
         handleScroll() {
-            if (this.isLoading || this.filteredBirds.length === 0) return;
+            if (this.activeDiaryOverview || this.isLoading || this.filteredBirds.length === 0) return;
             
             // More reliable bottom detection
             const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
@@ -3511,7 +4664,10 @@
         // search method to include cross-language search
         async handleSearch() {
             console.log("🔎 handleSearch called!");
+            const requestId = ++this.searchRequestId;
             const searchTerm = this.searchInput.value.toLowerCase().trim(); // normalize input - Convert to lowercase
+            this.activeDiaryOverview = false;
+            this.destroyDiaryOverviewMap();
 
             // --- Step 1: cleanup old state ---
             const loadingIndicator = this.birdGrid.querySelector('.loading');
@@ -3538,7 +4694,11 @@
 
             // --- Step 3: show current-language results immediately ---
             if (this.filteredBirds.length === 0) {
-                this.showNoResults();
+                if (searchTerm === '') {
+                    this.showNoResults('final');
+                } else {
+                    this.showNoResults('crossLanguageLoading', searchTerm);
+                }
                 this.loadMoreButton.style.display = 'none';
                 if (this.scrollSentinel) this.scrollSentinel.remove();
 
@@ -3559,16 +4719,26 @@
             if (searchTerm !== '') {
                 // Don’t block local results → continue async
                 this.searchAcrossAllLanguages(searchTerm, this.filteredBirds).then(results => {
+                    if (requestId !== this.searchRequestId) return;
                     this.crossLanguageSearchResults = results;
 
                     if (results.length > 0) {
+                        if (this.filteredBirds.length === 0) {
+                            this.birdGrid.innerHTML = '';
+                        }
                         // Append section dynamically (below local results)
                         this.showCrossLanguageResultsSection();
+                    } else if (this.filteredBirds.length === 0) {
+                        this.showNoResults('final', searchTerm);
                     }
 
                     console.log(`🌍 Cross-language search complete: ${results.length} matches found`);
                 }).catch(err => {
+                    if (requestId !== this.searchRequestId) return;
                     console.warn("Cross-language search failed:", err);
+                    if (this.filteredBirds.length === 0) {
+                        this.showNoResults('final', searchTerm);
+                    }
                 });
             }
         }
@@ -3721,13 +4891,29 @@
 
             const resultsSection = document.createElement('div');
             resultsSection.className = 'cross-language-results';
+            const languageSummary = this.getCrossLanguageResultSummary();
 
             resultsSection.innerHTML = `
 
                 <div class="results-separator"></div>
 
                 <h3>${this.escapeHtml(this.t('modal.otherLanguages'))}</h3>
-                <p>We found ${this.crossLanguageSearchResults.length} matches in other languages:</p>
+                <p>${this.escapeHtml(this.t('search.otherLanguageMatches', {
+                    count: this.formatInterfaceNumber(this.crossLanguageSearchResults.length)
+                }))}</p>
+                <div class="cross-language-summary">
+                    ${languageSummary.map(item => `
+                        <button class="cross-language-summary-pill" type="button"
+                            data-cross-language-toggle="${this.escapeHtml(item.language)}"
+                            aria-pressed="false">
+                            <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                            ${this.escapeHtml(this.t('search.foundInLanguage', {
+                                language: item.languageName,
+                                count: this.formatInterfaceNumber(item.count)
+                            }))}
+                        </button>
+                    `).join('')}
+                </div>
                 <div class="cross-language-birds">
                     ${this.crossLanguageSearchResults.map((bird, index) => {
                         // Get the flag for the bird's language
@@ -3739,7 +4925,7 @@
                             'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect width="100" height="100" fill="%23f0f0f0"/%3E%3C/svg%3E';
 
                         return `
-                            <div class="cross-language-bird" data-result-index="${index}">
+                            <div class="cross-language-bird" data-result-index="${index}" data-cross-language="${this.escapeHtml(bird.language)}">
                                 <div class="bird-image-container">
                                     <img src="${imageUrl}"
                                         alt="${bird.name}"
@@ -3785,9 +4971,39 @@
                 });
             });
 
+            resultsSection.querySelectorAll('[data-cross-language-toggle]').forEach(toggle => {
+                toggle.addEventListener('click', () => {
+                    // Hide or reveal one language group while keeping the summary pill visible.
+                    const language = toggle.dataset.crossLanguageToggle;
+                    const isHidden = toggle.classList.toggle('is-hidden');
+                    toggle.setAttribute('aria-pressed', String(isHidden));
+                    resultsSection.querySelectorAll(`[data-cross-language="${CSS.escape(language)}"]`).forEach(card => {
+                        card.hidden = isHidden;
+                    });
+                });
+            });
 
             // Initialize lazy loading for these images
             this.lazyLoadCrossLanguageImages();
+        }
+
+        getCrossLanguageResultSummary() {
+            // Group background-search matches by language for a compact completion indicator.
+            const counts = new Map();
+            this.crossLanguageSearchResults.forEach(bird => {
+                const languageInfo = this.availableLanguages[bird.language] || {};
+                const languageName = `${languageInfo.flag || ''} ${languageInfo.name || bird.languageName || bird.language}`.trim();
+                const current = counts.get(bird.language) || {
+                    language: bird.language,
+                    languageName,
+                    count: 0
+                };
+                current.count += 1;
+                counts.set(bird.language, current);
+            });
+            return [...counts.values()].sort((a, b) =>
+                a.languageName.localeCompare(b.languageName, this.currentLanguage.replace('_', '-'))
+            );
         }
 
         // Add this method to handle lazy loading for cross-language images
@@ -3897,6 +5113,9 @@
                     this.englishNamesBySciName = new Map(
                         this.birds.map(bird => [bird.latin.toLowerCase(), bird.name])
                     );
+                    this.allBirdsBySciName = new Map(
+                        this.birds.map(bird => [this.observationKey(bird.latin), { ...bird }])
+                    );
                 }
 
                 // Set current language
@@ -4003,13 +5222,36 @@
             document.body.style.overflow = '';
             this.stopCarouselInterval();
             this.currentBirdId = null;
+            this.clearActiveDiaryUiState();
+            if (this.modalObservationToggle) this.modalObservationToggle.hidden = true;
+        }
+
+        clearActiveDiaryUiState() {
+            // Clear transient open/editor state without deleting saved species-specific diary notes.
+            this.openDiaryEntryId = null;
+            this.editingDiaryEntryId = null;
+            this.openDiarySpeciesKey = null;
+            this.editingDiarySpeciesKey = null;
         }
         
-        showNoResults() {
+        showNoResults(state = 'final', searchTerm = '') {
+            // Show a non-final loading state while cross-language search continues in the background.
             this.birdGrid.innerHTML = '';
             const noResults = document.createElement('div');
             noResults.className = 'no-results';
-            noResults.textContent = 'No birds found matching your search in selected language.';
+            if (state === 'crossLanguageLoading') {
+                noResults.classList.add('no-results-loading');
+                noResults.innerHTML = `
+                    <div class="inline-search-spinner" aria-hidden="true"></div>
+                    <strong>${this.escapeHtml(this.t('search.noLocalResults'))}</strong>
+                    <p>${this.escapeHtml(this.t('search.checkingOtherLanguages', { query: searchTerm }))}</p>
+                `;
+            } else {
+                noResults.innerHTML = `
+                    <strong>${this.escapeHtml(this.t('search.noResultsTitle'))}</strong>
+                    <p>${this.escapeHtml(this.t('search.noResultsSelectedLanguage'))}</p>
+                `;
+            }
             this.birdGrid.appendChild(noResults);
         }
         
