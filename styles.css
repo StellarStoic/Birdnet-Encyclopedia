@@ -985,6 +985,25 @@ body[data-theme="paper"] {
     font-weight: 900;
 }
 
+.diary-summary-range {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--muted);
+    font-size: 0.84rem;
+    font-weight: 850;
+}
+
+.diary-summary-range select {
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--background);
+    color: var(--text);
+    padding: 8px 12px;
+    font: inherit;
+    font-weight: 850;
+}
+
 .diary-summary-button:disabled {
     cursor: wait;
     opacity: 0.65;

@@ -3423,6 +3423,8 @@
             const entries = this.getDiaryOverviewEntries(searchTerm, sortMode);
             const observedSpecies = this.getDiaryObservedSpecies(searchTerm, sortMode);
             const visibleEntries = entries.filter(item => !this.diaryHiddenSpecies.has(this.observationKey(item.scientificName)));
+            const summaryRange = options.summaryRange || this.birdGrid.querySelector('[data-diary-summary-range]')?.value || '30';
+            const summaryEntries = this.filterDiaryEntriesBySummaryRange(visibleEntries, summaryRange);
             const mapEntries = visibleEntries.filter(item => item.entry.location);
             this.birdGrid.innerHTML = `
                 <section class="diary-overview" data-diary-overview>
@@ -3452,8 +3454,14 @@
                             <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
                             ${this.escapeHtml(this.t('diary.summarize'))}
                         </button>
+                        <label class="diary-summary-range">
+                            <span>${this.escapeHtml(this.t('diary.summaryRange'))}</span>
+                            <select data-diary-summary-range>
+                                ${this.renderDiarySummaryRangeOptions(summaryRange)}
+                            </select>
+                        </label>
                         <span class="diary-summary-scope">${this.escapeHtml(this.t('diary.summaryScope', {
-                            count: this.formatInterfaceNumber(visibleEntries.length)
+                            count: this.formatInterfaceNumber(summaryEntries.length)
                         }))}</span>
                     </div>
                     <div class="diary-summary-result" data-diary-summary-result hidden></div>
@@ -3484,6 +3492,35 @@
             if (!options.skipImageFetch) {
                 this.ensureDiaryOverviewImages([...entries, ...observedSpecies], searchTerm, sortMode);
             }
+        }
+
+        renderDiarySummaryRangeOptions(selectedRange) {
+            // Render the AI summary time-window choices without affecting the visible diary note list.
+            const ranges = [
+                ['10', this.t('diary.summaryLast10Days')],
+                ['30', this.t('diary.summaryLast30Days')],
+                ['90', this.t('diary.summaryLast90Days')],
+                ['365', this.t('diary.summaryLastYear')],
+                ['all', this.t('diary.summaryAllTime')]
+            ];
+            return ranges.map(([value, label]) => `
+                <option value="${this.escapeHtml(value)}" ${value === selectedRange ? 'selected' : ''}>${this.escapeHtml(label)}</option>
+            `).join('');
+        }
+
+        filterDiaryEntriesBySummaryRange(entries, summaryRange) {
+            // Keep AI summaries focused on the selected recent period while leaving the diary list untouched.
+            if (summaryRange === 'all') return entries;
+            const days = Number(summaryRange);
+            if (!Number.isFinite(days) || days <= 0) return entries;
+            const cutoff = Date.now() - (days * 24 * 60 * 60 * 1000);
+            return entries.filter(item => {
+                const normalized = String(item.entry.date || item.entry.updatedAt || '').includes('T')
+                    ? String(item.entry.date || item.entry.updatedAt || '')
+                    : String(item.entry.date || item.entry.updatedAt || '').replace(' ', 'T');
+                const date = new Date(normalized);
+                return Number.isFinite(date.getTime()) && date.getTime() >= cutoff;
+            });
         }
 
         renderDiaryObservedSpecies(item) {
@@ -3703,9 +3740,15 @@
         handleDiaryOverviewChange(event) {
             // Re-sort diary notes and observed species without running the main encyclopedia search.
             const sortSelect = event.target.closest('[data-diary-sort]');
-            if (!sortSelect) return;
+            const summaryRangeSelect = event.target.closest('[data-diary-summary-range]');
+            if (!sortSelect && !summaryRangeSelect) return;
             const searchInput = this.birdGrid.querySelector('[data-diary-search]');
-            this.showDiaryOverview(searchInput?.value || '', sortSelect.value);
+            const currentSort = sortSelect?.value || this.birdGrid.querySelector('[data-diary-sort]')?.value || 'date';
+            const currentRange = summaryRangeSelect?.value || this.birdGrid.querySelector('[data-diary-summary-range]')?.value || '30';
+            this.showDiaryOverview(searchInput?.value || '', currentSort, {
+                summaryRange: currentRange,
+                skipImageFetch: true
+            });
         }
 
         async summarizeDiaryOverview(button) {
@@ -3713,9 +3756,11 @@
             const result = this.birdGrid.querySelector('[data-diary-summary-result]');
             const searchInput = this.birdGrid.querySelector('[data-diary-search]');
             const sortSelect = this.birdGrid.querySelector('[data-diary-sort]');
+            const summaryRangeSelect = this.birdGrid.querySelector('[data-diary-summary-range]');
             const entries = this.getDiaryOverviewEntries(searchInput?.value || '', sortSelect?.value || 'date')
                 .filter(item => !this.diaryHiddenSpecies.has(this.observationKey(item.scientificName)));
-            if (!entries.length) {
+            const summaryEntries = this.filterDiaryEntriesBySummaryRange(entries, summaryRangeSelect?.value || '30');
+            if (!summaryEntries.length) {
                 if (result) {
                     result.hidden = false;
                     result.textContent = this.t('diary.summaryNoNotes');
@@ -3728,7 +3773,7 @@
 
             const selectedModel = this.getAiTextModel();
             const targetLanguage = this.languageMap[this.currentLanguage]?.name || this.currentLanguage;
-            const sourceText = entries.map((item, index) => {
+            const sourceText = summaryEntries.map((item, index) => {
                 const displayName = item.localName || item.englishName || item.scientificName;
                 return `${index + 1}. ${displayName} (${item.scientificName}), ${this.formatObservationDate(item.entry.date)}\n${item.entry.note}`;
             }).join('\n\n');
