@@ -469,6 +469,7 @@
             this.iucnDetailBucketPromises = new Map(); // Shares concurrent requests for the same letter
             this.iucnTranslationSections = new Map(); // Stores modal IUCN text blocks that can be translated on demand
             this.observationDiary = this.loadObservationDiary(); // Local seen-state and diary entries keyed by scientific name
+            this.localizedNameCache = new Map(); // Caches language-file names used to guide AI description translations
             this.openDiaryEntryId = null; // Keeps only the newly started diary note expanded after adding it
             this.editingDiaryEntryId = null; // Shows the diary editor only for the entry being actively edited
             this.openDiarySpeciesKey = null; // Scopes expanded diary entries to the species modal that owns them
@@ -1450,6 +1451,36 @@
         // Helper method to get English bird names
         getEnglishBirdName(latinName) {
             return this.englishNamesBySciName.get(latinName.toLowerCase()) || null;
+        }
+
+        async getLocalizedBirdNameForLanguage(latinName, languageCode) {
+            // Resolve the established local species name directly from the selected language file.
+            if (!latinName || !languageCode || languageCode === 'en') return '';
+            const normalizedLatin = latinName.toLowerCase();
+            const cacheKey = `${languageCode}|${normalizedLatin}`;
+            if (this.localizedNameCache.has(cacheKey)) {
+                return this.localizedNameCache.get(cacheKey);
+            }
+
+            try {
+                const response = await fetch(`lang/labels_${languageCode}.txt`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.text();
+                const line = data.split('\n').find(entry => {
+                    const latin = entry.split('_')[0]?.trim().toLowerCase();
+                    return latin === normalizedLatin;
+                });
+                const translatedName = line?.split('_').slice(1).join('_').trim() || '';
+                const localName = translatedName && !this.isEnglishFallback(translatedName, latinName)
+                    ? translatedName
+                    : '';
+                this.localizedNameCache.set(cacheKey, localName);
+                return localName;
+            } catch (error) {
+                console.warn(`Could not resolve local bird name for ${latinName} in ${languageCode}:`, error);
+                this.localizedNameCache.set(cacheKey, '');
+                return '';
+            }
         }
 
         showTranslationStats(langCode) {
@@ -2653,11 +2684,13 @@
             const cacheStorageKey = 'birdDescriptionTranslationsV1';
             const selectedModel = this.getAiTextModel();
             const englishName = this.getEnglishBirdName(bird.latin) || '';
-            const localName = bird.name && this.normalizeSearchText(bird.name) !== this.normalizeSearchText(englishName)
+            const resolvedLocalName = await this.getLocalizedBirdNameForLanguage(bird.latin, languageCode);
+            const localName = resolvedLocalName
+                || (bird.name && this.normalizeSearchText(bird.name) !== this.normalizeSearchText(englishName)
                 ? bird.name
-                : '';
+                : '');
             // Include the prompt version and local name so old literal-name translations are not reused.
-            const cacheKey = `name-aware-v2|${bird.latin}|${languageCode}|${selectedModel}|${localName}|${description.length}|${description.slice(0, 80)}`;
+            const cacheKey = `name-aware-v3|${bird.latin}|${languageCode}|${selectedModel}|${localName}|${description.length}|${description.slice(0, 80)}`;
             let translationCache = {};
 
             try {
@@ -2676,7 +2709,7 @@
 
             const targetLanguage = this.languageMap[languageCode]?.name || languageCode;
             const namingInstruction = localName
-                ? `Use the established local species name "${localName}" as the primary name for ${bird.latin}. If the English source says "${englishName || bird.name}", replace that species name with "${localName}" where natural. Do not literally translate the English common name unless no local name is supplied.`
+                ? `Use the established local species name "${localName}" as the primary name for ${bird.latin}. If the English source says "${englishName || bird.name}", replace every species-name use with "${localName}" where natural, including the first sentence. Do not keep the English common name and do not literally translate it when this local name is supplied.`
                 : `No established local species name is supplied, so translate the English common name naturally only if that is normal in ${targetLanguage}.`;
             try {
                 // Pollinations uses an OpenAI-compatible chat endpoint for faithful plain-text translation.
