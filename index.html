@@ -476,6 +476,7 @@
             this.activeDiaryOverview = false; // Stops normal bird infinite-scroll while My diary is displayed
             this.diaryOverviewMap = null; // Leaflet map instance for the all-notes diary overview
             this.diaryOverviewMarkers = []; // Markers that link diary locations back to bird modals
+            this.diaryHiddenSpecies = new Set(); // Species excluded from the diary map and AI summary in the current view
             this.pendingDiaryLocationTarget = null; // Tracks which diary note receives the selected location
             this.pendingDiaryLocation = null; // Holds the GPS or map coordinate before the visitor saves it
             this.diaryLocationMap = null; // Leaflet map instance for the diary location picker
@@ -875,7 +876,7 @@
 
         renderBirdGridFromStart() {
             // Rebuild the first page deterministically after startup language changes or browser history restoration.
-            this.activeDiaryOverview = false;
+            this.leaveDiaryOverviewMode();
             this.destroyDiaryOverviewMap();
             this.birdGrid.innerHTML = '';
             this.displayedCount = 0;
@@ -1696,7 +1697,7 @@
 
         handleCategoryFilter(filter) {
             console.log('Filtering by category:', filter);
-            this.activeDiaryOverview = false;
+            this.leaveDiaryOverviewMode();
             this.destroyDiaryOverviewMap();
             this.activeIucnFilter = null;
             this.updateIucnFilterSelection();
@@ -1714,7 +1715,7 @@
 
         handleIucnFilter(code) {
             // Filter only official records present in the generated local IUCN status file.
-            this.activeDiaryOverview = false;
+            this.leaveDiaryOverviewMode();
             this.destroyDiaryOverviewMap();
             this.activeIucnFilter = code;
             this.updateIucnFilterSelection();
@@ -1857,6 +1858,7 @@
         }
 
         setupScrollObserver() {
+            if (this.activeDiaryOverview) return;
             // Remove existing sentinel if any
             if (this.scrollSentinel) {
                 this.scrollSentinel.remove();
@@ -1876,6 +1878,7 @@
             this.scrollObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting && 
+                        !this.activeDiaryOverview &&
                         !this.isLoading && 
                         this.displayedCount < this.filteredBirds.length) {
 
@@ -1897,6 +1900,7 @@
         }
 
         async handleLoadMore() {
+            if (this.activeDiaryOverview) return;
             if (this.isLoading || this.displayedCount >= this.filteredBirds.length) return;
             
             this.loadMoreButton.disabled = true;
@@ -2648,7 +2652,12 @@
 
             const cacheStorageKey = 'birdDescriptionTranslationsV1';
             const selectedModel = this.getAiTextModel();
-            const cacheKey = `${bird.latin}|${languageCode}|${selectedModel}|${description.length}|${description.slice(0, 80)}`;
+            const englishName = this.getEnglishBirdName(bird.latin) || '';
+            const localName = bird.name && this.normalizeSearchText(bird.name) !== this.normalizeSearchText(englishName)
+                ? bird.name
+                : '';
+            // Include the prompt version and local name so old literal-name translations are not reused.
+            const cacheKey = `name-aware-v2|${bird.latin}|${languageCode}|${selectedModel}|${localName}|${description.length}|${description.slice(0, 80)}`;
             let translationCache = {};
 
             try {
@@ -2666,6 +2675,9 @@
             }
 
             const targetLanguage = this.languageMap[languageCode]?.name || languageCode;
+            const namingInstruction = localName
+                ? `Use the established local species name "${localName}" as the primary name for ${bird.latin}. If the English source says "${englishName || bird.name}", replace that species name with "${localName}" where natural. Do not literally translate the English common name unless no local name is supplied.`
+                : `No established local species name is supplied, so translate the English common name naturally only if that is normal in ${targetLanguage}.`;
             try {
                 // Pollinations uses an OpenAI-compatible chat endpoint for faithful plain-text translation.
                 const response = await fetch('https://gen.pollinations.ai/v1/chat/completions', {
@@ -2679,7 +2691,7 @@
                         messages: [
                             {
                                 role: 'system',
-                                content: `Translate only the supplied bird encyclopedia text into ${targetLanguage}. The topic is a bird species; treat common names, scientific names, places, behaviours, habitats, and conservation facts in that bird context only. Do not reinterpret any word as a surname, person, brand, or unrelated topic. Preserve every fact and the complete meaning. Return only the translated description as plain text, without headings, notes, Markdown, or added facts.`
+                                content: `Translate only the supplied bird encyclopedia text into ${targetLanguage}. The topic is a bird species; treat common names, scientific names, places, behaviours, habitats, and conservation facts in that bird context only. ${namingInstruction} Preserve scientific names exactly. Do not reinterpret any word as a surname, person, brand, or unrelated topic. Preserve every fact and the complete meaning. Return only the translated description as plain text, without headings, notes, Markdown, or added facts.`
                             },
                             {
                                 role: 'user',
@@ -3254,6 +3266,16 @@
             if (diaryPanel?.dataset.scientificName === scientificName) {
                 diaryPanel.outerHTML = this.renderObservationDiarySection(scientificName);
             }
+
+            this.refreshDiaryOverviewIfActive();
+        }
+
+        refreshDiaryOverviewIfActive() {
+            // Redraw My diary behind an open bird modal after notes are edited, saved, or deleted.
+            if (!this.activeDiaryOverview) return;
+            const searchInput = this.birdGrid.querySelector('[data-diary-search]');
+            const sortSelect = this.birdGrid.querySelector('[data-diary-sort]');
+            this.showDiaryOverview(searchInput?.value || '', sortSelect?.value || 'date', { skipImageFetch: true });
         }
 
         updateModalObservationToggle(scientificName) {
@@ -3361,16 +3383,47 @@
             return dates[0] || record?.updatedAt || '';
         }
 
-        showDiaryOverview(searchTerm = '', sortMode = 'date') {
-            // Replace the grid with a searchable list and map of browser-local observation notes.
+        enterDiaryOverviewMode() {
+            // Isolate My diary from the normal bird grid, cross-language results, and infinite scrolling.
             this.searchRequestId += 1;
             this.activeDiaryOverview = true;
-            this.destroyDiaryOverviewMap();
+            this.isLoading = false;
+            this.displayedCount = 0;
+            this.filteredBirds = [];
+            if (this.scrollObserver) {
+                this.scrollObserver.disconnect();
+            }
+            if (this.scrollSentinel) {
+                this.scrollSentinel.remove();
+                this.scrollSentinel = null;
+            }
             const crossLangContainer = document.getElementById('cross-language-container');
-            if (crossLangContainer) crossLangContainer.innerHTML = '';
+            if (crossLangContainer) {
+                crossLangContainer.innerHTML = '';
+                crossLangContainer.hidden = true;
+            }
+            if (this.loadMoreButton) {
+                this.loadMoreButton.style.display = 'none';
+                this.loadMoreButton.disabled = true;
+            }
+        }
+
+        leaveDiaryOverviewMode() {
+            // Restore containers used by the normal encyclopedia search and grid views.
+            this.activeDiaryOverview = false;
+            const crossLangContainer = document.getElementById('cross-language-container');
+            if (crossLangContainer) crossLangContainer.hidden = false;
+            if (this.loadMoreButton) this.loadMoreButton.disabled = false;
+        }
+
+        showDiaryOverview(searchTerm = '', sortMode = 'date', options = {}) {
+            // Replace the grid with a searchable list and map of browser-local observation notes.
+            this.enterDiaryOverviewMode();
+            this.destroyDiaryOverviewMap();
             const entries = this.getDiaryOverviewEntries(searchTerm, sortMode);
             const observedSpecies = this.getDiaryObservedSpecies(searchTerm, sortMode);
-            const mapEntries = entries.filter(item => item.entry.location);
+            const visibleEntries = entries.filter(item => !this.diaryHiddenSpecies.has(this.observationKey(item.scientificName)));
+            const mapEntries = visibleEntries.filter(item => item.entry.location);
             this.birdGrid.innerHTML = `
                 <section class="diary-overview" data-diary-overview>
                     <div class="diary-overview-header">
@@ -3394,6 +3447,16 @@
                             <option value="name" ${sortMode === 'name' ? 'selected' : ''}>${this.escapeHtml(this.t('diary.sortName'))}</option>
                         </select>
                     </label>
+                    <div class="diary-overview-actions">
+                        <button class="diary-summary-button" type="button" data-diary-summary>
+                            <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
+                            ${this.escapeHtml(this.t('diary.summarize'))}
+                        </button>
+                        <span class="diary-summary-scope">${this.escapeHtml(this.t('diary.summaryScope', {
+                            count: this.formatInterfaceNumber(visibleEntries.length)
+                        }))}</span>
+                    </div>
+                    <div class="diary-summary-result" data-diary-summary-result hidden></div>
                     <div class="diary-overview-map" id="diary-overview-map">
                         ${mapEntries.length ? '' : `<p>${this.escapeHtml(this.t('diary.noMappedNotes'))}</p>`}
                     </div>
@@ -3418,14 +3481,20 @@
             if (mapEntries.length) {
                 setTimeout(() => this.initializeDiaryOverviewMap(mapEntries), 50);
             }
+            if (!options.skipImageFetch) {
+                this.ensureDiaryOverviewImages([...entries, ...observedSpecies], searchTerm, sortMode);
+            }
         }
 
         renderDiaryObservedSpecies(item) {
             // Render a compact observed-species result that is separate from normal bird cards.
             const displayName = item.localName || item.englishName || item.scientificName;
+            const isHidden = this.diaryHiddenSpecies.has(this.observationKey(item.scientificName));
             return `
-                <button class="diary-observed-species" type="button"
-                    data-diary-open-bird="${this.escapeHtml(item.scientificName)}">
+                <button class="diary-observed-species ${isHidden ? 'diary-observed-species-hidden' : ''}" type="button"
+                    aria-pressed="${isHidden ? 'true' : 'false'}"
+                    title="${this.escapeHtml(isHidden ? this.t('diary.includeSpecies') : this.t('diary.excludeSpecies'))}"
+                    data-diary-toggle-species="${this.escapeHtml(item.scientificName)}">
                     <i class="fa-solid fa-binoculars" aria-hidden="true"></i>
                     <span>${this.escapeHtml(displayName)}</span>
                     <small>${this.escapeHtml(item.scientificName)}</small>
@@ -3440,13 +3509,17 @@
             const displayName = item.localName || item.englishName || item.scientificName;
             const locationText = this.formatDiaryLocation(item.entry.location);
             const imageUrl = item.bird?.apiData?.thumbnail || 'img/origami_bird_B.png';
+            const isHidden = this.diaryHiddenSpecies.has(this.observationKey(item.scientificName));
             return `
-                <article class="diary-overview-card">
+                <article class="diary-overview-card ${isHidden ? 'diary-overview-card-hidden' : ''}">
                     <button class="diary-overview-bird" type="button"
                         data-diary-open-bird="${this.escapeHtml(item.scientificName)}">
                         <span class="diary-overview-bird-text">
                             <span>${this.escapeHtml(displayName)}</span>
                             <small>${this.escapeHtml(item.scientificName)}</small>
+                            <small class="diary-overview-bird-state">
+                                ${this.escapeHtml(isHidden ? this.t('diary.excludedFromSummary') : this.t('diary.includedInSummary'))}
+                            </small>
                         </span>
                         <img class="diary-overview-bird-image"
                             src="${this.escapeHtml(imageUrl)}"
@@ -3454,7 +3527,25 @@
                             loading="lazy">
                     </button>
                     <div class="diary-overview-note">
-                        <h3>${this.escapeHtml(item.noteName)}</h3>
+                        <div class="diary-overview-note-heading">
+                            <h3>${this.escapeHtml(item.noteName)}</h3>
+                            <span class="diary-overview-note-actions">
+                                <button class="diary-overview-note-action" type="button"
+                                    aria-label="${this.escapeHtml(this.t('diary.edit'))}"
+                                    title="${this.escapeHtml(this.t('diary.edit'))}"
+                                    data-diary-edit-note="${this.escapeHtml(item.entry.id)}"
+                                    data-scientific-name="${this.escapeHtml(item.scientificName)}">
+                                    <i class="fa-solid fa-pencil" aria-hidden="true"></i>
+                                </button>
+                                <button class="diary-overview-note-action diary-overview-note-delete" type="button"
+                                    aria-label="${this.escapeHtml(this.t('diary.delete'))}"
+                                    title="${this.escapeHtml(this.t('diary.delete'))}"
+                                    data-diary-delete-note="${this.escapeHtml(item.entry.id)}"
+                                    data-scientific-name="${this.escapeHtml(item.scientificName)}">
+                                    <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                                </button>
+                            </span>
+                        </div>
                         <p class="diary-overview-date">${this.escapeHtml(dateLabel)}</p>
                         <p>${this.escapeHtml(notePreview)}</p>
                         ${locationText ? `
@@ -3466,6 +3557,24 @@
                     </div>
                 </article>
             `;
+        }
+
+        ensureDiaryOverviewImages(items, searchTerm, sortMode) {
+            // Fetch missing bird thumbnails for diary cards and map pins, then redraw once with the same diary filters.
+            const uniqueBirds = [...new Map(
+                items
+                    .map(item => item.bird)
+                    .filter(bird => bird && !bird.apiData?.thumbnail)
+                    .map(bird => [this.observationKey(bird.latin), bird])
+            ).values()];
+            if (!uniqueBirds.length) return;
+            this.fetchINatDataForBirds(uniqueBirds)
+                .then(() => {
+                    if (this.activeDiaryOverview) {
+                        this.showDiaryOverview(searchTerm, sortMode, { skipImageFetch: true });
+                    }
+                })
+                .catch(error => console.warn('Diary thumbnail loading failed:', error));
         }
 
         initializeDiaryOverviewMap(entries) {
@@ -3529,7 +3638,49 @@
         }
 
         handleDiaryOverviewClick(event) {
-            // Open a species modal from diary overview cards.
+            // Keep diary overview clicks scoped to diary actions, not the normal bird grid.
+            const summaryButton = event.target.closest('[data-diary-summary]');
+            if (summaryButton) {
+                event.preventDefault();
+                this.summarizeDiaryOverview(summaryButton);
+                return;
+            }
+
+            const editNoteButton = event.target.closest('[data-diary-edit-note]');
+            if (editNoteButton) {
+                event.preventDefault();
+                const scientificName = editNoteButton.dataset.scientificName;
+                this.openDiaryEntryId = editNoteButton.dataset.diaryEditNote;
+                this.editingDiaryEntryId = editNoteButton.dataset.diaryEditNote;
+                this.openDiarySpeciesKey = this.observationKey(scientificName);
+                this.editingDiarySpeciesKey = this.observationKey(scientificName);
+                this.openBirdFromDiary(scientificName);
+                return;
+            }
+
+            const deleteNoteButton = event.target.closest('[data-diary-delete-note]');
+            if (deleteNoteButton) {
+                event.preventDefault();
+                if (!window.confirm(this.t('diary.confirmDeleteNote'))) return;
+                this.deleteObservationEntry(deleteNoteButton.dataset.scientificName, deleteNoteButton.dataset.diaryDeleteNote);
+                return;
+            }
+
+            const toggleButton = event.target.closest('[data-diary-toggle-species]');
+            if (toggleButton) {
+                event.preventDefault();
+                const key = this.observationKey(toggleButton.dataset.diaryToggleSpecies);
+                if (this.diaryHiddenSpecies.has(key)) {
+                    this.diaryHiddenSpecies.delete(key);
+                } else {
+                    this.diaryHiddenSpecies.add(key);
+                }
+                const searchInput = this.birdGrid.querySelector('[data-diary-search]');
+                const sortSelect = this.birdGrid.querySelector('[data-diary-sort]');
+                this.showDiaryOverview(searchInput?.value || '', sortSelect?.value || 'date', { skipImageFetch: true });
+                return;
+            }
+
             const openButton = event.target.closest('[data-diary-open-bird]');
             if (!openButton) return;
             event.preventDefault();
@@ -3555,6 +3706,72 @@
             if (!sortSelect) return;
             const searchInput = this.birdGrid.querySelector('[data-diary-search]');
             this.showDiaryOverview(searchInput?.value || '', sortSelect.value);
+        }
+
+        async summarizeDiaryOverview(button) {
+            // Use Pollinations only on diary notes that are not excluded from the current diary overview.
+            const result = this.birdGrid.querySelector('[data-diary-summary-result]');
+            const searchInput = this.birdGrid.querySelector('[data-diary-search]');
+            const sortSelect = this.birdGrid.querySelector('[data-diary-sort]');
+            const entries = this.getDiaryOverviewEntries(searchInput?.value || '', sortSelect?.value || 'date')
+                .filter(item => !this.diaryHiddenSpecies.has(this.observationKey(item.scientificName)));
+            if (!entries.length) {
+                if (result) {
+                    result.hidden = false;
+                    result.textContent = this.t('diary.summaryNoNotes');
+                }
+                return;
+            }
+
+            const apiKey = await this.requestPollinationsApiKey();
+            if (!apiKey) return;
+
+            const selectedModel = this.getAiTextModel();
+            const targetLanguage = this.languageMap[this.currentLanguage]?.name || this.currentLanguage;
+            const sourceText = entries.map((item, index) => {
+                const displayName = item.localName || item.englishName || item.scientificName;
+                return `${index + 1}. ${displayName} (${item.scientificName}), ${this.formatObservationDate(item.entry.date)}\n${item.entry.note}`;
+            }).join('\n\n');
+
+            button.disabled = true;
+            if (result) {
+                result.hidden = false;
+                result.textContent = this.t('diary.summaryLoading');
+            }
+
+            try {
+                const response = await fetch('https://gen.pollinations.ai/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        Authorization: `Bearer ${apiKey}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: selectedModel,
+                        messages: [
+                            {
+                                role: 'system',
+                                content: `Summarize the user's personal bird observation diary in ${targetLanguage}. Stay strictly on bird observations, locations, dates, behaviour, weather clues if mentioned, and repeated patterns. Do not invent species, places, or facts. Return concise plain text with short bullet points and a final one-sentence overall insight.`
+                            },
+                            {
+                                role: 'user',
+                                content: sourceText
+                            }
+                        ]
+                    })
+                });
+                if (!response.ok) throw new Error(`Pollinations returned HTTP ${response.status}`);
+                const data = await response.json();
+                this.recordAiTokenUsage(data.usage, selectedModel);
+                const summary = data.choices?.[0]?.message?.content?.trim();
+                if (!summary) throw new Error('Pollinations returned an empty summary');
+                if (result) result.textContent = summary;
+            } catch (error) {
+                console.warn('Diary summary failed:', error);
+                if (result) result.textContent = this.t('diary.summaryFailed');
+            } finally {
+                button.disabled = false;
+            }
         }
 
         openBirdFromDiary(scientificName) {
@@ -4528,6 +4745,9 @@
         }
         
         displayBirds(startIndex, count) {
+            if (this.activeDiaryOverview) {
+                return startIndex;
+            }
             if (this.isLoading || startIndex >= this.filteredBirds.length) {
                 return startIndex;
             }
@@ -4666,7 +4886,7 @@
             console.log("🔎 handleSearch called!");
             const requestId = ++this.searchRequestId;
             const searchTerm = this.searchInput.value.toLowerCase().trim(); // normalize input - Convert to lowercase
-            this.activeDiaryOverview = false;
+            this.leaveDiaryOverviewMode();
             this.destroyDiaryOverviewMap();
 
             // --- Step 1: cleanup old state ---
