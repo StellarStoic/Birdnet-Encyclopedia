@@ -734,6 +734,11 @@
                 this.handleObservationDiaryInput(event);
             });
 
+            this.modalBody.addEventListener('toggle', (event) => {
+                // Clean up empty draft notes when the visitor collapses the bird diary panel.
+                this.handleObservationDiaryToggle(event);
+            }, true);
+
             this.birdGrid.addEventListener('click', event => {
                 // Route clicks from the browser-local diary overview back into the bird modal.
                 this.handleDiaryOverviewClick(event);
@@ -4091,6 +4096,47 @@
                 this.updateObservationPreview(noteInput);
                 return;
             }
+        }
+
+        handleObservationDiaryToggle(event) {
+            // Remove an untouched new-note draft, or keep typed draft text, when the diary panel is collapsed.
+            const panel = event.target.closest?.('[data-observation-diary-panel]');
+            if (!panel || panel.open) return;
+
+            const scientificName = panel.dataset.scientificName;
+            const record = this.getObservationRecord(scientificName);
+            if (!record?.observations?.length) return;
+
+            panel.querySelectorAll('[data-observation-entry]').forEach(entryElement => {
+                const entryId = entryElement.dataset.observationEntry;
+                const textarea = entryElement.querySelector(`[data-observation-note="${CSS.escape(entryId)}"]`);
+                const dateInput = entryElement.querySelector(`[data-observation-date="${CSS.escape(entryId)}"]`);
+                const entry = record.observations.find(item => item.id === entryId);
+                if (!entry?.draft || !textarea) return;
+
+                const note = textarea.value.trim();
+                if (!note) {
+                    record.observations = record.observations.filter(item => item.id !== entryId);
+                    if (this.openDiaryEntryId === entryId) this.openDiaryEntryId = null;
+                    if (this.editingDiaryEntryId === entryId) this.editingDiaryEntryId = null;
+                    return;
+                }
+
+                entry.note = textarea.value;
+                entry.date = dateInput?.value || entry.date;
+                entry.name = this.getObservationEntryName(scientificName, entry);
+                entry.updatedAt = new Date().toISOString();
+            });
+
+            record.seen = record.observations.length > 0 ? record.seen : false;
+            record.updatedAt = new Date().toISOString();
+            this.openDiaryEntryId = null;
+            this.openDiarySpeciesKey = null;
+            this.editingDiarySpeciesKey = record.observations.some(entry => entry.id === this.editingDiaryEntryId)
+                ? this.editingDiarySpeciesKey
+                : null;
+            this.saveObservationDiary();
+            this.refreshObservationUi(scientificName);
         }
 
         saveObservationEntryFromButton(button) {
