@@ -1,4 +1,4 @@
-# Birds name
+# Birds.name
 
 A multilingual, browser-based bird-name guide and BirdNET observation dashboard.
 
@@ -10,7 +10,7 @@ encyclopedia.
 
 ## Main Features
 
-### Birds name
+### Birds.name
 
 - More than 6,000 BirdNET species and other supported taxa.
 - Bird names in every available BirdNET-Pi language file.

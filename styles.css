@@ -3300,12 +3300,102 @@ body[data-theme="midnight"] .dropdown-toggle.active .menu-bird-open {
     color: #9a6700;
 }
 
-.english-source-label {
-    margin-top: 1rem;
+.description-source-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 0.4rem;
+    color: var(--primary);
+    font-size: 0.92rem;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.description-source-link:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+}
+
+.description-ai-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 0.75rem;
+}
+
+.description-retranslate-button,
+.description-delete-cache-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--primary) 10%, var(--surface-solid));
+    color: var(--primary);
+    font-size: 0.88rem;
     font-weight: 800;
+    cursor: pointer;
+}
+
+.description-retranslate-button:hover,
+.description-retranslate-button:focus-visible,
+.description-delete-cache-button:hover,
+.description-delete-cache-button:focus-visible {
+    border-color: var(--primary);
+    outline: none;
+}
+
+.description-delete-cache-button {
+    background: color-mix(in srgb, #b42318 10%, var(--surface-solid));
+    color: #b42318;
+}
+
+.description-retranslate-button:disabled,
+.description-delete-cache-button:disabled {
+    cursor: wait;
+    opacity: 0.72;
+}
+
+.inline-description-loading {
+    min-height: auto;
+    padding: 12px 0;
+}
+
+.english-source-toggle {
+    margin-top: 1rem;
+}
+
+.english-source-toggle summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface-solid);
+    color: var(--primary);
+    font-size: 0.88rem;
+    font-weight: 800;
+    cursor: pointer;
+    list-style: none;
+}
+
+.english-source-toggle summary::-webkit-details-marker {
+    display: none;
+}
+
+.english-source-toggle summary::before {
+    content: "+";
+    font-weight: 900;
+}
+
+.english-source-toggle[open] summary::before {
+    content: "-";
 }
 
 .english-source-text {
+    margin-top: 0.9rem;
     border-left: 3px solid var(--border);
     padding-left: 12px;
     color: var(--muted);

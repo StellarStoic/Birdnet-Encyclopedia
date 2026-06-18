@@ -3,4 +3,4 @@ User-agent: *
 Allow: /
 Disallow: /test.html
 
-Sitemap: https://birdnet.woopod.com/sitemap.xml
+Sitemap: https://birds.name/sitemap.xml

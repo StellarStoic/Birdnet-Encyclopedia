@@ -1,6 +1,6 @@
 {
-  "name": "Birds name",
-  "short_name": "Birds name",
+  "name": "Birds.name",
+  "short_name": "Birds.name",
   "description": "A multilingual bird guide and observation statistics dashboard.",
   "start_url": "/",
   "scope": "/",
