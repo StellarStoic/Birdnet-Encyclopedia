@@ -2645,6 +2645,43 @@ body[data-theme="midnight"] .dropdown-toggle.active .menu-bird-open {
     line-height: 1.55;
 }
 
+.backup-card {
+    max-width: 620px;
+}
+
+.backup-warning {
+    padding: 12px 14px;
+    border: 1px solid color-mix(in srgb, #d97706 45%, var(--border));
+    border-radius: 12px;
+    background: color-mix(in srgb, #d97706 12%, var(--surface-solid));
+    color: var(--text);
+    font-weight: 700;
+}
+
+.backup-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 18px 0 8px;
+}
+
+.backup-actions .ai-primary-button,
+.backup-actions .ai-secondary-button {
+    flex: 1 1 220px;
+    justify-content: center;
+}
+
+.backup-status {
+    min-height: 1.35rem;
+    color: var(--muted);
+    font-size: 0.95rem;
+}
+
+.backup-status.error {
+    color: #b42318;
+    font-weight: 700;
+}
+
 .donation-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));

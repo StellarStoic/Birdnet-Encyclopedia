@@ -589,5 +589,20 @@
   "weather.windDirection": "Wind direction",
   "weather.windGust": "Wind gust (km/h)",
   "weather.windSpeed": "Wind speed (km/h)",
-  "modal.moreOnWikipedia": "在维基百科上了解更多"
+  "modal.moreOnWikipedia": "在维基百科上了解更多",
+  "about.introBeforeBirdnet": "Birds.name 是一个多语言鸟名指南，基于 ",
+  "about.introAfterBirdnet": " 翻译文件、Wikipedia 描述、IUCN 保护数据、鸟类媒体和个人观鸟笔记构建。",
+  "nav.backup": "Backup",
+  "backup.close": "Close backup",
+  "backup.title": "Backup and restore local data",
+  "backup.intro": "Export a JSON backup of data saved in this browser, including diary notes, saved settings, cached translations, My BirdNET uploaded data, station caches, and weather caches.",
+  "backup.excludes": "API keys and tokens are never exported or imported.",
+  "backup.export": "Export backup JSON",
+  "backup.import": "Import backup JSON",
+  "backup.exporting": "Creating backup...",
+  "backup.exported": "Backup file created. API keys and tokens were excluded.",
+  "backup.exportFailed": "Backup export failed.",
+  "backup.importing": "Importing backup...",
+  "backup.imported": "Backup imported. Reloading...",
+  "backup.importFailed": "Backup import failed. Check that this is a valid Birds.name backup JSON file."
 }

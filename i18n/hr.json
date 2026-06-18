@@ -589,5 +589,20 @@
   "weather.windDirection": "Wind direction",
   "weather.windGust": "Wind gust (km/h)",
   "weather.windSpeed": "Wind speed (km/h)",
-  "modal.moreOnWikipedia": "Više na Wikipediji"
+  "modal.moreOnWikipedia": "Više na Wikipediji",
+  "about.introBeforeBirdnet": "Birds.name je višejezični vodič za imena ptica izgrađen na ",
+  "about.introAfterBirdnet": " prijevodnim datotekama, opisima s Wikipedije, IUCN podacima o zaštiti, medijima o pticama i osobnim bilješkama promatranja.",
+  "nav.backup": "Backup",
+  "backup.close": "Close backup",
+  "backup.title": "Backup and restore local data",
+  "backup.intro": "Export a JSON backup of data saved in this browser, including diary notes, saved settings, cached translations, My BirdNET uploaded data, station caches, and weather caches.",
+  "backup.excludes": "API keys and tokens are never exported or imported.",
+  "backup.export": "Export backup JSON",
+  "backup.import": "Import backup JSON",
+  "backup.exporting": "Creating backup...",
+  "backup.exported": "Backup file created. API keys and tokens were excluded.",
+  "backup.exportFailed": "Backup export failed.",
+  "backup.importing": "Importing backup...",
+  "backup.imported": "Backup imported. Reloading...",
+  "backup.importFailed": "Backup import failed. Check that this is a valid Birds.name backup JSON file."
 }

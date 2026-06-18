@@ -222,6 +222,12 @@
                         <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
                     </button>
 
+                    <!-- Export and import browser-local app data without API keys or tokens. -->
+                    <button class="menu-page-link menu-action-button" id="backup-settings" type="button">
+                        <span><i class="fa-solid fa-file-export" aria-hidden="true"></i> <span data-i18n="nav.backup">Backup</span></span>
+                        <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                    </button>
+
                     <!-- Explain the website purpose and show optional donation details. -->
                     <button class="menu-page-link menu-action-button" id="about-settings" type="button">
                         <span><i class="fa-solid fa-circle-info" aria-hidden="true"></i> <span data-i18n="nav.about">About</span></span>
@@ -378,6 +384,31 @@
         </div>
     </div>
 
+    <!-- Export/import only browser-local data and intentionally exclude API credentials. -->
+    <div class="ai-consent-modal backup-modal" id="backup-modal" role="dialog" aria-modal="true" aria-labelledby="backup-title" hidden>
+        <div class="ai-consent-card backup-card">
+            <button class="ai-consent-close" id="backup-close" type="button" aria-label="Close backup" data-i18n-aria-label="backup.close">&times;</button>
+            <div class="ai-consent-icon" aria-hidden="true">
+                <i class="fa-solid fa-file-shield"></i>
+            </div>
+            <h2 id="backup-title" data-i18n="backup.title">Backup and restore local data</h2>
+            <p data-i18n="backup.intro">Export a JSON backup of data saved in this browser, including diary notes, saved settings, cached translations, My BirdNET uploaded data, station caches, and weather caches.</p>
+            <p class="backup-warning" data-i18n="backup.excludes">API keys and tokens are never exported or imported.</p>
+            <div class="backup-actions">
+                <button class="ai-primary-button" id="backup-export" type="button">
+                    <i class="fa-solid fa-download" aria-hidden="true"></i>
+                    <span data-i18n="backup.export">Export backup JSON</span>
+                </button>
+                <button class="ai-secondary-button" id="backup-import-trigger" type="button">
+                    <i class="fa-solid fa-upload" aria-hidden="true"></i>
+                    <span data-i18n="backup.import">Import backup JSON</span>
+                </button>
+            </div>
+            <input id="backup-import-file" type="file" accept="application/json,.json" hidden>
+            <p class="backup-status" id="backup-status" role="status" aria-live="polite"></p>
+        </div>
+    </div>
+
     <!-- Describe Birds.name and provide optional support links without leaving the app. -->
     <div class="ai-consent-modal about-modal" id="about-modal" role="dialog" aria-modal="true" aria-labelledby="about-title" hidden>
         <div class="ai-consent-card credits-card about-card">
@@ -386,7 +417,11 @@
                 <i class="fa-solid fa-circle-info"></i>
             </div>
             <h2 id="about-title" data-i18n="modal.aboutTitle">About Birds.name</h2>
-            <p data-i18n="about.intro">Birds.name is a multilingual bird-name guide built around BirdNET-Pi translation files, Wikipedia descriptions, IUCN conservation data, bird media, and personal observation notes.</p>
+            <p>
+                <span data-i18n="about.introBeforeBirdnet">Birds.name is a multilingual bird-name guide built around </span>
+                <a href="https://birdnet.cornell.edu/birdnet-pi/" target="_blank" rel="noopener noreferrer">BirdNET-Pi</a>
+                <span data-i18n="about.introAfterBirdnet"> translation files, Wikipedia descriptions, IUCN conservation data, bird media, and personal observation notes.</span>
+            </p>
             <p data-i18n="about.uses">Use it to search birds by local or scientific name, compare names across languages, check conservation status, keep a private diary of birds you observed, and explore BirdNET-Pi or BirdWeather detection statistics.</p>
             <div class="credits-highlight about-translation-help">
                 <h3 data-i18n="about.translationTitle">Translation help needed</h3>
@@ -575,6 +610,9 @@
             this.diaryLocationMarker = null; // Leaflet marker for the selected diary coordinate
             this.searchRequestId = 0; // Prevents old background cross-language searches from updating newer results
 
+            // Remove the obsolete experimental color-search cache so backups do not preserve unused data.
+            localStorage.removeItem('birdImageColorCacheV1');
+
             this.currentLanguage = 'en'; // Default to English
             this.availableLanguages = {};
             this.languageContainer = document.getElementById('language-options');
@@ -615,6 +653,13 @@
             this.aiModelContext = document.getElementById('ai-model-context');
             this.aiTokenUsageValue = document.getElementById('ai-token-usage-value');
             this.pollinationsTextModels = [];
+            this.backupSettings = document.getElementById('backup-settings');
+            this.backupModal = document.getElementById('backup-modal');
+            this.backupClose = document.getElementById('backup-close');
+            this.backupExport = document.getElementById('backup-export');
+            this.backupImportTrigger = document.getElementById('backup-import-trigger');
+            this.backupImportFile = document.getElementById('backup-import-file');
+            this.backupStatus = document.getElementById('backup-status');
             this.aboutSettings = document.getElementById('about-settings');
             this.aboutModal = document.getElementById('about-modal');
             this.aboutClose = document.getElementById('about-close');
@@ -792,6 +837,23 @@
                     this.hideDropdown();
                     this.showDiaryOverview();
                 });
+            }
+
+            if (this.backupSettings) {
+                this.backupSettings.addEventListener('click', () => this.showBackupModal());
+            }
+
+            if (this.backupClose) {
+                this.backupClose.addEventListener('click', () => this.hideBackupModal());
+            }
+
+            if (this.backupExport) {
+                this.backupExport.addEventListener('click', () => this.exportLocalBackup());
+            }
+
+            if (this.backupImportTrigger && this.backupImportFile) {
+                this.backupImportTrigger.addEventListener('click', () => this.backupImportFile.click());
+                this.backupImportFile.addEventListener('change', event => this.importLocalBackup(event));
             }
             
             // Modal events
@@ -1882,6 +1944,289 @@
                 this.displayedCount = this.displayBirds(0, this.batchSize);
             }
             this.updateLoadMoreButton();
+        }
+
+        isBackupCredentialKey(key) {
+            // Exclude API keys and tokens from backup files even when they live beside regular settings.
+            return /(api.*key|key.*api|token|secret|credential|password)/i.test(String(key || ''));
+        }
+
+        getBackupDatabaseDefinitions() {
+            // List only app-owned IndexedDB databases and stores that contain user/cache data.
+            return [
+                {
+                    name: 'birdEncyclopediaTranslations',
+                    version: 1,
+                    stores: [
+                        { name: 'translations', keyed: true }
+                    ]
+                },
+                {
+                    name: 'bird-encyclopedia-my-birdnet',
+                    version: 4,
+                    stores: [
+                        { name: 'datasets', keyed: false },
+                        { name: 'birdweather-cache', keyed: false },
+                        { name: 'birdweather-cache-metadata', keyed: false },
+                        { name: 'meteostat-cache', keyed: false }
+                    ]
+                }
+            ];
+        }
+
+        showBackupModal() {
+            // Open the backup modal from the burger menu without exposing credential values.
+            this.hideDropdown();
+            if (!this.backupModal) return;
+            this.backupModal.hidden = false;
+            this.showBackupStatus('');
+        }
+
+        hideBackupModal() {
+            // Close the backup modal and clear a previously selected import file.
+            if (this.backupModal) this.backupModal.hidden = true;
+            if (this.backupImportFile) this.backupImportFile.value = '';
+        }
+
+        showBackupStatus(message, isError = false) {
+            // Report export/import progress in the modal.
+            if (!this.backupStatus) return;
+            this.backupStatus.textContent = message || '';
+            this.backupStatus.classList.toggle('error', Boolean(isError));
+        }
+
+        setBackupBusy(isBusy) {
+            // Prevent double clicks while a backup file is being created or restored.
+            [this.backupExport, this.backupImportTrigger].forEach(button => {
+                if (button) button.disabled = isBusy;
+            });
+        }
+
+        openIndexedDatabase(name, version) {
+            // Open an app-owned IndexedDB database with enough upgrade logic for backup restores.
+            return new Promise((resolve, reject) => {
+                if (!window.indexedDB) {
+                    reject(new Error('IndexedDB is not supported by this browser.'));
+                    return;
+                }
+
+                const request = indexedDB.open(name, version);
+                request.onupgradeneeded = () => {
+                    const database = request.result;
+                    if (name === 'birdEncyclopediaTranslations' && !database.objectStoreNames.contains('translations')) {
+                        database.createObjectStore('translations');
+                    }
+                    if (name === 'bird-encyclopedia-my-birdnet') {
+                        if (!database.objectStoreNames.contains('datasets')) {
+                            database.createObjectStore('datasets', { keyPath: 'id' });
+                        }
+                        if (!database.objectStoreNames.contains('birdweather-cache')) {
+                            const store = database.createObjectStore('birdweather-cache', { keyPath: 'id' });
+                            store.createIndex('stationId', 'stationId', { unique: false });
+                        }
+                        if (!database.objectStoreNames.contains('birdweather-cache-metadata')) {
+                            database.createObjectStore('birdweather-cache-metadata', { keyPath: 'id' });
+                        }
+                        if (!database.objectStoreNames.contains('meteostat-cache')) {
+                            database.createObjectStore('meteostat-cache', { keyPath: 'id' });
+                        }
+                    }
+                };
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        readObjectStoreBackup(database, storeDefinition) {
+            // Export one object store, preserving explicit keys for stores without a keyPath.
+            if (!database.objectStoreNames.contains(storeDefinition.name)) {
+                return Promise.resolve([]);
+            }
+
+            return new Promise((resolve, reject) => {
+                const transaction = database.transaction(storeDefinition.name, 'readonly');
+                const store = transaction.objectStore(storeDefinition.name);
+                const valuesRequest = store.getAll();
+                const keysRequest = storeDefinition.keyed ? store.getAllKeys() : null;
+                let values = null;
+                let keys = storeDefinition.keyed ? null : [];
+                const resolveKeyedRecords = () => {
+                    if (values && keys) {
+                        resolve(values.map((value, index) => ({ key: keys[index], value })));
+                    }
+                };
+
+                valuesRequest.onsuccess = () => {
+                    values = valuesRequest.result || [];
+                    if (!storeDefinition.keyed) resolve(values.map(value => ({ value })));
+                    else resolveKeyedRecords();
+                };
+                valuesRequest.onerror = () => reject(valuesRequest.error);
+
+                if (keysRequest) {
+                    keysRequest.onsuccess = () => {
+                        keys = keysRequest.result || [];
+                        resolveKeyedRecords();
+                    };
+                    keysRequest.onerror = () => reject(keysRequest.error);
+                }
+            });
+        }
+
+        async exportIndexedDatabases() {
+            // Export all known app IndexedDB records and skip databases that the browser blocks.
+            const exportedDatabases = {};
+            for (const definition of this.getBackupDatabaseDefinitions()) {
+                try {
+                    const database = await this.openIndexedDatabase(definition.name, definition.version);
+                    const stores = {};
+                    for (const store of definition.stores) {
+                        stores[store.name] = await this.readObjectStoreBackup(database, store);
+                    }
+                    database.close();
+                    exportedDatabases[definition.name] = {
+                        version: definition.version,
+                        stores
+                    };
+                } catch (error) {
+                    console.warn(`Could not export IndexedDB database ${definition.name}:`, error);
+                }
+            }
+            return exportedDatabases;
+        }
+
+        collectBackupLocalStorage() {
+            // Copy localStorage values except credentials such as Pollinations or Meteostat API keys.
+            const values = {};
+            for (let index = 0; index < localStorage.length; index += 1) {
+                const key = localStorage.key(index);
+                if (!key || this.isBackupCredentialKey(key)) continue;
+                values[key] = localStorage.getItem(key);
+            }
+            return values;
+        }
+
+        async buildLocalBackupPayload() {
+            // Build a portable JSON backup for data saved by this website in the current browser.
+            return {
+                app: 'Birds.name',
+                type: 'browser-local-backup',
+                version: 1,
+                exportedAt: new Date().toISOString(),
+                excluded: ['API keys', 'tokens', 'secrets', 'password-like values'],
+                localStorage: this.collectBackupLocalStorage(),
+                indexedDB: await this.exportIndexedDatabases()
+            };
+        }
+
+        downloadJsonBackup(payload) {
+            // Trigger a local JSON download without sending backup data to any server.
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `Birds_name_backup_${timestamp}.json`;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            URL.revokeObjectURL(link.href);
+        }
+
+        async exportLocalBackup() {
+            // Export local app data while leaving API keys and tokens in the browser only.
+            try {
+                this.setBackupBusy(true);
+                this.showBackupStatus(this.t('backup.exporting'));
+                const payload = await this.buildLocalBackupPayload();
+                this.downloadJsonBackup(payload);
+                this.showBackupStatus(this.t('backup.exported'));
+            } catch (error) {
+                console.error('Backup export failed:', error);
+                this.showBackupStatus(this.t('backup.exportFailed'), true);
+            } finally {
+                this.setBackupBusy(false);
+            }
+        }
+
+        restoreBackupLocalStorage(values = {}) {
+            // Restore backed-up localStorage values except credential-looking keys.
+            Object.entries(values).forEach(([key, value]) => {
+                if (this.isBackupCredentialKey(key)) return;
+                localStorage.setItem(key, String(value ?? ''));
+            });
+        }
+
+        writeObjectStoreBackup(database, storeDefinition, records = []) {
+            // Replace one object store with the records from the backup file.
+            if (!database.objectStoreNames.contains(storeDefinition.name)) {
+                return Promise.resolve();
+            }
+
+            return new Promise((resolve, reject) => {
+                const transaction = database.transaction(storeDefinition.name, 'readwrite');
+                const store = transaction.objectStore(storeDefinition.name);
+                store.clear();
+                records.forEach(record => {
+                    if (storeDefinition.keyed) {
+                        store.put(record.value, record.key);
+                    } else {
+                        store.put(record.value);
+                    }
+                });
+                transaction.oncomplete = () => resolve();
+                transaction.onerror = () => reject(transaction.error);
+                transaction.onabort = () => reject(transaction.error);
+            });
+        }
+
+        async restoreIndexedDatabases(indexedData = {}) {
+            // Restore known app IndexedDB stores from a backup generated by this website.
+            for (const definition of this.getBackupDatabaseDefinitions()) {
+                const databaseBackup = indexedData[definition.name];
+                if (!databaseBackup?.stores) continue;
+                const database = await this.openIndexedDatabase(definition.name, definition.version);
+                for (const store of definition.stores) {
+                    await this.writeObjectStoreBackup(database, store, databaseBackup.stores[store.name] || []);
+                }
+                database.close();
+            }
+        }
+
+        readBackupFile(file) {
+            // Read the selected JSON backup file before validating and restoring it.
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = () => reject(reader.error);
+                reader.readAsText(file);
+            });
+        }
+
+        async importLocalBackup(event) {
+            // Restore a Birds.name backup file and reload so both app pages pick up restored data.
+            const file = event.target.files?.[0];
+            if (!file) return;
+
+            try {
+                this.setBackupBusy(true);
+                this.showBackupStatus(this.t('backup.importing'));
+                const text = await this.readBackupFile(file);
+                const payload = JSON.parse(text);
+                if (payload?.type !== 'browser-local-backup') {
+                    throw new Error('The selected file is not a Birds.name browser backup.');
+                }
+
+                this.restoreBackupLocalStorage(payload.localStorage || {});
+                await this.restoreIndexedDatabases(payload.indexedDB || {});
+                this.showBackupStatus(this.t('backup.imported'));
+                window.setTimeout(() => window.location.reload(), 900);
+            } catch (error) {
+                console.error('Backup import failed:', error);
+                this.showBackupStatus(this.t('backup.importFailed'), true);
+            } finally {
+                this.setBackupBusy(false);
+                if (this.backupImportFile) this.backupImportFile.value = '';
+            }
         }
 
         getObservedBirdsForCurrentLanguage() {

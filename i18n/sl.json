@@ -589,5 +589,20 @@
   "weather.windDirection": "Smer vetra",
   "weather.windGust": "Sunek vetra (km/h)",
   "weather.windSpeed": "Hitrost vetra (km/h)",
-  "modal.moreOnWikipedia": "Več na Wikipediji"
+  "modal.moreOnWikipedia": "Več na Wikipediji",
+  "about.introBeforeBirdnet": "Birds.name je večjezični vodnik po imenih ptic, zgrajen na prevodnih datotekah ",
+  "about.introAfterBirdnet": ", opisih iz Wikipedije, varstvenih podatkih IUCN, medijih ptic in osebnih zapiskih opazovanj.",
+  "nav.backup": "Varnostna kopija",
+  "backup.close": "Zapri varnostno kopijo",
+  "backup.title": "Varnostna kopija in obnovitev lokalnih podatkov",
+  "backup.intro": "Izvozite JSON varnostno kopijo podatkov, shranjenih v tem brskalniku, vključno z dnevniškimi zapiski, shranjenimi nastavitvami, predpomnjenimi prevodi, naloženimi podatki My BirdNET, predpomnilniki postaj in vremenskimi predpomnilniki.",
+  "backup.excludes": "API ključi in žetoni se nikoli ne izvozijo ali uvozijo.",
+  "backup.export": "Izvozi JSON varnostno kopijo",
+  "backup.import": "Uvozi JSON varnostno kopijo",
+  "backup.exporting": "Ustvarjam varnostno kopijo...",
+  "backup.exported": "Varnostna kopija je ustvarjena. API ključi in žetoni so bili izključeni.",
+  "backup.exportFailed": "Izvoz varnostne kopije ni uspel.",
+  "backup.importing": "Uvažam varnostno kopijo...",
+  "backup.imported": "Varnostna kopija je uvožena. Ponovno nalaganje...",
+  "backup.importFailed": "Uvoz varnostne kopije ni uspel. Preverite, ali je to veljavna JSON varnostna kopija Birds.name."
 }
