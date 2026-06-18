@@ -1,4 +1,4 @@
-<!--Birdnet encyclopedia shows a list of birds from the Birdnet-pi translation files + Bird stats from birdweather stations around you or your own Birdnet-pi exported datasets.>
+<!-- Birds name shows a list of birds from the Birdnet-pi translation files plus Bird stats from BirdWeather stations around you or your own Birdnet-pi exported datasets.
     Copyright (C) 2026  StellarStoic stellarstoic@tuta.io
 
     This program is free software: you can redistribute it and/or modify
@@ -18,26 +18,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Explore a multilingual BirdNET-Pi bird encyclopedia with localized bird names, Wikipedia descriptions, IUCN conservation status, photos, sounds, and BirdNET observation tools.">
-    <meta name="keywords" content="BirdNET-Pi, BirdNET, bird encyclopedia, bird identification, bird names, bird translations, IUCN bird status, bird conservation, bird observations, BirdWeather">
+    <meta name="description" content="Explore Birds name, a multilingual bird guide with localized bird names, Wikipedia descriptions, IUCN conservation status, photos, sounds, and BirdNET observation tools.">
+    <meta name="keywords" content="Birds name, BirdNET-Pi, BirdNET, bird guide, bird identification, bird names, bird translations, IUCN bird status, bird conservation, bird observations, BirdWeather">
     <meta name="author" content="StellarStoic">
     <meta name="robots" content="index, follow, max-image-preview:large">
     <meta name="theme-color" content="#4c8620">
     <link rel="canonical" href="https://birdnet.woopod.com/">
     <link rel="alternate" href="https://birdnet.woopod.com/" hreflang="x-default">
-    <title>BirdNET-Pi Encyclopedia | Multilingual Bird Guide and Conservation Status</title>
+    <title>Birds name | Multilingual Bird Guide and Conservation Status</title>
     <!-- Open Graph metadata gives search engines and social previews a concise page summary. -->
     <meta property="og:type" content="website">
-    <meta property="og:site_name" content="BirdNET-Pi Encyclopedia">
-    <meta property="og:title" content="BirdNET-Pi Encyclopedia">
-    <meta property="og:description" content="Discover BirdNET-Pi species in many languages with photos, descriptions, sounds, IUCN conservation status, and observation analytics.">
+    <meta property="og:site_name" content="Birds name">
+    <meta property="og:title" content="Birds name">
+    <meta property="og:description" content="Discover bird species in many languages with photos, descriptions, sounds, IUCN conservation status, and observation analytics.">
     <meta property="og:url" content="https://birdnet.woopod.com/">
     <meta property="og:image" content="https://birdnet.woopod.com/img/origami_bird_B-ICO.png">
-    <meta property="og:image:alt" content="Origami bird icon for the BirdNET-Pi Encyclopedia">
+    <meta property="og:image:alt" content="Origami bird icon for Birds name">
     <!-- Twitter/X cards reuse the same static preview image for link sharing. -->
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="BirdNET-Pi Encyclopedia">
-    <meta name="twitter:description" content="A multilingual BirdNET-Pi encyclopedia with bird names, descriptions, conservation status, media, and observation tools.">
+    <meta name="twitter:title" content="Birds name">
+    <meta name="twitter:description" content="A multilingual bird guide with bird names, descriptions, conservation status, media, and observation tools.">
     <meta name="twitter:image" content="https://birdnet.woopod.com/img/origami_bird_B-ICO.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Leaflet powers the optional diary map picker for personal observation locations. -->
@@ -52,11 +52,11 @@
         {
             "@context": "https://schema.org",
             "@type": "WebApplication",
-            "name": "BirdNET-Pi Encyclopedia",
+            "name": "Birds name",
             "url": "https://birdnet.woopod.com/",
             "applicationCategory": "ReferenceApplication",
             "operatingSystem": "Any",
-            "description": "A multilingual BirdNET-Pi bird encyclopedia with localized bird names, bird descriptions, media, IUCN conservation status, and observation tools.",
+            "description": "A multilingual bird guide with localized bird names, bird descriptions, media, IUCN conservation status, and observation tools.",
             "image": "https://birdnet.woopod.com/img/origami_bird_B-ICO.png",
             "isAccessibleForFree": true,
             "inLanguage": "en",
@@ -83,7 +83,7 @@
     <!-- Public Pollinations app identity; visitor-scoped secret keys are never embedded in source. -->
     <script>
         window.BIRD_ENCYCLOPEDIA_CONFIG = {
-            pollinationsAppKey: 'pk_2lwEO7DMMuEkos1g'
+            pollinationsAppKey: 'pk_Yqjxjk9KGnLzhYKR'
         };
     </script>
 
@@ -100,7 +100,7 @@
         
         <div class="dropdown-menu" id="dropdown-menu">
             <div class="dropdown-header">
-                <h3 data-i18n="app.encyclopedia">Bird Encyclopedia</h3>
+                <h3 data-i18n="app.encyclopedia">Birds name</h3>
             </div>
             <div class="dropdown-content">
                 <div class="dropdown-section">
@@ -222,6 +222,12 @@
                         <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
                     </button>
 
+                    <!-- Explain the website purpose and show optional donation details. -->
+                    <button class="menu-page-link menu-action-button" id="about-settings" type="button">
+                        <span><i class="fa-solid fa-circle-info" aria-hidden="true"></i> <span data-i18n="nav.about">About</span></span>
+                        <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                    </button>
+
                     <!-- Open acknowledgements for the projects and data sources used by this website. -->
                     <button class="menu-page-link menu-action-button" id="credits-settings" type="button">
                         <span><i class="fa-solid fa-heart" aria-hidden="true"></i> <span data-i18n="nav.credits">Credits</span></span>
@@ -234,7 +240,7 @@
     
     <div class="container">
         <header>
-            <h1 data-i18n="app.encyclopedia">BirdNET-Pi Encyclopedia</h1>
+            <h1 data-i18n="app.encyclopedia">Birds name</h1>
             <p class="subtitle" data-i18n="encyclopedia.subtitle">Discover over 6000 bird and a few other species</p>
         </header>
         
@@ -372,6 +378,90 @@
         </div>
     </div>
 
+    <!-- Describe Birds name and provide optional support links without leaving the app. -->
+    <div class="ai-consent-modal about-modal" id="about-modal" role="dialog" aria-modal="true" aria-labelledby="about-title" hidden>
+        <div class="ai-consent-card credits-card about-card">
+            <button class="ai-consent-close" id="about-close" type="button" aria-label="Close about page" data-i18n-aria-label="about.close">&times;</button>
+            <div class="ai-consent-icon" aria-hidden="true">
+                <i class="fa-solid fa-circle-info"></i>
+            </div>
+            <h2 id="about-title" data-i18n="modal.aboutTitle">About Birds name</h2>
+            <p data-i18n="about.intro">Birds name is a multilingual bird-name guide built around BirdNET-Pi translation files, Wikipedia descriptions, IUCN conservation data, bird media, and personal observation notes.</p>
+            <p data-i18n="about.uses">Use it to search birds by local or scientific name, compare names across languages, check conservation status, keep a private diary of birds you observed, and explore BirdNET-Pi or BirdWeather detection statistics.</p>
+            <div class="credits-highlight about-translation-help">
+                <h3 data-i18n="about.translationTitle">Translation help needed</h3>
+                <p data-i18n="about.translationText">Some languages still need better interface translations and bird-name corrections. If you can help, go to the GitHub repository and open a pull request. Do not know how? Ask AI to guide you through making a PR.</p>
+                <a class="about-repo-link" href="https://github.com/StellarStoic/Birdnet-Encyclopedia" target="_blank" rel="noopener noreferrer">
+                    <i class="fa-brands fa-github" aria-hidden="true"></i>
+                    <span data-i18n="about.githubRepo">Open GitHub repository</span>
+                </a>
+            </div>
+            <div class="about-donation-cta">
+                <p data-i18n="donation.cta">Found this page useful? Donations are more than welcome.</p>
+                <button class="ai-primary-button about-donate-toggle" id="about-donate-toggle" type="button">
+                    <i class="fa-solid fa-mug-hot" aria-hidden="true"></i>
+                    <span data-i18n="about.donateButton">Donate</span>
+                </button>
+            </div>
+            <section class="donation-panel" id="donation-panel" hidden>
+                <h3 data-i18n="donation.title">Support Birds name</h3>
+                <p data-i18n="donation.intro">Birds name is made by one independent creator. Donations help with hosting, maintenance, testing, and the time needed to keep improving the website without ads or trackers.</p>
+                <div class="donation-grid">
+                    <article class="donation-method">
+                        <h4>Credit Card or PayPal</h4>
+                        <img class="donation-qr" src="img/qr/ko-fi-QR.png" alt="Ko-fi QR code" data-donation-copy="https://ko-fi.com/H2H31SXBT8">
+                        <div class="donation-address-row">
+                            <button class="donation-address donation-address-short" type="button" data-donation-copy="https://ko-fi.com/H2H31SXBT8">https://ko-fi.com/H2H31SXBT8</button>
+                            <button class="copy-icon-btn" type="button" aria-label="Copy Ko-fi link" title="Copy link" data-donation-type="Ko-fi" data-donation-copy="https://ko-fi.com/H2H31SXBT8"><i class="fa-regular fa-copy" aria-hidden="true"></i></button>
+                        </div>
+                        <a class="kofi-link" href="https://ko-fi.com/H2H31SXBT8" target="_blank" rel="noopener noreferrer">Buy me a coffee</a>
+                    </article>
+                    <article class="donation-method">
+                        <h4>Bitcoin Lightning</h4>
+                        <img class="donation-qr" src="img/qr/qrLND.svg" alt="Bitcoin Lightning QR code" data-donation-copy="ss@cake.cash">
+                        <div class="donation-address-row">
+                            <button class="donation-address donation-address-short" type="button" data-donation-copy="ss@cake.cash">ss@cake.cash</button>
+                            <button class="copy-icon-btn" type="button" aria-label="Copy Bitcoin Lightning address" title="Copy address" data-donation-type="Bitcoin Lightning" data-donation-copy="ss@cake.cash"><i class="fa-regular fa-copy" aria-hidden="true"></i></button>
+                        </div>
+                    </article>
+                    <article class="donation-method">
+                        <h4>Bitcoin <a class="donation-heading-link" href="https://silentpayments.xyz/docs/wallets/" target="_blank" rel="noopener noreferrer">(Silent Payment)</a></h4>
+                        <img class="donation-qr" src="img/qr/qrBitcoinSilentPaymentAddr.svg" alt="Bitcoin Silent Payment QR code" data-donation-copy="sp1qq24wwmm387h92ewnnskggvjneg3ljmsl4m82huysxf4qssewm70m2qnzwaaexj4z6f5rsedr06ys6gztdfauwkd3n0n7zh7grykgequp7vfv973s">
+                        <div class="donation-address-row">
+                            <button class="donation-address donation-address-long" type="button" data-donation-copy="sp1qq24wwmm387h92ewnnskggvjneg3ljmsl4m82huysxf4qssewm70m2qnzwaaexj4z6f5rsedr06ys6gztdfauwkd3n0n7zh7grykgequp7vfv973s">sp1qq24wwmm387h92ewnnskggvjneg3ljmsl4m82huysxf4qssewm70m2qnzwaaexj4z6f5rsedr06ys6gztdfauwkd3n0n7zh7grykgequp7vfv973s</button>
+                            <button class="copy-icon-btn" type="button" aria-label="Copy Bitcoin Silent Payment address" title="Copy address" data-donation-type="Bitcoin Silent Payment" data-donation-copy="sp1qq24wwmm387h92ewnnskggvjneg3ljmsl4m82huysxf4qssewm70m2qnzwaaexj4z6f5rsedr06ys6gztdfauwkd3n0n7zh7grykgequp7vfv973s"><i class="fa-regular fa-copy" aria-hidden="true"></i></button>
+                        </div>
+                    </article>
+                    <article class="donation-method">
+                        <h4>Monero</h4>
+                        <img class="donation-qr" src="img/qr/qrMonero.svg" alt="Monero QR code" data-donation-copy="873v6Svx7x3Ai12BVvJNU7UceEroDeCLx5dzSi3zUWzqLsDbzPV6UeAQpQJNgV3YhrhME4pZ8Qa7N9833Kx1Z2EQ3G1snDC">
+                        <div class="donation-address-row">
+                            <button class="donation-address donation-address-long" type="button" data-donation-copy="873v6Svx7x3Ai12BVvJNU7UceEroDeCLx5dzSi3zUWzqLsDbzPV6UeAQpQJNgV3YhrhME4pZ8Qa7N9833Kx1Z2EQ3G1snDC">873v6Svx7x3Ai12BVvJNU7UceEroDeCLx5dzSi3zUWzqLsDbzPV6UeAQpQJNgV3YhrhME4pZ8Qa7N9833Kx1Z2EQ3G1snDC</button>
+                            <button class="copy-icon-btn" type="button" aria-label="Copy Monero address" title="Copy address" data-donation-type="Monero" data-donation-copy="873v6Svx7x3Ai12BVvJNU7UceEroDeCLx5dzSi3zUWzqLsDbzPV6UeAQpQJNgV3YhrhME4pZ8Qa7N9833Kx1Z2EQ3G1snDC"><i class="fa-regular fa-copy" aria-hidden="true"></i></button>
+                        </div>
+                    </article>
+                    <article class="donation-method">
+                        <h4>Tether</h4>
+                        <img class="donation-qr" src="img/qr/qrTether.svg" alt="Tether QR code" data-donation-copy="0xDEa397D50179e2dbf46781087C2235FAd460D3c6">
+                        <div class="donation-address-row">
+                            <button class="donation-address donation-address-medium" type="button" data-donation-copy="0xDEa397D50179e2dbf46781087C2235FAd460D3c6">0xDEa397D50179e2dbf46781087C2235FAd460D3c6</button>
+                            <button class="copy-icon-btn" type="button" aria-label="Copy Tether address" title="Copy address" data-donation-type="Tether" data-donation-copy="0xDEa397D50179e2dbf46781087C2235FAd460D3c6"><i class="fa-regular fa-copy" aria-hidden="true"></i></button>
+                        </div>
+                    </article>
+                    <article class="donation-method">
+                        <h4>Ton</h4>
+                        <img class="donation-qr" src="img/qr/qrTon.svg" alt="Ton QR code" data-donation-copy="UQBabpCfz6dDmTfDIw1TDOdt13pRAEMD35V3hgHFI_7ETxRf">
+                        <div class="donation-address-row">
+                            <button class="donation-address donation-address-medium" type="button" data-donation-copy="UQBabpCfz6dDmTfDIw1TDOdt13pRAEMD35V3hgHFI_7ETxRf">UQBabpCfz6dDmTfDIw1TDOdt13pRAEMD35V3hgHFI_7ETxRf</button>
+                            <button class="copy-icon-btn" type="button" aria-label="Copy Ton address" title="Copy address" data-donation-type="Ton" data-donation-copy="UQBabpCfz6dDmTfDIw1TDOdt13pRAEMD35V3hgHFI_7ETxRf"><i class="fa-regular fa-copy" aria-hidden="true"></i></button>
+                        </div>
+                    </article>
+                </div>
+                <p class="copy-notification" id="donation-copy-notification" role="status" aria-live="polite" hidden data-i18n="donation.copied">Copied to clipboard.</p>
+            </section>
+        </div>
+    </div>
+
     <!-- Credit the open projects, services, and creators which make the encyclopedia possible. -->
     <div class="ai-consent-modal credits-modal" id="credits-modal" role="dialog" aria-modal="true" aria-labelledby="credits-title" hidden>
         <div class="ai-consent-card credits-card">
@@ -445,7 +535,7 @@
 <!-- Leaflet is loaded after the page markup so the diary map picker can initialize on demand. -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-    // Production-ready Birdnet-Pi Encyclopedia Application
+    // Production-ready Birds name application.
     class BirdEncyclopedia {
         constructor() {
             this.birds = [];
@@ -524,6 +614,12 @@
             this.aiModelContext = document.getElementById('ai-model-context');
             this.aiTokenUsageValue = document.getElementById('ai-token-usage-value');
             this.pollinationsTextModels = [];
+            this.aboutSettings = document.getElementById('about-settings');
+            this.aboutModal = document.getElementById('about-modal');
+            this.aboutClose = document.getElementById('about-close');
+            this.aboutDonateToggle = document.getElementById('about-donate-toggle');
+            this.donationPanel = document.getElementById('donation-panel');
+            this.donationCopyNotification = document.getElementById('donation-copy-notification');
             this.creditsSettings = document.getElementById('credits-settings');
             this.creditsModal = document.getElementById('credits-modal');
             this.creditsClose = document.getElementById('credits-close');
@@ -756,6 +852,7 @@
 
             // Let visitors review or change their optional AI translation preference at any time.
             this.setupAiTranslationConsent();
+            this.setupAboutModal();
             this.setupCreditsModal();
             this.setupDiaryLocationPicker();
 
@@ -1561,7 +1658,7 @@
             // Debug: log all subtitle elements
             console.log('All subtitle elements:', document.querySelectorAll('.subtitle'));
             // Update page title or other static text based on language
-            document.title = window.BirdI18n?.t('page.encyclopediaTitle') || 'BirdNET-Pi Encyclopedia | Multilingual Bird Guide and Conservation Status';
+            document.title = window.BirdI18n?.t('page.encyclopediaTitle') || 'Birds name | Multilingual Bird Guide and Conservation Status';
 
             // Update subtitle
             const subtitle = document.querySelector('.subtitle');
@@ -2395,6 +2492,74 @@
             };
             localStorage.setItem('birdAiLastTokenUsage', JSON.stringify(tokenUsage));
             this.updateAiModelDetails();
+        }
+
+        setupAboutModal() {
+            // Open the About dialog and handle its donation panel and copyable wallet details.
+            this.aboutSettings?.addEventListener('click', () => {
+                this.hideDropdown();
+                this.aboutModal.hidden = false;
+                document.body.classList.add('ai-consent-open');
+                this.aboutClose?.focus();
+            });
+            this.aboutClose?.addEventListener('click', () => this.closeAboutModal());
+            this.aboutModal?.addEventListener('click', event => {
+                if (event.target === this.aboutModal) this.closeAboutModal();
+                const copyTarget = event.target.closest('[data-donation-copy]');
+                if (copyTarget) {
+                    this.copyDonationValue(copyTarget.dataset.donationCopy);
+                }
+            });
+            this.aboutDonateToggle?.addEventListener('click', () => {
+                const wasHidden = this.donationPanel?.hidden;
+                if (this.donationPanel) this.donationPanel.hidden = !wasHidden;
+                if (wasHidden) this.donationPanel?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            });
+            document.addEventListener('keydown', event => {
+                if (event.key === 'Escape' && !this.aboutModal?.hidden) {
+                    this.closeAboutModal();
+                }
+            });
+        }
+
+        async copyDonationValue(value) {
+            // Copy a donation link or wallet address, falling back for older browsers.
+            if (!value) return;
+            try {
+                if (navigator.clipboard?.writeText) {
+                    await navigator.clipboard.writeText(value);
+                } else {
+                    const fallback = document.createElement('textarea');
+                    fallback.value = value;
+                    fallback.setAttribute('readonly', '');
+                    fallback.style.position = 'fixed';
+                    fallback.style.opacity = '0';
+                    document.body.appendChild(fallback);
+                    fallback.select();
+                    document.execCommand('copy');
+                    fallback.remove();
+                }
+                this.showDonationCopyNotification();
+            } catch (error) {
+                console.warn('Could not copy donation value:', error);
+            }
+        }
+
+        showDonationCopyNotification() {
+            // Show short feedback after a donation value has been copied.
+            if (!this.donationCopyNotification) return;
+            this.donationCopyNotification.hidden = false;
+            clearTimeout(this.donationCopyNotificationTimer);
+            this.donationCopyNotificationTimer = setTimeout(() => {
+                this.donationCopyNotification.hidden = true;
+            }, 2200);
+        }
+
+        closeAboutModal() {
+            // Restore scrolling and return focus to the About menu control after closing.
+            this.aboutModal.hidden = true;
+            document.body.classList.remove('ai-consent-open');
+            this.aboutSettings?.focus();
         }
 
         setupCreditsModal() {

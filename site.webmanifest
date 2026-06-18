@@ -1,7 +1,7 @@
 {
-  "name": "BirdNET-Pi Encyclopedia",
-  "short_name": "BirdNET Birds",
-  "description": "A multilingual BirdNET-Pi bird encyclopedia and observation statistics dashboard.",
+  "name": "Birds name",
+  "short_name": "Birds name",
+  "description": "A multilingual bird guide and observation statistics dashboard.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

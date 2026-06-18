@@ -1,4 +1,4 @@
-/*Birdnet encyclopedia shows a list of birds from the Birdnet-pi translation files + Bird stats from birdweather stations around you or your own Birdnet-pi exported datasets.>
+/* Birds name shows a list of birds from the Birdnet-pi translation files plus Bird stats from BirdWeather stations around you or your own Birdnet-pi exported datasets.
     Copyright (C) 2026  StellarStoic stellarstoic@tuta.io
 
     This program is free software: you can redistribute it and/or modify

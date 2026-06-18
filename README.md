@@ -1,6 +1,6 @@
-# BirdNET-Pi Encyclopedia
+# Birds name
 
-A multilingual, browser-based bird encyclopedia and BirdNET observation dashboard.
+A multilingual, browser-based bird-name guide and BirdNET observation dashboard.
 
 The website combines BirdNET-Pi species translations, eBird taxonomy, Wikipedia
 descriptions, iNaturalist media, public BirdWeather observations, and private
@@ -10,7 +10,7 @@ encyclopedia.
 
 ## Main Features
 
-### Bird Encyclopedia
+### Birds name
 
 - More than 6,000 BirdNET species and other supported taxa.
 - Bird names in every available BirdNET-Pi language file.
