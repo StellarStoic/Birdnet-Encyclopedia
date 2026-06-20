@@ -98,6 +98,33 @@ Dashboard features:
 - Cache station histories locally and remove individual station caches.
 - Import up to 500,000 detections per station and period as an emergency limit.
 
+### Featheration and Nostr
+
+Nostr support is optional and keeps the core encyclopedia usable without an
+account. Visitors can create a new Nostr ID or sign in with a NIP-07 browser
+extension, Amber, or a temporary private-key session.
+
+- The public identity is saved in the browser, while private keys are kept out
+  of persistent storage.
+- Diary notes can be published to selected Nostr relays as NIP-78 application
+  data.
+- Bulk publishing sends each selected diary note as its own replaceable event,
+  so edited notes can replace older versions and individual notes can later be
+  deleted.
+- The observed-species totals are published as one replaceable NIP-78 summary
+  when the visitor chooses to include them.
+- Publishing warns before coordinates are shared from diary notes.
+- Published event IDs can be copied or opened on `njump.me`.
+- NIP-09 deletion requests are sent when deleting published diary notes, and a
+  local blocklist hides deleted events even if some relays keep old copies.
+- Signing in fetches previously published Birds.name diary data, observed
+  species totals, deletions, and badge awards from the configured relays.
+- Relay settings are available under `Settings > Nostr`, with default relays
+  enabled for normal visitors and optional personal relays for advanced users.
+- Achievements use NIP-58 self-attested badges. Locked badges are blurred;
+  earned badges are issued to the visitor's Nostr identity and can be restored
+  from relays after browser storage is cleared.
+
 ## Privacy and Local Storage
 
 Private BirdNET files are parsed in the browser and are not uploaded by this
@@ -116,12 +143,15 @@ The browser stores:
 | Uploaded BirdNET dataset | IndexedDB | Reopen private statistics |
 | BirdWeather station histories | IndexedDB | Avoid downloading large histories again |
 | BirdWeather cache metadata | IndexedDB | Show which stations are saved locally |
+| Observation diary and counters | `localStorage` | Keep seen birds and private diary notes |
+| Nostr public identity, relay settings, published event references, blocklist, and badge awards | `localStorage` | Restore optional Featheration features |
+| Temporary Nostr private-key session | `sessionStorage` | Sign events only for the current browser tab session |
 
 Browser geolocation is requested only when finding nearby BirdWeather stations.
 The website does not save the visitor's coordinates.
 
 Clearing site data in the browser removes saved files, station caches,
-preferences, favourites, and AI credentials.
+preferences, favourites, diary data, Nostr state, and AI credentials.
 
 ## Description and Translation Logic
 
@@ -323,6 +353,9 @@ timestamps, and each row must identify a species.
   data.
 - [Pollinations](https://pollinations.ai/) for optional AI description
   translation.
+- [Nostr](https://nostr.com/) relays for optional Featheration identity, diary
+  publishing, application-data restore, deletion signals, and achievement
+  badges.
 - [Meteostat](https://dev.meteostat.net/data/) for optional historical weather
   context. The BirdWeather station location or average coordinates from an
   imported file select the three nearest weather stations. Annual station bulk
@@ -364,7 +397,9 @@ These libraries are currently loaded from public CDNs.
 |   |-- taxonomy.json          # Local eBird taxonomy data
 |   |-- iucn-statuses.json     # Generated global conservation categories
 |   `-- iucn-details/          # Generated assessment details by initial
-|-- img/                       # Menu and decorative image assets
+|-- badges.md                  # Birds.name achievement badge catalog
+|-- img/                       # Menu, decorative, and badge image assets
+|   `-- badges/                # Nostr achievement badge PNG files
 |-- lang/
 |   |-- labels_*.txt           # Generated localized bird names
 |   |-- README.md              # Translation maintenance notes

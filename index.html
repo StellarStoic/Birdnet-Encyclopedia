@@ -96,6 +96,7 @@
         <!-- The white and black bird images crossfade when the navigation menu toggles. -->
         <img class="menu-bird menu-bird-closed" src="img/origami_bird_W.png" alt="">
         <img class="menu-bird menu-bird-open" src="img/origami_bird_B.png" alt="">
+        <img class="menu-nostr-avatar" id="menu-nostr-avatar" alt="" hidden>
     </button>
         
         <div class="dropdown-menu" id="dropdown-menu">
@@ -112,13 +113,13 @@
                         </button>
                         <div class="submenu-panel" id="categories-submenu">
                             <div class="submenu-content">
-                                <button class="dropdown-item" data-filter="all" data-i18n="nav.allBirds">All Birds</button>
-                                <button class="dropdown-item" data-filter="water" data-i18n="nav.waterbirds">Waterbirds</button>
-                                <button class="dropdown-item" data-filter="predator" data-i18n="nav.birdsOfPrey">Birds of Prey</button>
-                                <button class="dropdown-item" data-filter="song" data-i18n="nav.songbirds">Songbirds</button>
-                                <button class="dropdown-item" data-filter="parrot" data-i18n="nav.parrots">Parrots</button>
-                                <button class="dropdown-item" data-filter="game" data-i18n="nav.gamebirds">Gamebirds</button>
-                                <button class="dropdown-item" data-filter="observed" data-i18n="nav.birdsISaw">Birds I saw</button>
+                                <button class="dropdown-item" data-filter="all"><span data-i18n="nav.allBirds">All Birds</span><small class="menu-count" data-category-count="all"></small></button>
+                                <button class="dropdown-item" data-filter="water"><span data-i18n="nav.waterbirds">Waterbirds</span><small class="menu-count" data-category-count="water"></small></button>
+                                <button class="dropdown-item" data-filter="predator"><span data-i18n="nav.birdsOfPrey">Birds of Prey</span><small class="menu-count" data-category-count="predator"></small></button>
+                                <button class="dropdown-item" data-filter="song"><span data-i18n="nav.songbirds">Songbirds</span><small class="menu-count" data-category-count="song"></small></button>
+                                <button class="dropdown-item" data-filter="parrot"><span data-i18n="nav.parrots">Parrots</span><small class="menu-count" data-category-count="parrot"></small></button>
+                                <button class="dropdown-item" data-filter="game"><span data-i18n="nav.gamebirds">Gamebirds</span><small class="menu-count" data-category-count="game"></small></button>
+                                <button class="dropdown-item" data-filter="observed"><span data-i18n="nav.birdsISaw">Birds I saw</span><small class="menu-count" data-category-count="observed"></small></button>
 
                                 <!-- Separate taxonomy categories from global IUCN conservation filters. -->
                                 <hr class="categories-divider">
@@ -137,35 +138,35 @@
                                     </div>
                                     <div class="iucn-filter-options">
                                         <button class="iucn-filter-option" type="button" data-iucn-filter="lc">
-                                            <strong><span class="iucn-code status-lc">LC</span> <span data-i18n="iucn.lc.label">Least Concern</span></strong>
+                                            <strong><span><span class="iucn-code status-lc">LC</span> <span data-i18n="iucn.lc.label">Least Concern</span></span><small class="menu-count" data-iucn-count="lc"></small></strong>
                                             <small data-i18n="iucn.lc.description">Evaluated and currently at low risk of extinction.</small>
                                         </button>
                                         <button class="iucn-filter-option" type="button" data-iucn-filter="nt">
-                                            <strong><span class="iucn-code status-nt">NT</span> <span data-i18n="iucn.nt.label">Near Threatened</span></strong>
+                                            <strong><span><span class="iucn-code status-nt">NT</span> <span data-i18n="iucn.nt.label">Near Threatened</span></span><small class="menu-count" data-iucn-count="nt"></small></strong>
                                             <small data-i18n="iucn.nt.description">Close to qualifying for a threatened category.</small>
                                         </button>
                                         <button class="iucn-filter-option" type="button" data-iucn-filter="vu">
-                                            <strong><span class="iucn-code status-vu">VU</span> <span data-i18n="iucn.vu.label">Vulnerable</span></strong>
+                                            <strong><span><span class="iucn-code status-vu">VU</span> <span data-i18n="iucn.vu.label">Vulnerable</span></span><small class="menu-count" data-iucn-count="vu"></small></strong>
                                             <small data-i18n="iucn.vu.description">Facing a high risk of extinction in the wild.</small>
                                         </button>
                                         <button class="iucn-filter-option" type="button" data-iucn-filter="en">
-                                            <strong><span class="iucn-code status-en">EN</span> <span data-i18n="iucn.en.label">Endangered</span></strong>
+                                            <strong><span><span class="iucn-code status-en">EN</span> <span data-i18n="iucn.en.label">Endangered</span></span><small class="menu-count" data-iucn-count="en"></small></strong>
                                             <small data-i18n="iucn.en.description">Facing a very high risk of extinction in the wild.</small>
                                         </button>
                                         <button class="iucn-filter-option" type="button" data-iucn-filter="cr">
-                                            <strong><span class="iucn-code status-cr">CR</span> <span data-i18n="iucn.cr.label">Critically Endangered</span></strong>
+                                            <strong><span><span class="iucn-code status-cr">CR</span> <span data-i18n="iucn.cr.label">Critically Endangered</span></span><small class="menu-count" data-iucn-count="cr"></small></strong>
                                             <small data-i18n="iucn.cr.description">Facing an extremely high risk of extinction in the wild.</small>
                                         </button>
                                         <button class="iucn-filter-option" type="button" data-iucn-filter="ew">
-                                            <strong><span class="iucn-code status-ew">EW</span> <span data-i18n="iucn.ew.label">Extinct in the Wild</span></strong>
+                                            <strong><span><span class="iucn-code status-ew">EW</span> <span data-i18n="iucn.ew.label">Extinct in the Wild</span></span><small class="menu-count" data-iucn-count="ew"></small></strong>
                                             <small data-i18n="iucn.ew.description">Survives only in captivity or outside its former range.</small>
                                         </button>
                                         <button class="iucn-filter-option" type="button" data-iucn-filter="ex">
-                                            <strong><span class="iucn-code status-ex">EX</span> <span data-i18n="iucn.ex.label">Extinct</span></strong>
+                                            <strong><span><span class="iucn-code status-ex">EX</span> <span data-i18n="iucn.ex.label">Extinct</span></span><small class="menu-count" data-iucn-count="ex"></small></strong>
                                             <small data-i18n="iucn.ex.description">No reasonable doubt that the last individual has died.</small>
                                         </button>
                                         <button class="iucn-filter-option" type="button" data-iucn-filter="dd">
-                                            <strong><span class="iucn-code status-dd">DD</span> <span data-i18n="iucn.dd.label">Data Deficient</span></strong>
+                                            <strong><span><span class="iucn-code status-dd">DD</span> <span data-i18n="iucn.dd.label">Data Deficient</span></span><small class="menu-count" data-iucn-count="dd"></small></strong>
                                             <small data-i18n="iucn.dd.description">Available information is insufficient to assess extinction risk.</small>
                                         </button>
                                     </div>
@@ -185,6 +186,26 @@
                         <span><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="nav.myDiary">My diary</span></span>
                         <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
                     </button>
+
+                    <!-- Featheration groups future Nostr federation tools for bird observations. -->
+                    <div class="submenu menu-section">
+                        <button class="submenu-toggle" id="featheration-submenu-toggle" type="button" aria-expanded="false" aria-controls="featheration-submenu">
+                            <span><i class="fa-solid fa-feather-pointed" aria-hidden="true"></i> <span data-i18n="nav.featheration">Featheration</span></span>
+                            <i class="fa-solid fa-chevron-down submenu-chevron" aria-hidden="true"></i>
+                        </button>
+                        <div class="submenu-panel" id="featheration-submenu">
+                            <div class="submenu-content settings-submenu-content">
+                                <button class="menu-page-link menu-action-button" id="nostr-key-settings" type="button">
+                                    <span><i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i> <span data-i18n="nostr.signInMenu">Sign in / log in</span></span>
+                                    <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                                </button>
+                                <button class="menu-page-link menu-action-button" id="nostr-achievements-settings" type="button">
+                                    <span><i class="fa-solid fa-award" aria-hidden="true"></i> <span data-i18n="achievements.menu">Achievements</span></span>
+                                    <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
 
                     <!-- Settings groups preferences and local-data tools in one menu section. -->
                     <div class="submenu menu-section">
@@ -229,6 +250,26 @@
                                     <span><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> <span data-i18n="nav.aiTranslations">AI translations</span></span>
                                     <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
                                 </button>
+
+                                <!-- Group all Nostr settings under one submenu with focused settings panels. -->
+                                <div class="submenu nested-settings-submenu">
+                                    <button class="submenu-toggle" id="nostr-settings-submenu-toggle" type="button" aria-expanded="false" aria-controls="nostr-settings-submenu">
+                                        <span><i class="fa-solid fa-feather-pointed" aria-hidden="true"></i> <span data-i18n="nostr.settingsMenu">Nostr</span></span>
+                                        <i class="fa-solid fa-chevron-down submenu-chevron" aria-hidden="true"></i>
+                                    </button>
+                                    <div class="submenu-panel" id="nostr-settings-submenu">
+                                        <div class="submenu-content settings-submenu-content">
+                                            <button class="menu-page-link menu-action-button" id="nostr-relay-settings" type="button">
+                                                <span><i class="fa-solid fa-tower-broadcast" aria-hidden="true"></i> <span data-i18n="nostr.relaysSectionTitle">Relays</span></span>
+                                                <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                                            </button>
+                                            <button class="menu-page-link menu-action-button" id="nostr-blocked-events-settings" type="button">
+                                                <span><i class="fa-solid fa-ban" aria-hidden="true"></i> <span data-i18n="nostr.blockedEventsMenu">Blocked events</span></span>
+                                                <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
 
                                 <!-- Export and import browser-local app data without API keys or tokens. -->
                                 <button class="menu-page-link menu-action-button" id="backup-settings" type="button">
@@ -425,6 +466,204 @@
             </div>
             <input id="backup-import-file" type="file" accept="application/json,.json" hidden>
             <p class="backup-status" id="backup-status" role="status" aria-live="polite"></p>
+        </div>
+    </div>
+
+    <!-- Create browser-local Nostr keys without sending the private key anywhere. -->
+    <div class="ai-consent-modal nostr-modal" id="nostr-modal" role="dialog" aria-modal="true" aria-labelledby="nostr-title" hidden>
+        <div class="ai-consent-card credits-card nostr-card">
+            <button class="ai-consent-close" id="nostr-close" type="button" aria-label="Close Nostr key setup" data-i18n-aria-label="nostr.close">&times;</button>
+            <div class="ai-consent-icon" aria-hidden="true">
+                <i class="fa-solid fa-feather-pointed"></i>
+            </div>
+            <h2 id="nostr-title" data-i18n="nostr.title">Featheration sign in</h2>
+            <p data-i18n="nostr.intro">Nostr lets you use one identity across compatible apps. Birds.name will use it later for optional federation features around your bird observations.</p>
+            <div class="nostr-warning">
+                <strong data-i18n="nostr.privateWarningTitle">Your private key is your account.</strong>
+                <p data-i18n="nostr.privateWarningText">Anyone who gets your private key can post, edit, or delete as you in Nostr apps. Birds.name generates the key in this browser and does not upload it. To write events safely, put the private key in a signer extension or app and let Birds.name ask that signer for signatures.</p>
+            </div>
+            <div class="nostr-step-guide">
+                <h3 data-i18n="nostr.stepGuideTitle">Recommended setup</h3>
+                <ol>
+                    <li data-i18n="nostr.stepCreate">Create a Nostr key here.</li>
+                    <li data-i18n="nostr.stepBackup">Copy the private key and save it somewhere safe, such as a password manager. If you lose it, the account cannot be recovered and you will need to create a new one.</li>
+                    <li data-i18n="nostr.stepSigner">Install a signer app, add your private key (nsec1...), and use it to connect with Birds.name so you can publish and interact with other members in the Featherverse without storing your private key here.</li>
+                </ol>
+            </div>
+            <div class="nostr-new-user" id="nostr-new-user" hidden>
+                <strong data-i18n="nostr.noPublicKeyTitle">No Nostr identity saved yet.</strong>
+                <p data-i18n="nostr.noPublicKeyText">New to Nostr? Generate a new ID. Already have one? Log in with a signer, Amber, or your private key.</p>
+                <div class="nostr-entry-actions">
+                    <button class="ai-primary-button" id="nostr-generate-key" type="button">
+                        <i class="fa-solid fa-key" aria-hidden="true"></i>
+                        <span data-i18n="nostr.generateKey">Generate new ID</span>
+                    </button>
+                    <button class="ai-secondary-button" id="nostr-open-login" type="button">
+                        <i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i>
+                        <span data-i18n="nostr.signInButton">Log in with existing ID</span>
+                    </button>
+                </div>
+            </div>
+            <div class="nostr-login-panel" id="nostr-login-panel" hidden>
+                <h3 data-i18n="nostr.loginTitle">Choose a sign-in method</h3>
+                <p data-i18n="nostr.loginIntro">Use a browser extension on desktop, Amber on Android, or paste a private key only for this browser session.</p>
+                <div class="nostr-login-grid">
+                    <button class="nostr-login-option" id="nostr-login-extension" type="button">
+                        <i class="fa-solid fa-puzzle-piece" aria-hidden="true"></i>
+                        <span><strong data-i18n="nostr.loginExtension">Browser extension</strong><small data-i18n="nostr.loginExtensionText">Use Alby, nos2x, or another NIP-07 signer.</small></span>
+                    </button>
+                    <button class="nostr-login-option" id="nostr-login-amber" type="button">
+                        <i class="fa-brands fa-android" aria-hidden="true"></i>
+                        <span><strong data-i18n="nostr.loginAmber">Amber</strong><small data-i18n="nostr.loginAmberText">Open Amber for online or offline Android signing.</small></span>
+                    </button>
+                </div>
+                <details class="nostr-private-login">
+                    <summary data-i18n="nostr.loginPrivate">Sign in with private key</summary>
+                    <label for="nostr-private-login-key" data-i18n="nostr.privateKey">Private key (nsec)</label>
+                    <div class="nostr-private-login-row">
+                        <input id="nostr-private-login-key" type="password" autocomplete="off" spellcheck="false" placeholder="nsec1..." data-i18n-placeholder="nostr.privateKeyPlaceholder">
+                        <button class="ai-secondary-button" id="nostr-login-private" type="button" data-i18n="nostr.loginPrivateButton">Use private key for this session</button>
+                    </div>
+                    <small data-i18n="nostr.privateLoginNote">This stores the private key only in this browser tab session. Prefer a signer for regular use.</small>
+                </details>
+            </div>
+            <div class="nostr-signer-options">
+                <h3 data-i18n="nostr.signerTitle">Signer options</h3>
+                <div class="nostr-signer-grid">
+                    <a class="nostr-signer-link" href="https://getalby.com/" target="_blank" rel="noopener noreferrer">
+                        <i class="fa-solid fa-puzzle-piece" aria-hidden="true"></i>
+                        <span><strong>Alby</strong><small data-i18n="nostr.albyText">Browser signer extension.</small></span>
+                    </a>
+                    <a class="nostr-signer-link" href="https://github.com/fiatjaf/nos2x" target="_blank" rel="noopener noreferrer">
+                        <i class="fa-brands fa-github" aria-hidden="true"></i>
+                        <span><strong>nos2x</strong><small data-i18n="nostr.nos2xText">Simple browser signer extension.</small></span>
+                    </a>
+                    <a class="nostr-signer-link" href="https://github.com/greenart7c3/Amber" target="_blank" rel="noopener noreferrer">
+                        <i class="fa-brands fa-android" aria-hidden="true"></i>
+                        <span><strong>Amber</strong><small data-i18n="nostr.amberText">Android signer app.</small></span>
+                    </a>
+                </div>
+                <p class="nostr-platform-note" data-i18n="nostr.appleNote">Apple/iOS is not supported by this website.</p>
+            </div>
+            <div class="nostr-current-public nostr-profile-panel" id="nostr-current-public" hidden>
+                <img class="nostr-profile-avatar" id="nostr-profile-avatar" src="img/origami_bird_B-ICO.png" alt="">
+                <div class="nostr-profile-copy">
+                    <strong data-i18n="nostr.loggedInAs">Logged in as</strong>
+                    <span class="nostr-profile-name" id="nostr-profile-name">Nostr user</span>
+                    <code id="nostr-saved-public-key"></code>
+                    <small id="nostr-profile-nip05" hidden></small>
+                    <button class="ai-secondary-button nostr-logout-button" id="nostr-logout" type="button">
+                        <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
+                        <span data-i18n="nostr.logout">Log out</span>
+                    </button>
+                </div>
+            </div>
+            <div class="nostr-key-result" id="nostr-key-result" hidden>
+                <label for="nostr-public-key" data-i18n="nostr.publicKey">Public key (npub)</label>
+                <div class="nostr-copy-row">
+                    <textarea id="nostr-public-key" readonly rows="2"></textarea>
+                    <button class="copy-icon-btn" id="nostr-copy-public" type="button" aria-label="Copy public key" data-i18n-aria-label="nostr.copyPublic"><i class="fa-regular fa-copy" aria-hidden="true"></i></button>
+                </div>
+                <label for="nostr-private-key" data-i18n="nostr.privateKey">Private key (nsec)</label>
+                <div class="nostr-copy-row nostr-private-row">
+                    <textarea id="nostr-private-key" readonly rows="2"></textarea>
+                    <button class="copy-icon-btn" id="nostr-copy-private" type="button" aria-label="Copy private key" data-i18n-aria-label="nostr.copyPrivate"><i class="fa-regular fa-copy" aria-hidden="true"></i></button>
+                </div>
+                <p class="nostr-private-reminder" data-i18n="nostr.privateReminder">Copy the private key before closing this window. It will not be stored by Birds.name.</p>
+                <div class="nostr-actions">
+                    <button class="ai-primary-button" id="nostr-save-public" type="button">
+                        <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
+                        <span data-i18n="nostr.savePublic">Save only public key in browser</span>
+                    </button>
+                </div>
+            </div>
+            <p class="backup-status" id="nostr-status" role="status" aria-live="polite"></p>
+        </div>
+    </div>
+
+    <!-- Show Birds.name badge achievements, including Nostr-restored badge awards. -->
+    <div class="ai-consent-modal achievements-modal" id="achievements-modal" role="dialog" aria-modal="true" aria-labelledby="achievements-title" hidden>
+        <div class="ai-consent-card achievements-card">
+            <button class="ai-consent-close" id="achievements-close" type="button" aria-label="Close achievements" data-i18n-aria-label="achievements.close">&times;</button>
+            <div class="ai-consent-icon" aria-hidden="true">
+                <i class="fa-solid fa-award"></i>
+            </div>
+            <h2 id="achievements-title" data-i18n="achievements.title">Birding achievements</h2>
+            <p data-i18n="achievements.intro">Badges are self-attested Birds.name achievements. Locked badges are blurred; unlocked badges are issued to your Nostr identity when you publish eligible diary data.</p>
+            <p class="achievements-status" id="achievements-status" role="status" aria-live="polite"></p>
+            <div class="achievements-grid" id="achievements-grid"></div>
+        </div>
+    </div>
+
+    <!-- Confirm exactly which local diary observations will be published to Nostr relays. -->
+    <div class="ai-consent-modal nostr-publish-modal" id="nostr-publish-modal" role="dialog" aria-modal="true" aria-labelledby="nostr-publish-title" hidden>
+        <div class="ai-consent-card nostr-publish-card">
+            <button class="ai-consent-close" id="nostr-publish-close" type="button" aria-label="Close Nostr publish" data-i18n-aria-label="nostr.publishClose">&times;</button>
+            <div class="ai-consent-icon" aria-hidden="true">
+                <i class="fa-solid fa-feather"></i>
+            </div>
+            <h2 id="nostr-publish-title" data-i18n="nostr.publishTitle">Publish diary to Nostr</h2>
+            <p data-i18n="nostr.publishIntro">Select the diary notes you want to publish. Published Nostr events can be copied by relays and other clients.</p>
+            <div class="nostr-location-warning" id="nostr-location-warning" hidden>
+                <strong data-i18n="nostr.locationWarningTitle">Location warning</strong>
+                <p data-i18n="nostr.locationWarningText">One or more selected notes include coordinates. Publishing them may reveal where you observed the bird.</p>
+            </div>
+            <div class="nostr-publish-list" id="nostr-publish-list"></div>
+            <label class="nostr-publish-aggregate">
+                <input id="nostr-publish-aggregate" type="checkbox" checked>
+                <span data-i18n="nostr.publishAggregate">Also publish my observed species totals for collective Birds.name statistics.</span>
+            </label>
+            <div class="nostr-publish-actions">
+                <button class="ai-secondary-button" id="nostr-publish-cancel" type="button" data-i18n="action.cancel">Cancel</button>
+                <button class="ai-primary-button" id="nostr-publish-confirm" type="button">
+                    <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
+                    <span data-i18n="nostr.publishSelected">Publish selected</span>
+                </button>
+            </div>
+            <p class="backup-status" id="nostr-publish-status" role="status" aria-live="polite"></p>
+        </div>
+    </div>
+
+    <!-- Keep all advanced Nostr settings together, including relays and blocked diary events. -->
+    <div class="ai-consent-modal nostr-relay-modal" id="nostr-relay-modal" role="dialog" aria-modal="true" aria-labelledby="nostr-relay-title" hidden>
+        <div class="ai-consent-card nostr-relay-card">
+            <button class="ai-consent-close" id="nostr-relay-close" type="button" aria-label="Close Nostr settings" data-i18n-aria-label="nostr.settingsClose">&times;</button>
+            <div class="ai-consent-icon" aria-hidden="true">
+                <i class="fa-solid fa-feather-pointed"></i>
+            </div>
+            <h2 id="nostr-relay-title" data-i18n="nostr.settingsTitle">Nostr settings</h2>
+            <p id="nostr-relay-intro" data-i18n="nostr.settingsIntro">Manage Nostr relays and locally blocked diary events used by Birds.name federation features.</p>
+            <div class="nostr-relay-section" id="nostr-relays-section" tabindex="-1">
+                <h3 data-i18n="nostr.relaysSectionTitle">Relays</h3>
+                <p class="nostr-relay-explainer" data-i18n="nostr.relaysExplainer">Relays are like servers that receive, store, and share events. Birds.name uses relays to publish your diary events and to find them again when you log in with the same Nostr identity.</p>
+                <p class="nostr-relay-section-note" data-i18n="nostr.relaysIntro">Personal relays are used first for publishing and reading Birds.name events. App default relays are optional fallbacks.</p>
+                <label class="nostr-relay-default-toggle">
+                    <input id="nostr-use-default-relays" type="checkbox">
+                    <span data-i18n="nostr.useDefaultRelays">Also use Birds.name default relays</span>
+                </label>
+                <div class="nostr-relay-subsection">
+                    <h4 data-i18n="nostr.personalRelays">Personal relays</h4>
+                    <div class="nostr-relay-add-row">
+                        <input id="nostr-relay-input" type="url" placeholder="wss://relay.example.com" spellcheck="false">
+                        <button class="ai-primary-button" id="nostr-relay-add" type="button" data-i18n="nostr.addRelay">Add relay</button>
+                    </div>
+                    <div class="nostr-relay-list" id="nostr-personal-relay-list"></div>
+                </div>
+                <div class="nostr-relay-subsection">
+                    <h4 data-i18n="nostr.defaultRelays">Birds.name default relays</h4>
+                    <div class="nostr-relay-list" id="nostr-default-relay-list"></div>
+                </div>
+            </div>
+            <div class="nostr-relay-section nostr-blocked-diaries-section" id="nostr-blocked-events-section" tabindex="-1">
+                <h3 data-i18n="nostr.blockedEventsTitle">Blocked events</h3>
+                <p class="nostr-relay-explainer" data-i18n="nostr.blockedDiariesIntro">These are Nostr diary events hidden locally because you deleted them here. Unblock only if you want them to appear again when fetching from relays.</p>
+                <div class="nostr-blocked-diary-list" id="nostr-blocked-diary-list"></div>
+            </div>
+            <p class="nostr-relay-help" id="nostr-relay-help">
+                <span data-i18n="nostr.findRelaysText">To look for public relays, visit</span>
+                <a href="https://nostr.watch/relays/find" target="_blank" rel="noopener noreferrer">nostr.watch</a>.
+            </p>
+            <p class="backup-status" id="nostr-relay-status" role="status" aria-live="polite"></p>
         </div>
     </div>
 
@@ -692,6 +931,65 @@
             this.creditsSettings = document.getElementById('credits-settings');
             this.creditsModal = document.getElementById('credits-modal');
             this.creditsClose = document.getElementById('credits-close');
+            this.featherationSubmenuToggle = document.getElementById('featheration-submenu-toggle');
+            this.featherationSubmenu = document.getElementById('featheration-submenu');
+            this.nostrKeySettings = document.getElementById('nostr-key-settings');
+            this.nostrAchievementsSettings = document.getElementById('nostr-achievements-settings');
+            this.achievementsModal = document.getElementById('achievements-modal');
+            this.achievementsClose = document.getElementById('achievements-close');
+            this.achievementsGrid = document.getElementById('achievements-grid');
+            this.achievementsStatus = document.getElementById('achievements-status');
+            this.nostrModal = document.getElementById('nostr-modal');
+            this.nostrClose = document.getElementById('nostr-close');
+            this.nostrGenerateKey = document.getElementById('nostr-generate-key');
+            this.nostrKeyResult = document.getElementById('nostr-key-result');
+            this.nostrPublicKey = document.getElementById('nostr-public-key');
+            this.nostrPrivateKey = document.getElementById('nostr-private-key');
+            this.nostrCopyPublic = document.getElementById('nostr-copy-public');
+            this.nostrCopyPrivate = document.getElementById('nostr-copy-private');
+            this.nostrSavePublic = document.getElementById('nostr-save-public');
+            this.nostrStatus = document.getElementById('nostr-status');
+            this.nostrCurrentPublic = document.getElementById('nostr-current-public');
+            this.nostrSavedPublicKey = document.getElementById('nostr-saved-public-key');
+            this.nostrProfileAvatar = document.getElementById('nostr-profile-avatar');
+            this.nostrProfileName = document.getElementById('nostr-profile-name');
+            this.nostrProfileNip05 = document.getElementById('nostr-profile-nip05');
+            this.nostrLogout = document.getElementById('nostr-logout');
+            this.nostrNewUser = document.getElementById('nostr-new-user');
+            this.nostrOpenLogin = document.getElementById('nostr-open-login');
+            this.nostrLoginPanel = document.getElementById('nostr-login-panel');
+            this.nostrLoginExtension = document.getElementById('nostr-login-extension');
+            this.nostrLoginAmber = document.getElementById('nostr-login-amber');
+            this.nostrPrivateLoginKey = document.getElementById('nostr-private-login-key');
+            this.nostrLoginPrivate = document.getElementById('nostr-login-private');
+            this.currentNostrKeyPair = null; // Holds the freshly generated key only while the modal is open
+            this.nostrPublishModal = document.getElementById('nostr-publish-modal');
+            this.nostrPublishClose = document.getElementById('nostr-publish-close');
+            this.nostrPublishCancel = document.getElementById('nostr-publish-cancel');
+            this.nostrPublishConfirm = document.getElementById('nostr-publish-confirm');
+            this.nostrPublishList = document.getElementById('nostr-publish-list');
+            this.nostrPublishStatus = document.getElementById('nostr-publish-status');
+            this.nostrLocationWarning = document.getElementById('nostr-location-warning');
+            this.nostrPublishAggregate = document.getElementById('nostr-publish-aggregate');
+            this.pendingNostrPublishEntries = []; // Keeps the currently reviewed publish selection out of storage
+            this.nostrRelaySettings = document.getElementById('nostr-relay-settings');
+            this.nostrBlockedEventsSettings = document.getElementById('nostr-blocked-events-settings');
+            this.nostrSettingsSubmenuToggle = document.getElementById('nostr-settings-submenu-toggle');
+            this.nostrSettingsSubmenu = document.getElementById('nostr-settings-submenu');
+            this.nostrRelayModal = document.getElementById('nostr-relay-modal');
+            this.nostrRelayTitle = document.getElementById('nostr-relay-title');
+            this.nostrRelayIntro = document.getElementById('nostr-relay-intro');
+            this.nostrRelayClose = document.getElementById('nostr-relay-close');
+            this.nostrRelayInput = document.getElementById('nostr-relay-input');
+            this.nostrRelayAdd = document.getElementById('nostr-relay-add');
+            this.nostrUseDefaultRelays = document.getElementById('nostr-use-default-relays');
+            this.nostrPersonalRelayList = document.getElementById('nostr-personal-relay-list');
+            this.nostrDefaultRelayList = document.getElementById('nostr-default-relay-list');
+            this.nostrBlockedDiaryList = document.getElementById('nostr-blocked-diary-list');
+            this.nostrRelaysSection = document.getElementById('nostr-relays-section');
+            this.nostrBlockedEventsSection = document.getElementById('nostr-blocked-events-section');
+            this.nostrRelayHelp = document.getElementById('nostr-relay-help');
+            this.nostrRelayStatus = document.getElementById('nostr-relay-status');
 
             this.crossLanguageSearchResults = [];
             this.showCrossLanguageResults = false;
@@ -700,6 +998,7 @@
             this.dropdownContainer = document.querySelector('.dropdown-container');
 
             this.dropdownToggle = document.getElementById('dropdown-toggle');
+            this.menuNostrAvatar = document.getElementById('menu-nostr-avatar');
             this.dropdownMenu = document.getElementById('dropdown-menu');
             this.categoriesSubmenuToggle = document.getElementById('categories-submenu-toggle');
             this.categoriesSubmenu = document.getElementById('categories-submenu');
@@ -742,6 +1041,7 @@
 
             // Accept a scoped Pollinations user key returned by the official app authorization page.
             this.handlePollinationsAuthorizationCallback();
+            this.handleNostrSignerCallback();
 
             // scroll-to-top button setup
             this.setupScrollToTop();
@@ -812,11 +1112,27 @@
                 });
             }
 
+            // Expand future Nostr federation tools without leaving the main navigation.
+            if (this.featherationSubmenuToggle) {
+                this.featherationSubmenuToggle.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.toggleFeatherationSubmenu();
+                });
+            }
+
             // Expand the shared theme choices without closing the burger menu.
             if (this.themeSubmenuToggle) {
                 this.themeSubmenuToggle.addEventListener('click', (e) => {
                     e.stopPropagation();
                     this.toggleThemeSubmenu();
+                });
+            }
+
+            // Expand Nostr settings into focused Relays and Blocked events actions.
+            if (this.nostrSettingsSubmenuToggle) {
+                this.nostrSettingsSubmenuToggle.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.toggleNostrSettingsSubmenu();
                 });
             }
 
@@ -976,6 +1292,15 @@
             this.setupAiTranslationConsent();
             this.setupAboutModal();
             this.setupCreditsModal();
+            this.setupNostrKeyModal();
+            this.renderSavedNostrPublicKey();
+            const savedNostrPublicHex = localStorage.getItem('birdNostrPublicKeyHex');
+            if (savedNostrPublicHex && !localStorage.getItem('birdNostrProfile')) {
+                this.loadNostrProfile();
+            }
+            if (savedNostrPublicHex) {
+                this.loadNostrApplicationData(savedNostrPublicHex);
+            }
             this.setupDiaryLocationPicker();
 
             // Browser back/forward cache can restore controls while omitting dynamically created bird cards.
@@ -1013,6 +1338,7 @@
                     await this.changeLanguage(savedLanguage, { renderBirds: false });
                 }
 
+                this.updateCategoryMenuCounts();
                 this.renderBirdGridFromStart();
                 console.log('Initial birds loaded:', this.displayedCount);
 
@@ -1905,8 +2231,10 @@
             [
                 [this.languageSubmenu, this.languageSubmenuToggle],
                 [this.categoriesSubmenu, this.categoriesSubmenuToggle],
+                [this.featherationSubmenu, this.featherationSubmenuToggle],
                 [this.settingsSubmenu, this.settingsSubmenuToggle],
-                [this.themeSubmenu, this.themeSubmenuToggle]
+                [this.themeSubmenu, this.themeSubmenuToggle],
+                [this.nostrSettingsSubmenu, this.nostrSettingsSubmenuToggle]
             ].forEach(([panel, toggle]) => {
                 panel?.classList.remove('show');
                 toggle?.classList.remove('active');
@@ -1931,6 +2259,13 @@
             this.categoriesSubmenuToggle.setAttribute('aria-expanded', String(isOpen));
         }
 
+        // Toggle the Nostr-focused Featheration menu section.
+        toggleFeatherationSubmenu() {
+            const isOpen = this.featherationSubmenu.classList.toggle('show');
+            this.featherationSubmenuToggle.classList.toggle('active', isOpen);
+            this.featherationSubmenuToggle.setAttribute('aria-expanded', String(isOpen));
+        }
+
         // Toggle the Settings accordion containing language, theme, AI, and backup tools.
         toggleSettingsSubmenu() {
             const isOpen = this.settingsSubmenu.classList.toggle('show');
@@ -1943,6 +2278,13 @@
             const isOpen = this.themeSubmenu.classList.toggle('show');
             this.themeSubmenuToggle.classList.toggle('active', isOpen);
             this.themeSubmenuToggle.setAttribute('aria-expanded', String(isOpen));
+        }
+
+        // Toggle the nested Nostr settings menu containing Relays and Blocked events.
+        toggleNostrSettingsSubmenu() {
+            const isOpen = this.nostrSettingsSubmenu.classList.toggle('show');
+            this.nostrSettingsSubmenuToggle.classList.toggle('active', isOpen);
+            this.nostrSettingsSubmenuToggle.setAttribute('aria-expanded', String(isOpen));
         }
 
         applyTheme(theme, { persist = true } = {}) {
@@ -2284,6 +2626,1292 @@
             }
         }
 
+        setupNostrKeyModal() {
+            // Open the local Nostr key modal from Featheration and keep private keys out of storage.
+            this.nostrKeySettings?.addEventListener('click', () => {
+                this.hideDropdown();
+                this.openNostrKeyModal();
+            });
+            this.nostrAchievementsSettings?.addEventListener('click', () => this.openAchievementsModal());
+            this.achievementsClose?.addEventListener('click', () => this.closeAchievementsModal());
+            this.achievementsModal?.addEventListener('click', event => {
+                if (event.target === this.achievementsModal) this.closeAchievementsModal();
+            });
+            this.nostrClose?.addEventListener('click', () => this.closeNostrKeyModal());
+            this.nostrModal?.addEventListener('click', event => {
+                if (event.target === this.nostrModal) this.closeNostrKeyModal();
+            });
+            this.nostrGenerateKey?.addEventListener('click', () => this.generateAndShowNostrKey());
+            this.nostrCopyPublic?.addEventListener('click', () => this.copyNostrValue(this.nostrPublicKey?.value, 'nostr.publicCopied'));
+            this.nostrCopyPrivate?.addEventListener('click', () => this.copyNostrValue(this.nostrPrivateKey?.value, 'nostr.privateCopied'));
+            this.nostrSavePublic?.addEventListener('click', () => this.saveNostrPublicKey());
+            this.nostrOpenLogin?.addEventListener('click', () => this.showNostrLoginPanel());
+            this.nostrLoginExtension?.addEventListener('click', () => this.signInWithNostrExtension());
+            this.nostrLoginAmber?.addEventListener('click', () => this.signInWithAmber());
+            this.nostrLoginPrivate?.addEventListener('click', () => this.signInWithPrivateKey());
+            this.nostrLogout?.addEventListener('click', () => this.logoutNostr());
+            this.nostrPublishClose?.addEventListener('click', () => this.closeNostrPublishModal());
+            this.nostrPublishCancel?.addEventListener('click', () => this.closeNostrPublishModal());
+            this.nostrPublishConfirm?.addEventListener('click', () => this.publishSelectedDiaryEntriesToNostr());
+            this.nostrPublishModal?.addEventListener('click', event => {
+                if (event.target === this.nostrPublishModal) this.closeNostrPublishModal();
+            });
+            this.nostrPublishList?.addEventListener('change', () => this.updateNostrPublishLocationWarning());
+            this.nostrPublishModal?.addEventListener('click', event => {
+                const copyButton = event.target.closest('[data-copy-nostr-event-id]');
+                if (copyButton) this.copyNostrValue(copyButton.dataset.copyNostrEventId, 'nostr.eventIdCopied');
+            });
+            this.nostrRelaySettings?.addEventListener('click', () => this.openNostrRelayModal('relays'));
+            this.nostrBlockedEventsSettings?.addEventListener('click', () => this.openNostrRelayModal('blocked'));
+            this.nostrRelayClose?.addEventListener('click', () => this.closeNostrRelayModal());
+            this.nostrRelayModal?.addEventListener('click', event => {
+                if (event.target === this.nostrRelayModal) this.closeNostrRelayModal();
+                const removeButton = event.target.closest('[data-nostr-remove-relay]');
+                if (removeButton) this.removeNostrPersonalRelay(removeButton.dataset.nostrRemoveRelay);
+                const unblockButton = event.target.closest('[data-nostr-unblock-event]');
+                if (unblockButton) this.unblockNostrEvent(unblockButton.dataset.nostrUnblockEvent);
+            });
+            this.nostrRelayAdd?.addEventListener('click', () => this.addNostrPersonalRelay());
+            this.nostrRelayInput?.addEventListener('keydown', event => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    this.addNostrPersonalRelay();
+                }
+            });
+            this.nostrUseDefaultRelays?.addEventListener('change', () => {
+                localStorage.setItem('birdNostrUseDefaultRelays', this.nostrUseDefaultRelays.checked ? 'true' : 'false');
+                this.renderNostrRelaySettings();
+            });
+            document.addEventListener('keydown', event => {
+                if (event.key === 'Escape' && !this.nostrModal?.hidden) this.closeNostrKeyModal();
+                if (event.key === 'Escape' && !this.achievementsModal?.hidden) this.closeAchievementsModal();
+                if (event.key === 'Escape' && !this.nostrPublishModal?.hidden) this.closeNostrPublishModal();
+                if (event.key === 'Escape' && !this.nostrRelayModal?.hidden) this.closeNostrRelayModal();
+            });
+        }
+
+        openNostrKeyModal() {
+            // Show any already saved public identity without exposing or asking for a private key.
+            if (!this.nostrModal) return;
+            this.renderSavedNostrPublicKey();
+            if (this.nostrLoginPanel) this.nostrLoginPanel.hidden = true;
+            this.showNostrStatus('');
+            this.nostrModal.hidden = false;
+            document.body.classList.add('ai-consent-open');
+            (localStorage.getItem('birdNostrPublicKey') ? this.nostrClose : this.nostrGenerateKey)?.focus();
+        }
+
+        closeNostrKeyModal() {
+            // Clear generated private key material from the page when the visitor closes the modal.
+            if (!this.nostrModal) return;
+            this.currentNostrKeyPair = null;
+            if (this.nostrPrivateKey) this.nostrPrivateKey.value = '';
+            if (this.nostrPublicKey) this.nostrPublicKey.value = '';
+            if (this.nostrPrivateLoginKey) this.nostrPrivateLoginKey.value = '';
+            if (this.nostrKeyResult) this.nostrKeyResult.hidden = true;
+            this.showNostrStatus('');
+            this.nostrModal.hidden = true;
+            document.body.classList.remove('ai-consent-open');
+            this.nostrKeySettings?.focus();
+        }
+
+        renderSavedNostrPublicKey() {
+            // Display the browser-local Nostr identity and hide setup UI once logged in.
+            const savedPublicKey = localStorage.getItem('birdNostrPublicKey') || '';
+            const profile = this.getCachedNostrProfile();
+            const displayName = profile?.display_name || profile?.displayName || profile?.name || this.t('nostr.defaultProfileName');
+            const avatar = profile?.picture || profile?.image || 'img/origami_bird_B-ICO.png';
+            const nip05 = profile?.nip05 || '';
+            const isLoggedIn = Boolean(savedPublicKey);
+            const nostrCard = this.nostrModal?.querySelector('.nostr-card');
+            nostrCard?.classList.toggle('logged-in', isLoggedIn);
+            if (this.nostrCurrentPublic) this.nostrCurrentPublic.hidden = !isLoggedIn;
+            if (this.nostrSavedPublicKey) this.nostrSavedPublicKey.textContent = savedPublicKey ? this.shortenNostrKey(savedPublicKey) : '';
+            if (this.nostrProfileName) this.nostrProfileName.textContent = isLoggedIn ? displayName : this.t('nostr.defaultProfileName');
+            if (this.nostrProfileAvatar) this.nostrProfileAvatar.src = isLoggedIn ? avatar : 'img/origami_bird_B-ICO.png';
+            if (this.nostrProfileAvatar) this.nostrProfileAvatar.onerror = () => { this.nostrProfileAvatar.src = 'img/origami_bird_B-ICO.png'; };
+            if (this.nostrProfileNip05) {
+                this.nostrProfileNip05.hidden = !isLoggedIn || !nip05;
+                this.nostrProfileNip05.textContent = isLoggedIn ? nip05 : '';
+            }
+            if (this.nostrNewUser) this.nostrNewUser.hidden = isLoggedIn;
+            if (isLoggedIn) {
+                if (this.nostrLoginPanel) this.nostrLoginPanel.hidden = true;
+                if (this.nostrKeyResult) this.nostrKeyResult.hidden = true;
+                if (this.nostrPrivateKey) this.nostrPrivateKey.value = '';
+                if (this.nostrPublicKey) this.nostrPublicKey.value = '';
+            } else {
+                if (this.nostrLoginPanel) this.nostrLoginPanel.hidden = true;
+                if (this.nostrKeyResult) this.nostrKeyResult.hidden = true;
+            }
+            if (this.menuNostrAvatar) {
+                this.menuNostrAvatar.hidden = !isLoggedIn;
+                this.menuNostrAvatar.src = avatar;
+                this.menuNostrAvatar.onerror = () => { this.menuNostrAvatar.src = 'img/origami_bird_B-ICO.png'; };
+            }
+            this.dropdownToggle?.classList.toggle('nostr-logged-in', isLoggedIn);
+        }
+
+        getCachedNostrProfile() {
+            // Read the browser-local Nostr metadata event content if one has already been fetched.
+            try {
+                const profile = JSON.parse(localStorage.getItem('birdNostrProfile') || 'null');
+                const publicHex = localStorage.getItem('birdNostrPublicKeyHex') || '';
+                return profile?.publicHex === publicHex ? profile : null;
+            } catch (error) {
+                return null;
+            }
+        }
+
+        shortenNostrKey(npub) {
+            // Keep the logged-in view compact while preserving the recognizable start and end of the npub.
+            return npub && npub.length > 18 ? `${npub.slice(0, 12)}...${npub.slice(-6)}` : npub;
+        }
+
+        showNostrLoginPanel() {
+            // Reveal existing-ID login methods only after the visitor explicitly asks for them.
+            if (!this.nostrLoginPanel) return;
+            this.nostrLoginPanel.hidden = false;
+            this.nostrLoginPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            this.nostrLoginExtension?.focus({ preventScroll: true });
+        }
+
+        generateAndShowNostrKey() {
+            // Generate a valid Nostr secp256k1 private key and derive its x-only public key locally.
+            try {
+                const privateKeyBytes = this.generateNostrPrivateKeyBytes();
+                const publicKeyBytes = this.deriveNostrPublicKeyBytes(privateKeyBytes);
+                this.currentNostrKeyPair = {
+                    privateHex: this.bytesToHex(privateKeyBytes),
+                    publicHex: this.bytesToHex(publicKeyBytes),
+                    nsec: this.encodeNostrBech32('nsec', privateKeyBytes),
+                    npub: this.encodeNostrBech32('npub', publicKeyBytes)
+                };
+                if (this.nostrPublicKey) this.nostrPublicKey.value = this.currentNostrKeyPair.npub;
+                if (this.nostrPrivateKey) this.nostrPrivateKey.value = this.currentNostrKeyPair.nsec;
+                if (this.nostrKeyResult) this.nostrKeyResult.hidden = false;
+                this.showNostrStatus(this.t('nostr.generated'));
+            } catch (error) {
+                console.error('Nostr key generation failed:', error);
+                this.showNostrStatus(this.t('nostr.generationFailed'), true);
+            }
+        }
+
+        generateNostrPrivateKeyBytes() {
+            // Draw cryptographically secure random bytes until they form a valid secp256k1 scalar.
+            const curveOrder = BigInt('0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141');
+            const bytes = new Uint8Array(32);
+            do {
+                crypto.getRandomValues(bytes);
+            } while (this.bytesToBigInt(bytes) === 0n || this.bytesToBigInt(bytes) >= curveOrder);
+            return bytes;
+        }
+
+        deriveNostrPublicKeyBytes(privateKeyBytes) {
+            // Nostr public keys are the x coordinate of privateKey * secp256k1 generator.
+            const privateScalar = this.bytesToBigInt(privateKeyBytes);
+            const point = this.secp256k1Multiply(privateScalar);
+            return this.hexToBytes(point.x.toString(16).padStart(64, '0'));
+        }
+
+        secp256k1Multiply(privateScalar) {
+            // Use double-and-add scalar multiplication over secp256k1 without external libraries.
+            const generator = {
+                x: BigInt('0x79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798'),
+                y: BigInt('0x483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8')
+            };
+            let result = null;
+            let addend = generator;
+            let scalar = privateScalar;
+            while (scalar > 0n) {
+                if (scalar & 1n) result = this.secp256k1Add(result, addend);
+                addend = this.secp256k1Add(addend, addend);
+                scalar >>= 1n;
+            }
+            return result;
+        }
+
+        secp256k1Add(firstPoint, secondPoint) {
+            // Add two curve points; null represents the point at infinity.
+            if (!firstPoint) return secondPoint;
+            if (!secondPoint) return firstPoint;
+            const fieldPrime = BigInt('0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F');
+            if (firstPoint.x === secondPoint.x && this.mod(firstPoint.y + secondPoint.y, fieldPrime) === 0n) return null;
+            const slope = firstPoint.x === secondPoint.x && firstPoint.y === secondPoint.y
+                ? this.mod(3n * firstPoint.x * firstPoint.x * this.modInverse(2n * firstPoint.y, fieldPrime), fieldPrime)
+                : this.mod((secondPoint.y - firstPoint.y) * this.modInverse(secondPoint.x - firstPoint.x, fieldPrime), fieldPrime);
+            const x = this.mod(slope * slope - firstPoint.x - secondPoint.x, fieldPrime);
+            const y = this.mod(slope * (firstPoint.x - x) - firstPoint.y, fieldPrime);
+            return { x, y };
+        }
+
+        mod(value, modulo) {
+            // Normalize BigInt modulo results because JavaScript keeps the sign of negative dividends.
+            return ((value % modulo) + modulo) % modulo;
+        }
+
+        modInverse(value, modulo) {
+            // Compute a modular inverse with the extended Euclidean algorithm.
+            let [oldRemainder, remainder] = [modulo, this.mod(value, modulo)];
+            let [oldCoefficient, coefficient] = [0n, 1n];
+            while (remainder !== 0n) {
+                const quotient = oldRemainder / remainder;
+                [oldRemainder, remainder] = [remainder, oldRemainder - quotient * remainder];
+                [oldCoefficient, coefficient] = [coefficient, oldCoefficient - quotient * coefficient];
+            }
+            if (oldRemainder !== 1n) throw new Error('Value has no modular inverse.');
+            return this.mod(oldCoefficient, modulo);
+        }
+
+        encodeNostrBech32(prefix, bytes) {
+            // Encode Nostr npub/nsec values using the same bech32 alphabet as NIP-19.
+            const words = this.convertBits([...bytes], 8, 5, true);
+            const checksum = this.createBech32Checksum(prefix, words);
+            const alphabet = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l';
+            return `${prefix}1${[...words, ...checksum].map(value => alphabet[value]).join('')}`;
+        }
+
+        decodeNostrBech32(value, expectedPrefix) {
+            // Decode NIP-19 npub/nsec values and verify the bech32 checksum before use.
+            const alphabet = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l';
+            const separatorIndex = value.lastIndexOf('1');
+            if (separatorIndex < 1) throw new Error('Missing bech32 separator.');
+            const prefix = value.slice(0, separatorIndex);
+            if (expectedPrefix && prefix !== expectedPrefix) throw new Error(`Expected ${expectedPrefix} key.`);
+            const words = [...value.slice(separatorIndex + 1)].map(character => alphabet.indexOf(character));
+            if (words.some(word => word < 0)) throw new Error('Invalid bech32 character.');
+            const checksumValues = [
+                ...[...prefix].map(character => character.charCodeAt(0) >> 5),
+                0,
+                ...[...prefix].map(character => character.charCodeAt(0) & 31),
+                ...words
+            ];
+            if (this.bech32Polymod(checksumValues) !== 1) throw new Error('Invalid bech32 checksum.');
+            const bytes = new Uint8Array(this.convertBits(words.slice(0, -6), 5, 8, false));
+            if (bytes.length !== 32) throw new Error('Nostr keys must be 32 bytes.');
+            return { prefix, bytes, hex: this.bytesToHex(bytes) };
+        }
+
+        createBech32Checksum(prefix, words) {
+            // Produce the six-word bech32 checksum for the supplied human-readable prefix.
+            const values = [
+                ...[...prefix].map(character => character.charCodeAt(0) >> 5),
+                0,
+                ...[...prefix].map(character => character.charCodeAt(0) & 31),
+                ...words,
+                0, 0, 0, 0, 0, 0
+            ];
+            const polymod = (this.bech32Polymod(values) ^ 1) >>> 0;
+            return Array.from({ length: 6 }, (_, index) => (polymod >>> (5 * (5 - index))) & 31);
+        }
+
+        bech32Polymod(values) {
+            // Run the bech32 checksum polynomial over the prefix, data words, and zero padding.
+            const generators = [0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3];
+            let checksum = 1;
+            values.forEach(value => {
+                const top = checksum >>> 25;
+                checksum = (((checksum & 0x1ffffff) << 5) ^ value) >>> 0;
+                generators.forEach((generator, index) => {
+                    if ((top >>> index) & 1) checksum = (checksum ^ generator) >>> 0;
+                });
+            });
+            return checksum;
+        }
+
+        convertBits(data, fromBits, toBits, pad) {
+            // Convert bytes to five-bit bech32 words while preserving leading zeroes.
+            let accumulator = 0;
+            let bits = 0;
+            const result = [];
+            const maxValue = (1 << toBits) - 1;
+            data.forEach(value => {
+                accumulator = (accumulator << fromBits) | value;
+                bits += fromBits;
+                while (bits >= toBits) {
+                    bits -= toBits;
+                    result.push((accumulator >> bits) & maxValue);
+                }
+            });
+            if (pad && bits > 0) result.push((accumulator << (toBits - bits)) & maxValue);
+            return result;
+        }
+
+        bytesToBigInt(bytes) {
+            // Convert random key bytes to a scalar without losing leading zeroes.
+            return BigInt(`0x${this.bytesToHex(bytes)}`);
+        }
+
+        bytesToHex(bytes) {
+            // Format bytes as lower-case hexadecimal for local storage and debugging.
+            return [...bytes].map(value => value.toString(16).padStart(2, '0')).join('');
+        }
+
+        hexToBytes(hex) {
+            // Convert a fixed-width hexadecimal public key into bytes for bech32 encoding.
+            return new Uint8Array(hex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+        }
+
+        async copyNostrValue(value, successKey) {
+            // Copy the requested Nostr key value and avoid leaking it to any server.
+            if (!value) return;
+            try {
+                if (navigator.clipboard?.writeText) {
+                    await navigator.clipboard.writeText(value);
+                } else {
+                    const fallback = document.createElement('textarea');
+                    fallback.value = value;
+                    fallback.setAttribute('readonly', '');
+                    fallback.style.position = 'fixed';
+                    fallback.style.opacity = '0';
+                    document.body.appendChild(fallback);
+                    fallback.select();
+                    document.execCommand('copy');
+                    fallback.remove();
+                }
+                this.showNostrStatus(this.t(successKey));
+            } catch (error) {
+                console.warn('Could not copy Nostr value:', error);
+                this.showNostrStatus(this.t('nostr.copyFailed'), true);
+            }
+        }
+
+        saveNostrIdentity({ publicHex, npub, method }) {
+            // Persist only public identity details; private keys are signer-owned or session-only.
+            if (!publicHex && !npub) return;
+            const normalizedPublicHex = publicHex || this.decodeNostrBech32(npub, 'npub').hex;
+            const normalizedNpub = npub || this.encodeNostrBech32('npub', this.hexToBytes(normalizedPublicHex));
+            if (localStorage.getItem('birdNostrPublicKeyHex') !== normalizedPublicHex) {
+                localStorage.removeItem('birdNostrProfile');
+            }
+            localStorage.setItem('birdNostrPublicKey', normalizedNpub);
+            localStorage.setItem('birdNostrPublicKeyHex', normalizedPublicHex);
+            localStorage.setItem('birdNostrLoginMethod', method || 'unknown');
+            localStorage.setItem('birdNostrPublicKeySavedAt', new Date().toISOString());
+            this.renderSavedNostrPublicKey();
+            this.loadNostrProfile(normalizedPublicHex);
+            this.loadNostrApplicationData(normalizedPublicHex);
+        }
+
+        saveNostrPublicKey() {
+            // Save the generated public key while leaving its matching private key outside persistent storage.
+            if (!this.currentNostrKeyPair?.npub) return;
+            this.saveNostrIdentity({
+                publicHex: this.currentNostrKeyPair.publicHex,
+                npub: this.currentNostrKeyPair.npub,
+                method: 'generated'
+            });
+            this.showNostrStatus('');
+        }
+
+        async signInWithNostrExtension() {
+            // Ask a NIP-07 browser signer for the public key without touching the user's private key.
+            if (!window.nostr?.getPublicKey) {
+                this.showNostrStatus(this.t('nostr.extensionMissing'), true);
+                return;
+            }
+            try {
+                const publicHex = await window.nostr.getPublicKey();
+                if (!/^[0-9a-f]{64}$/i.test(publicHex || '')) throw new Error('Invalid public key returned by signer.');
+                this.saveNostrIdentity({ publicHex: publicHex.toLowerCase(), method: 'extension' });
+                this.showNostrStatus('');
+            } catch (error) {
+                console.warn('Nostr extension sign-in failed:', error);
+                this.showNostrStatus(this.t('nostr.extensionFailed'), true);
+            }
+        }
+
+        signInWithAmber() {
+            // Open Amber's Android signer scheme for online/offline signing and accept callback pubkeys.
+            const callbackUrl = `${window.location.origin}${window.location.pathname}?nostr_callback=amber`;
+            const signerUrl = `nostrsigner:?type=get_public_key&compressionType=none&returnType=signature&callbackUrl=${encodeURIComponent(callbackUrl)}`;
+            localStorage.setItem('birdNostrLoginMethod', 'amber');
+            this.showNostrStatus(this.t('nostr.amberOpening'));
+            window.location.href = signerUrl;
+        }
+
+        signInWithPrivateKey() {
+            // Derive the public key from nsec/hex and keep the private key only for the current session.
+            try {
+                const rawValue = this.nostrPrivateLoginKey?.value?.trim() || '';
+                const privateKeyBytes = this.parseNostrPrivateKey(rawValue);
+                const publicKeyBytes = this.deriveNostrPublicKeyBytes(privateKeyBytes);
+                const privateHex = this.bytesToHex(privateKeyBytes);
+                const publicHex = this.bytesToHex(publicKeyBytes);
+                sessionStorage.setItem('birdNostrSessionPrivateKeyHex', privateHex);
+                sessionStorage.setItem('birdNostrSessionPrivateKeySavedAt', new Date().toISOString());
+                this.saveNostrIdentity({ publicHex, method: 'private-key' });
+                if (this.nostrPrivateLoginKey) this.nostrPrivateLoginKey.value = '';
+                this.showNostrStatus('');
+            } catch (error) {
+                console.warn('Nostr private-key sign-in failed:', error);
+                this.showNostrStatus(this.t('nostr.privateSignInFailed'), true);
+            }
+        }
+
+        parseNostrPrivateKey(value) {
+            // Accept either nsec or raw 64-character hex private keys for local session sign-in.
+            if (/^nsec1/i.test(value)) return this.decodeNostrBech32(value.toLowerCase(), 'nsec').bytes;
+            if (/^[0-9a-f]{64}$/i.test(value)) return this.hexToBytes(value.toLowerCase());
+            throw new Error('Invalid Nostr private key.');
+        }
+
+        handleNostrSignerCallback() {
+            // Store a returned signer public key if Amber or another app redirects back with one.
+            const params = new URLSearchParams(`${window.location.search}&${window.location.hash.replace(/^#/, '')}`);
+            const candidate = params.get('pubkey') || params.get('publicKey') || params.get('npub') || params.get('nostr_pubkey');
+            if (!candidate) return;
+            try {
+                const identity = /^npub1/i.test(candidate)
+                    ? { npub: candidate.toLowerCase(), method: 'amber' }
+                    : { publicHex: candidate.toLowerCase(), method: 'amber' };
+                this.saveNostrIdentity(identity);
+                window.history.replaceState(null, '', `${window.location.origin}${window.location.pathname}${window.location.hash && !window.location.hash.includes('pubkey') ? window.location.hash : ''}`);
+            } catch (error) {
+                console.warn('Could not save Nostr signer callback:', error);
+            }
+        }
+
+        showNostrStatus(message, isError = false) {
+            // Report Nostr key actions inside the modal without interrupting the user.
+            if (!this.nostrStatus) return;
+            this.nostrStatus.textContent = message || '';
+            this.nostrStatus.classList.toggle('error', Boolean(isError));
+        }
+
+        openAchievementsModal() {
+            // Open the Featheration achievements modal and render current badge status.
+            this.hideDropdown();
+            this.renderAchievements();
+            if (!this.achievementsModal) return;
+            this.achievementsModal.hidden = false;
+            document.body.classList.add('ai-consent-open');
+            this.achievementsClose?.focus();
+        }
+
+        closeAchievementsModal() {
+            // Close the achievements modal without changing local badge state.
+            if (this.achievementsModal) this.achievementsModal.hidden = true;
+            document.body.classList.remove('ai-consent-open');
+            this.nostrAchievementsSettings?.focus();
+        }
+
+        renderAchievements() {
+            // Show every badge from the catalog, blurring locked cards and restoring unlocked state from local/Nostr awards.
+            if (!this.achievementsGrid) return;
+            const awarded = this.getStoredNostrAwardedBadges();
+            const progress = this.getBadgeProgressSnapshot();
+            const catalog = this.getNostrBadgeCatalog();
+            const unlockedCount = catalog.filter(badge => awarded[badge.id] || this.getBadgeCurrentProgress(badge, progress) >= badge.threshold).length;
+            if (this.achievementsStatus) {
+                this.achievementsStatus.textContent = this.t('achievements.status', {
+                    unlocked: this.formatInterfaceNumber(unlockedCount),
+                    total: this.formatInterfaceNumber(catalog.length)
+                });
+            }
+            this.achievementsGrid.innerHTML = catalog.map(badge => this.renderAchievementCard(badge, awarded[badge.id], progress)).join('');
+        }
+
+        renderAchievementCard(badge, award, progress) {
+            // Render one achievement card with badge image, description, and current progress.
+            const current = this.getBadgeCurrentProgress(badge, progress);
+            const achieved = current >= badge.threshold;
+            const issued = Boolean(award);
+            const progressText = this.t('achievements.progress', {
+                current: this.formatInterfaceNumber(current),
+                target: this.formatInterfaceNumber(badge.threshold)
+            });
+            return `
+                <article class="achievement-card ${achieved || issued ? 'achievement-card-unlocked' : 'achievement-card-locked'}">
+                    <div class="achievement-image-wrap">
+                        <img src="${this.escapeHtml(badge.image)}"
+                            alt="${this.escapeHtml(badge.name)}"
+                            loading="lazy">
+                    </div>
+                    <div class="achievement-copy">
+                        <h3>${this.escapeHtml(badge.name)}</h3>
+                        <p>${this.escapeHtml(badge.description)}</p>
+                        <small>${this.escapeHtml(issued ? this.t('achievements.unlocked') : achieved ? this.t('achievements.readyToIssue') : progressText)}</small>
+                    </div>
+                </article>
+            `;
+        }
+
+        getBadgeCurrentProgress(badge, progress = this.getBadgeProgressSnapshot()) {
+            // Return the matching progress number for a unique, category, or IUCN badge.
+            if (badge.track === 'unique') return progress.uniqueSpecies;
+            if (badge.track === 'category') return progress.categories[badge.category] || 0;
+            if (badge.track === 'iucn') return progress.iucn[badge.status] || 0;
+            return 0;
+        }
+
+        getDefaultNostrPublishRelays() {
+            // Hardcoded publish fallbacks are optional and visible in relay settings.
+            return ['wss://relay.damus.io', 'wss://nos.lol', 'wss://relay.primal.net', 'wss://relay.nostr.band'];
+        }
+
+        getDefaultNostrProfileRelays() {
+            // Profile lookup defaults include profile-heavy relays as optional fallbacks.
+            return [
+                'wss://purplepag.es',
+                'wss://relay.damus.io',
+                'wss://nos.lol',
+                'wss://relay.primal.net',
+                'wss://relay.snort.social'
+            ];
+        }
+
+        shouldUseNostrDefaultRelays() {
+            // Defaults stay enabled unless advanced users explicitly turn them off.
+            return localStorage.getItem('birdNostrUseDefaultRelays') !== 'false';
+        }
+
+        getNostrPersonalRelays() {
+            // Read visitor-managed relay URLs from localStorage.
+            try {
+                const relays = JSON.parse(localStorage.getItem('birdNostrPersonalRelays') || '[]');
+                return Array.isArray(relays) ? relays.filter(url => /^wss:\/\//i.test(url)) : [];
+            } catch (error) {
+                return [];
+            }
+        }
+
+        saveNostrPersonalRelays(relays) {
+            // Persist personal relays after de-duplicating valid websocket URLs.
+            const normalized = [...new Set(relays.map(url => this.normalizeNostrRelayUrl(url)).filter(Boolean))];
+            localStorage.setItem('birdNostrPersonalRelays', JSON.stringify(normalized));
+            this.renderNostrRelaySettings();
+        }
+
+        normalizeNostrRelayUrl(value) {
+            // Accept only secure websocket relay URLs for browser use.
+            const url = String(value || '').trim().replace(/\/+$/, '');
+            return /^wss:\/\/[^\s]+$/i.test(url) ? url : '';
+        }
+
+        openNostrRelayModal(section = 'relays') {
+            // Open Nostr settings from the Settings submenu and focus the requested section.
+            this.hideDropdown();
+            this.lastNostrSettingsTrigger = section === 'blocked' ? this.nostrBlockedEventsSettings : this.nostrRelaySettings;
+            this.renderNostrRelaySettings();
+            this.configureNostrSettingsView(section);
+            if (this.nostrRelayModal) {
+                this.nostrRelayModal.hidden = false;
+                document.body.classList.add('ai-consent-open');
+                requestAnimationFrame(() => {
+                    const target = section === 'blocked' ? this.nostrBlockedEventsSection : this.nostrRelaysSection;
+                    target?.scrollIntoView({ block: 'start' });
+                    target?.focus({ preventScroll: true });
+                });
+            }
+        }
+
+        configureNostrSettingsView(section = 'relays') {
+            // Show only the Nostr settings section requested by the submenu item.
+            const showBlocked = section === 'blocked';
+            if (this.nostrRelaysSection) this.nostrRelaysSection.hidden = showBlocked;
+            if (this.nostrBlockedEventsSection) this.nostrBlockedEventsSection.hidden = !showBlocked;
+            if (this.nostrRelayHelp) this.nostrRelayHelp.hidden = showBlocked;
+            if (this.nostrRelayTitle) {
+                this.nostrRelayTitle.textContent = showBlocked
+                    ? this.t('nostr.blockedEventsTitle')
+                    : this.t('nostr.relaysTitle');
+            }
+            if (this.nostrRelayIntro) {
+                this.nostrRelayIntro.textContent = showBlocked
+                    ? this.t('nostr.blockedDiariesIntro')
+                    : this.t('nostr.relaysIntro');
+            }
+        }
+
+        closeNostrRelayModal() {
+            // Close Nostr settings without changing any saved relay or blocklist values.
+            if (this.nostrRelayModal) this.nostrRelayModal.hidden = true;
+            if (this.nostrRelayInput) this.nostrRelayInput.value = '';
+            this.showNostrRelayStatus('');
+            document.body.classList.remove('ai-consent-open');
+            this.lastNostrSettingsTrigger?.focus();
+        }
+
+        renderNostrRelaySettings() {
+            // Render personal and optional default relays in the relay settings modal.
+            const personalRelays = this.getNostrPersonalRelays();
+            const defaultRelays = [...new Set([...this.getDefaultNostrPublishRelays(), ...this.getDefaultNostrProfileRelays()])];
+            if (this.nostrUseDefaultRelays) this.nostrUseDefaultRelays.checked = this.shouldUseNostrDefaultRelays();
+            if (this.nostrPersonalRelayList) {
+                this.nostrPersonalRelayList.innerHTML = personalRelays.length
+                    ? personalRelays.map(url => this.renderNostrRelayRow(url, { removable: true })).join('')
+                    : `<p class="nostr-relay-empty">${this.escapeHtml(this.t('nostr.noPersonalRelays'))}</p>`;
+            }
+            if (this.nostrDefaultRelayList) {
+                this.nostrDefaultRelayList.innerHTML = defaultRelays.map(url => this.renderNostrRelayRow(url, { removable: false })).join('');
+            }
+            this.renderBlockedNostrDiaries();
+        }
+
+        renderNostrRelayRow(url, { removable }) {
+            // Render one relay row and optionally attach a remove action for personal relays.
+            return `
+                <div class="nostr-relay-row">
+                    <code>${this.escapeHtml(url)}</code>
+                    ${removable ? `
+                        <button class="diary-overview-note-action" type="button"
+                            aria-label="${this.escapeHtml(this.t('nostr.removeRelay'))}"
+                            title="${this.escapeHtml(this.t('nostr.removeRelay'))}"
+                            data-nostr-remove-relay="${this.escapeHtml(url)}">
+                            <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                        </button>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        addNostrPersonalRelay() {
+            // Add one personal relay URL after validating it as a secure websocket address.
+            const relayUrl = this.normalizeNostrRelayUrl(this.nostrRelayInput?.value);
+            if (!relayUrl) {
+                this.showNostrRelayStatus(this.t('nostr.invalidRelay'), true);
+                return;
+            }
+            this.saveNostrPersonalRelays([...this.getNostrPersonalRelays(), relayUrl]);
+            if (this.nostrRelayInput) this.nostrRelayInput.value = '';
+            this.showNostrRelayStatus(this.t('nostr.relayAdded'));
+        }
+
+        removeNostrPersonalRelay(relayUrl) {
+            // Remove one personal relay URL from local storage.
+            this.saveNostrPersonalRelays(this.getNostrPersonalRelays().filter(url => url !== relayUrl));
+            this.showNostrRelayStatus(this.t('nostr.relayRemoved'));
+        }
+
+        renderBlockedNostrDiaries() {
+            // Render locally blocked Nostr diary events so visitors can unblock accidental deletions.
+            if (!this.nostrBlockedDiaryList) return;
+            const entries = Object.entries(this.getNostrEventBlockList())
+                .filter(([, metadata]) => Number(metadata?.kind) === 30078 || metadata?.reason === 'local-diary-delete')
+                .sort(([, left], [, right]) => String(right?.blockedAt || '').localeCompare(String(left?.blockedAt || '')));
+            if (!entries.length) {
+                this.nostrBlockedDiaryList.innerHTML = `<p class="nostr-relay-empty">${this.escapeHtml(this.t('nostr.noBlockedDiaries'))}</p>`;
+                return;
+            }
+            this.nostrBlockedDiaryList.innerHTML = entries.map(([eventId, metadata]) => this.renderBlockedNostrDiaryRow(eventId, metadata)).join('');
+        }
+
+        renderBlockedNostrDiaryRow(eventId, metadata = {}) {
+            // Show one blocked diary event with enough context to recognize and unblock it.
+            const blockedDate = metadata.blockedAt
+                ? new Date(metadata.blockedAt).toLocaleString(this.currentLanguage || undefined)
+                : this.t('common.unknown');
+            const species = metadata.scientificName || this.t('common.unknown');
+            const noteName = metadata.noteName || this.t('nostr.blockedDiaryNote');
+            return `
+                <div class="nostr-blocked-diary-row">
+                    <div class="nostr-blocked-diary-copy">
+                        <strong>${this.escapeHtml(noteName)}</strong>
+                        <span>${this.escapeHtml(species)}</span>
+                        <small>${this.escapeHtml(this.t('nostr.blockedOn'))}: ${this.escapeHtml(blockedDate)}</small>
+                        <code>${this.escapeHtml(this.shortenNostrKey(eventId))}</code>
+                    </div>
+                    <button class="ai-secondary-button nostr-unblock-button" type="button"
+                        data-nostr-unblock-event="${this.escapeHtml(eventId)}">
+                        ${this.escapeHtml(this.t('nostr.unblockDiary'))}
+                    </button>
+                </div>
+            `;
+        }
+
+        unblockNostrEvent(eventId) {
+            // Remove one event ID from the local Nostr blocklist and refresh the settings view.
+            if (!eventId) return;
+            const blockList = this.getNostrEventBlockList();
+            delete blockList[String(eventId)];
+            this.saveNostrEventBlockList(blockList);
+            this.renderBlockedNostrDiaries();
+            this.showNostrRelayStatus(this.t('nostr.diaryUnblocked'));
+        }
+
+        showNostrRelayStatus(message, isError = false) {
+            // Report relay settings validation and save status.
+            if (!this.nostrRelayStatus) return;
+            this.nostrRelayStatus.textContent = message || '';
+            this.nostrRelayStatus.classList.toggle('error', Boolean(isError));
+        }
+
+        logoutNostr() {
+            // Remove all Nostr identity data owned by Birds.name from persistent and session storage.
+            [
+                'birdNostrPublicKey',
+                'birdNostrPublicKeyHex',
+                'birdNostrLoginMethod',
+                'birdNostrPublicKeySavedAt',
+                'birdNostrProfile'
+            ].forEach(key => localStorage.removeItem(key));
+            [
+                'birdNostrSessionPrivateKeyHex',
+                'birdNostrSessionPrivateKeySavedAt'
+            ].forEach(key => sessionStorage.removeItem(key));
+            this.currentNostrKeyPair = null;
+            if (this.nostrPrivateKey) this.nostrPrivateKey.value = '';
+            if (this.nostrPublicKey) this.nostrPublicKey.value = '';
+            if (this.nostrPrivateLoginKey) this.nostrPrivateLoginKey.value = '';
+            if (this.nostrKeyResult) this.nostrKeyResult.hidden = true;
+            if (this.nostrLoginPanel) this.nostrLoginPanel.hidden = true;
+            this.renderSavedNostrPublicKey();
+            this.showNostrStatus(this.t('nostr.loggedOut'));
+            window.setTimeout(() => this.showNostrStatus(''), 2400);
+        }
+
+        async signNostrEvent(event) {
+            // Sign Nostr events with a browser signer first, falling back to this tab's private-key session.
+            const eventWithId = {
+                ...event,
+                id: await this.calculateNostrEventId(event)
+            };
+            if (window.nostr?.signEvent) {
+                return window.nostr.signEvent(eventWithId);
+            }
+            const privateHex = sessionStorage.getItem('birdNostrSessionPrivateKeyHex');
+            if (!privateHex) throw new Error(this.t('nostr.signerRequired'));
+            return {
+                ...eventWithId,
+                sig: await this.signNostrEventWithPrivateKey(eventWithId, privateHex)
+            };
+        }
+
+        async calculateNostrEventId(event) {
+            // Nostr event IDs are SHA-256 hashes of the canonical serialized event array.
+            const serialized = JSON.stringify([
+                0,
+                event.pubkey,
+                event.created_at,
+                event.kind,
+                event.tags,
+                event.content
+            ]);
+            return this.bytesToHex(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(serialized))));
+        }
+
+        async signNostrEventWithPrivateKey(event, privateHex) {
+            // Sign a Nostr event ID with BIP-340 Schnorr using the temporary session private key.
+            const privateBytes = this.hexToBytes(privateHex);
+            const privateScalar = this.bytesToBigInt(privateBytes);
+            const publicPoint = this.secp256k1Multiply(privateScalar);
+            const curveOrder = BigInt('0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141');
+            const effectivePrivate = (publicPoint.y & 1n) === 0n ? privateScalar : curveOrder - privateScalar;
+            const publicKeyBytes = this.hexToBytes(publicPoint.x.toString(16).padStart(64, '0'));
+            const aux = new Uint8Array(32);
+            crypto.getRandomValues(aux);
+            const auxHash = await this.nostrTaggedHash('BIP0340/aux', aux);
+            const privateEffectiveBytes = this.hexToBytes(effectivePrivate.toString(16).padStart(64, '0'));
+            const t = privateEffectiveBytes.map((value, index) => value ^ auxHash[index]);
+            const messageBytes = this.hexToBytes(event.id);
+            const nonceHash = await this.nostrTaggedHash('BIP0340/nonce', new Uint8Array([...t, ...publicKeyBytes, ...messageBytes]));
+            let nonce = this.bytesToBigInt(nonceHash) % curveOrder;
+            if (nonce === 0n) throw new Error('Schnorr nonce was zero.');
+            const noncePoint = this.secp256k1Multiply(nonce);
+            const effectiveNonce = (noncePoint.y & 1n) === 0n ? nonce : curveOrder - nonce;
+            const rBytes = this.hexToBytes(noncePoint.x.toString(16).padStart(64, '0'));
+            const challengeHash = await this.nostrTaggedHash('BIP0340/challenge', new Uint8Array([...rBytes, ...publicKeyBytes, ...messageBytes]));
+            const challenge = this.bytesToBigInt(challengeHash) % curveOrder;
+            const signatureScalar = this.mod(effectiveNonce + challenge * effectivePrivate, curveOrder);
+            return `${this.bytesToHex(rBytes)}${signatureScalar.toString(16).padStart(64, '0')}`;
+        }
+
+        async nostrTaggedHash(tag, message) {
+            // Compute BIP-340 tagged hashes used by Schnorr nonce and challenge generation.
+            const encoder = new TextEncoder();
+            const tagHash = new Uint8Array(await crypto.subtle.digest('SHA-256', encoder.encode(tag)));
+            return new Uint8Array(await crypto.subtle.digest('SHA-256', new Uint8Array([...tagHash, ...tagHash, ...message])));
+        }
+
+        async publishNostrEvents(events) {
+            // Send signed events to the user's signer relays plus common public relays.
+            const relays = await this.getNostrPublishRelays();
+            const results = await Promise.allSettled(relays.map(relay => this.publishNostrEventsToRelay(relay, events)));
+            return {
+                successRelays: results.filter(result => result.status === 'fulfilled' && result.value).length,
+                attemptedRelays: relays.length
+            };
+        }
+
+        async publishNostrDeletionEvent(eventId, scientificName, entryId) {
+            // Publish a NIP-09 deletion request for a previously published diary note event.
+            const publicHex = localStorage.getItem('birdNostrPublicKeyHex');
+            if (!publicHex) throw new Error(this.t('nostr.loginRequired'));
+            const deletionEvent = await this.signNostrEvent({
+                kind: 5,
+                pubkey: publicHex,
+                created_at: Math.floor(Date.now() / 1000),
+                tags: [
+                    ['e', eventId],
+                    ['k', '30078'],
+                    ['client', 'Birds.name'],
+                    ['species', scientificName || ''],
+                    ['d', `birds.name:diary:${this.observationKey(scientificName)}:${entryId}`]
+                ],
+                content: this.t('nostr.deleteReason')
+            });
+            const result = await this.publishNostrEvents([deletionEvent]);
+            if (result.successRelays < 1) throw new Error(this.t('nostr.deletePublishFailed'));
+            this.storePublishedNostrEvents([deletionEvent]);
+        }
+
+        async getNostrPublishRelays() {
+            // Publish to personal relays first, then signer/default relays according to visitor settings.
+            const personalRelays = this.getNostrPersonalRelays();
+            const signerRelays = [];
+            try {
+                if (window.nostr?.getRelays) {
+                    const relays = await window.nostr.getRelays();
+                    signerRelays.push(...Object.entries(relays || {})
+                        .filter(([, policy]) => policy?.write !== false)
+                        .map(([url]) => url)
+                        .filter(url => /^wss:\/\//i.test(url)));
+                }
+            } catch (error) {
+                console.warn('Could not read Nostr publish relays:', error);
+            }
+            const defaultRelays = this.shouldUseNostrDefaultRelays() ? this.getDefaultNostrPublishRelays() : [];
+            return [...new Set([...personalRelays, ...signerRelays, ...defaultRelays])].slice(0, 12);
+        }
+
+        publishNostrEventsToRelay(relay, events) {
+            // Publish all signed events to one relay and resolve once the relay acknowledges or times out.
+            return new Promise(resolve => {
+                let accepted = 0;
+                let settled = false;
+                const finish = value => {
+                    if (settled) return;
+                    settled = true;
+                    try { socket.close(); } catch (error) { /* Ignore relay close errors. */ }
+                    resolve(value);
+                };
+                let socket;
+                try {
+                    socket = new WebSocket(relay);
+                    const timer = window.setTimeout(() => finish(accepted > 0), 6500);
+                    socket.addEventListener('open', () => {
+                        events.forEach(event => socket.send(JSON.stringify(['EVENT', event])));
+                    });
+                    socket.addEventListener('message', messageEvent => {
+                        try {
+                            const message = JSON.parse(messageEvent.data);
+                            if (message[0] === 'OK' && message[2] === true) accepted += 1;
+                            if (accepted >= events.length) {
+                                window.clearTimeout(timer);
+                                finish(true);
+                            }
+                        } catch (error) {
+                            console.warn('Could not parse Nostr publish response:', error);
+                        }
+                    });
+                    socket.addEventListener('error', () => finish(false));
+                } catch (error) {
+                    console.warn(`Could not publish to Nostr relay ${relay}:`, error);
+                    resolve(false);
+                }
+            });
+        }
+
+        async loadNostrProfile(publicHex = localStorage.getItem('birdNostrPublicKeyHex')) {
+            // Fetch the latest public Nostr kind-0 metadata event and cache its profile fields locally.
+            if (!/^[0-9a-f]{64}$/i.test(publicHex || '')) return null;
+            const relays = await this.getNostrProfileRelays();
+            const profileEvent = await this.fetchLatestNostrMetadataEvent(publicHex.toLowerCase(), relays);
+            if (!profileEvent?.content) return null;
+            try {
+                const profile = JSON.parse(profileEvent.content);
+                localStorage.setItem('birdNostrProfile', JSON.stringify({
+                    ...profile,
+                    publicHex: publicHex.toLowerCase(),
+                    fetchedAt: new Date().toISOString(),
+                    relay: profileEvent.relay
+                }));
+                this.renderSavedNostrPublicKey();
+                return profile;
+            } catch (error) {
+                console.warn('Could not parse Nostr profile metadata:', error);
+                return null;
+            }
+        }
+
+        async getNostrProfileRelays() {
+            // Prefer personal and signer relays, then optional app defaults for profile lookup.
+            const personalRelays = this.getNostrPersonalRelays();
+            const signerRelays = [];
+            try {
+                if (window.nostr?.getRelays) {
+                    const relays = await window.nostr.getRelays();
+                    signerRelays.push(...Object.keys(relays || {}).filter(url => /^wss:\/\//i.test(url)));
+                }
+            } catch (error) {
+                console.warn('Could not read Nostr signer relays:', error);
+            }
+            const defaultRelays = this.shouldUseNostrDefaultRelays() ? this.getDefaultNostrProfileRelays() : [];
+            return [...new Set([...personalRelays, ...signerRelays, ...defaultRelays])].slice(0, 12);
+        }
+
+        fetchLatestNostrMetadataEvent(publicHex, relays) {
+            // Query several relays briefly and return the newest metadata event found.
+            return new Promise(resolve => {
+                const requestId = Math.random().toString(36).slice(2);
+                const sockets = [];
+                let latestEvent = null;
+                let settled = false;
+                let openedRelays = 0;
+                let endedRelays = 0;
+                const closeAll = () => sockets.forEach(socket => {
+                    try { socket.close(); } catch (error) { /* Ignore relay close errors. */ }
+                });
+                const finish = () => {
+                    if (settled) return;
+                    settled = true;
+                    closeAll();
+                    resolve(latestEvent);
+                };
+                const timer = window.setTimeout(finish, 6500);
+                const markRelayDone = () => {
+                    endedRelays += 1;
+                    if (openedRelays > 0 && endedRelays >= openedRelays) {
+                        window.clearTimeout(timer);
+                        finish();
+                    }
+                };
+                relays.forEach(relay => {
+                    try {
+                        const socket = new WebSocket(relay);
+                        sockets.push(socket);
+                        socket.addEventListener('open', () => {
+                            openedRelays += 1;
+                            socket.send(JSON.stringify(['REQ', requestId, { kinds: [0], authors: [publicHex], limit: 5 }]));
+                        });
+                        socket.addEventListener('message', event => {
+                            try {
+                                const message = JSON.parse(event.data);
+                                if (message[1] !== requestId) return;
+                                if (message[0] === 'EVENT') {
+                                    const nostrEvent = { ...message[2], relay };
+                                    if (!latestEvent || Number(nostrEvent.created_at || 0) > Number(latestEvent.created_at || 0)) {
+                                        latestEvent = nostrEvent;
+                                    }
+                                }
+                                if (message[0] === 'EOSE') {
+                                    markRelayDone();
+                                }
+                            } catch (error) {
+                                console.warn('Could not read Nostr relay message:', error);
+                            }
+                        });
+                        socket.addEventListener('error', markRelayDone);
+                        socket.addEventListener('close', () => {
+                            if (socket.readyState !== WebSocket.OPEN) markRelayDone();
+                        });
+                    } catch (error) {
+                        console.warn(`Could not connect to Nostr relay ${relay}:`, error);
+                    }
+                });
+            });
+        }
+
+        async loadNostrApplicationData(publicHex = localStorage.getItem('birdNostrPublicKeyHex')) {
+            // After login, fetch this user's Birds.name NIP-78 app data so a fresh browser restores their diary.
+            if (!/^[0-9a-f]{64}$/i.test(publicHex || '')) return;
+            if (this.nostrAppDataLoadingPubKey === publicHex) return;
+            this.nostrAppDataLoadingPubKey = publicHex;
+            this.showNostrStatus(this.t('nostr.fetchingAppData'));
+            try {
+                const relays = await this.getNostrApplicationDataRelays();
+                const events = await this.fetchNostrApplicationEvents(publicHex.toLowerCase(), relays);
+                const imported = this.importNostrApplicationEvents(events);
+                if (imported.notes || imported.species || imported.badges) {
+                    this.showNostrStatus(this.t('nostr.importedAppData', {
+                        notes: this.formatInterfaceNumber(imported.notes),
+                        species: this.formatInterfaceNumber(imported.species),
+                        badges: this.formatInterfaceNumber(imported.badges)
+                    }));
+                } else {
+                    this.showNostrStatus(this.t('nostr.noAppDataFound'));
+                }
+            } catch (error) {
+                console.warn('Could not load Birds.name Nostr app data:', error);
+                this.showNostrStatus(this.t('nostr.fetchAppDataFailed'), true);
+            } finally {
+                this.nostrAppDataLoadingPubKey = '';
+            }
+        }
+
+        async getNostrApplicationDataRelays() {
+            // Read app data from personal, signer, and default relays because users may publish from any of them.
+            const personalRelays = this.getNostrPersonalRelays();
+            const signerRelays = [];
+            try {
+                if (window.nostr?.getRelays) {
+                    const relays = await window.nostr.getRelays();
+                    signerRelays.push(...Object.keys(relays || {}).filter(url => /^wss:\/\//i.test(url)));
+                }
+            } catch (error) {
+                console.warn('Could not read Nostr signer relays for app data:', error);
+            }
+            const defaultRelays = this.shouldUseNostrDefaultRelays()
+                ? [...this.getDefaultNostrPublishRelays(), ...this.getDefaultNostrProfileRelays()]
+                : [];
+            return [...new Set([...personalRelays, ...signerRelays, ...defaultRelays])].slice(0, 12);
+        }
+
+        fetchNostrApplicationEvents(publicHex, relays) {
+            // Query relays for Birds.name replaceable app data and deletion events owned by this account.
+            return new Promise(resolve => {
+                const requestId = Math.random().toString(36).slice(2);
+                const eventsById = new Map();
+                const sockets = [];
+                const finishedRelays = new Set();
+                let openedRelays = 0;
+                let settled = false;
+                const closeAll = () => sockets.forEach(socket => {
+                    try { socket.close(); } catch (error) { /* Ignore relay close errors. */ }
+                });
+                const finish = () => {
+                    if (settled) return;
+                    settled = true;
+                    closeAll();
+                    resolve([...eventsById.values()]);
+                };
+                const timer = window.setTimeout(finish, 8500);
+                const markRelayDone = relay => {
+                    if (finishedRelays.has(relay)) return;
+                    finishedRelays.add(relay);
+                    if (openedRelays > 0 && finishedRelays.size >= openedRelays) {
+                        window.clearTimeout(timer);
+                        finish();
+                    }
+                };
+                relays.forEach(relay => {
+                    try {
+                        const socket = new WebSocket(relay);
+                        sockets.push(socket);
+                        socket.addEventListener('open', () => {
+                            openedRelays += 1;
+                            socket.send(JSON.stringify(['REQ', requestId, {
+                                kinds: [30078, 30009, 8, 5],
+                                authors: [publicHex],
+                                limit: 1000
+                            }]));
+                        });
+                        socket.addEventListener('message', event => {
+                            try {
+                                const message = JSON.parse(event.data);
+                                if (message[1] !== requestId) return;
+                                if (message[0] === 'EVENT' && message[2]?.id) {
+                                    eventsById.set(message[2].id, { ...message[2], relay });
+                                }
+                                if (message[0] === 'EOSE') markRelayDone(relay);
+                            } catch (error) {
+                                console.warn('Could not parse Nostr app-data response:', error);
+                            }
+                        });
+                        socket.addEventListener('error', () => markRelayDone(relay));
+                        socket.addEventListener('close', () => {
+                            if (socket.readyState !== WebSocket.OPEN) markRelayDone(relay);
+                        });
+                    } catch (error) {
+                        console.warn(`Could not connect to Nostr relay ${relay}:`, error);
+                    }
+                });
+                if (!relays.length) {
+                    window.clearTimeout(timer);
+                    finish();
+                }
+            });
+        }
+
+        importNostrApplicationEvents(events = []) {
+            // Merge fetched Birds.name events into local diary state while respecting NIP-09 and local blocklist.
+            const deletedEventIds = this.getNostrDeletedEventIds(events);
+            const latestEvents = this.getLatestNostrApplicationEvents(events, deletedEventIds);
+            const changedSpecies = new Set();
+            let importedNotes = 0;
+            let importedSpecies = 0;
+            const importedBadges = this.importNostrBadgeAwards(events);
+
+            latestEvents.forEach(event => {
+                let payload = null;
+                try {
+                    payload = JSON.parse(event.content || '{}');
+                } catch (error) {
+                    return;
+                }
+                if (payload?.app !== 'birds.name') return;
+                if (payload.type === 'diary-note') {
+                    const changed = this.importNostrDiaryNoteEvent(event, payload);
+                    if (changed) {
+                        importedNotes += 1;
+                        changedSpecies.add(this.observationKey(payload.scientificName));
+                    }
+                }
+                if (payload.type === 'observed-species-summary') {
+                    const changed = this.importNostrObservedSpeciesSummary(payload);
+                    importedSpecies += changed.count;
+                    changed.keys.forEach(key => changedSpecies.add(key));
+                }
+            });
+
+            if (importedNotes || importedSpecies) {
+                this.saveObservationDiary();
+                changedSpecies.forEach(key => {
+                    const record = this.observationDiary[key];
+                    if (record?.scientificName) this.refreshObservationUi(record.scientificName);
+                });
+                if (this.activeDiaryOverview) this.showDiaryOverview();
+                this.updateCategoryMenuCounts();
+            }
+
+            return { notes: importedNotes, species: importedSpecies, badges: importedBadges };
+        }
+
+        importNostrBadgeAwards(events = []) {
+            // Restore locally forgotten Birds.name badge awards from NIP-58 kind-8 events on relays.
+            const catalogById = new Map(this.getNostrBadgeCatalog().map(badge => [badge.id, badge]));
+            const awarded = this.getStoredNostrAwardedBadges();
+            let imported = 0;
+            events
+                .filter(event => Number(event.kind) === 8)
+                .forEach(event => {
+                    const badgeRef = this.getNostrEventTag(event, 'a');
+                    const badgeId = String(badgeRef || '').split(':').slice(2).join(':');
+                    const badge = catalogById.get(badgeId);
+                    if (!badge || awarded[badge.id]) return;
+                    awarded[badge.id] = {
+                        id: badge.id,
+                        threshold: badge.threshold,
+                        track: badge.track,
+                        awardEventId: event.id,
+                        awardedAt: new Date(Number(event.created_at || 0) * 1000).toISOString(),
+                        restoredFromRelay: true
+                    };
+                    imported += 1;
+                });
+            if (imported) {
+                this.saveStoredNostrAwardedBadges(awarded);
+                if (!this.achievementsModal?.hidden) this.renderAchievements();
+            }
+            return imported;
+        }
+
+        getNostrDeletedEventIds(events = []) {
+            // Collect NIP-09 deletion targets so stale diary events are not restored from relays.
+            const deleted = new Set();
+            events
+                .filter(event => Number(event.kind) === 5)
+                .forEach(event => {
+                    const tags = Array.isArray(event.tags) ? event.tags : [];
+                    tags.filter(tag => tag?.[0] === 'e' && tag[1]).forEach(tag => deleted.add(String(tag[1])));
+                });
+            return deleted;
+        }
+
+        getLatestNostrApplicationEvents(events = [], deletedEventIds = new Set()) {
+            // Keep only the newest replaceable Birds.name event for each d tag.
+            const latestByDTag = new Map();
+            this.filterBlockedNostrEvents(events)
+                .filter(event => Number(event.kind) === 30078 && !deletedEventIds.has(event.id))
+                .forEach(event => {
+                    const dTag = (Array.isArray(event.tags) ? event.tags : []).find(tag => tag?.[0] === 'd')?.[1] || '';
+                    if (!dTag.startsWith('birds.name:')) return;
+                    const current = latestByDTag.get(dTag);
+                    if (!current || Number(event.created_at || 0) > Number(current.created_at || 0)) {
+                        latestByDTag.set(dTag, event);
+                    }
+                });
+            return [...latestByDTag.values()];
+        }
+
+        importNostrDiaryNoteEvent(event, payload) {
+            // Import one remote diary note unless a newer local copy already exists.
+            const scientificName = String(payload.scientificName || this.getNostrEventTag(event, 'species') || '').trim();
+            if (!scientificName) return false;
+            const entryId = this.getNostrDiaryEntryId(event) || `${event.id.slice(0, 16)}`;
+            const record = this.ensureObservationRecord(scientificName);
+            const remoteUpdatedAt = payload.updatedAt || new Date(Number(event.created_at || 0) * 1000).toISOString();
+            const existing = record.observations.find(entry => entry.id === entryId);
+            if (existing && new Date(existing.updatedAt || existing.createdAt || 0) > new Date(remoteUpdatedAt || 0)) {
+                if (!existing.nostrPublishedEventId) existing.nostrPublishedEventId = event.id;
+                return false;
+            }
+            const importedEntry = {
+                id: entryId,
+                date: payload.observedAt || remoteUpdatedAt,
+                note: payload.note || '',
+                name: payload.noteName || '',
+                draft: false,
+                createdAt: payload.observedAt || remoteUpdatedAt,
+                updatedAt: remoteUpdatedAt,
+                location: this.normalizeNostrDiaryLocation(payload.location),
+                nostrPublishedEventId: event.id,
+                nostrPublishedAt: new Date(Number(event.created_at || 0) * 1000).toISOString(),
+                nostrPublishHistory: [{ id: event.id, publishedAt: new Date(Number(event.created_at || 0) * 1000).toISOString() }]
+            };
+            importedEntry.name = importedEntry.name || this.getObservationEntryName(scientificName, importedEntry);
+            if (existing) {
+                Object.assign(existing, importedEntry);
+            } else {
+                record.observations.unshift(importedEntry);
+            }
+            record.observationCount = Math.max(
+                this.getObservationCount(scientificName),
+                Number(payload.observationCount) || 0,
+                record.observations.length
+            );
+            record.seen = true;
+            record.updatedAt = new Date().toISOString();
+            record.observations.sort((left, right) =>
+                new Date(right.date || right.updatedAt || 0) - new Date(left.date || left.updatedAt || 0)
+            );
+            return true;
+        }
+
+        importNostrObservedSpeciesSummary(payload) {
+            // Import aggregate observed counts for species that may not have diary notes.
+            const changedKeys = new Set();
+            const species = Array.isArray(payload.species) ? payload.species : [];
+            species.forEach(item => {
+                const scientificName = String(item.scientificName || '').trim();
+                if (!scientificName) return;
+                const record = this.ensureObservationRecord(scientificName);
+                const nextCount = Math.max(Number(record.observationCount) || 0, Number(item.observationCount) || 0);
+                if (nextCount <= (Number(record.observationCount) || 0) && record.seen) return;
+                record.observationCount = nextCount;
+                record.seen = nextCount > 0 || record.observations.length > 0;
+                record.updatedAt = new Date().toISOString();
+                changedKeys.add(this.observationKey(scientificName));
+            });
+            return { count: changedKeys.size, keys: changedKeys };
+        }
+
+        normalizeNostrDiaryLocation(location) {
+            // Keep only valid coordinates and a small source label from remote diary data.
+            if (!location) return null;
+            const lat = Number(location.lat);
+            const lng = Number(location.lng);
+            if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+            return {
+                lat,
+                lng,
+                source: String(location.source || 'nostr').slice(0, 40)
+            };
+        }
+
+        getNostrEventTag(event, tagName) {
+            // Read the first value for a Nostr event tag.
+            return (Array.isArray(event.tags) ? event.tags : []).find(tag => tag?.[0] === tagName)?.[1] || '';
+        }
+
+        getNostrDiaryEntryId(event) {
+            // Recover the original local diary entry ID from the Birds.name d tag.
+            const dTag = this.getNostrEventTag(event, 'd');
+            const parts = String(dTag || '').split(':');
+            return parts[0] === 'birds.name' && parts[1] === 'diary' ? parts.slice(3).join(':') : '';
+        }
+
         getObservedBirdsForCurrentLanguage() {
             // Build the observed category from diary records, not only from the translated visible species list.
             const observedBirds = [];
@@ -2304,6 +3932,51 @@
                 option.classList.toggle('active', active);
                 option.setAttribute('aria-pressed', String(active));
             });
+        }
+
+        updateCategoryMenuCounts() {
+            // Show current result counts beside category and IUCN menu items.
+            if (!this.dropdownMenu) return;
+            const categoryCounts = this.getCategoryMenuCounts();
+            this.dropdownMenu.querySelectorAll('[data-category-count]').forEach(element => {
+                const key = element.dataset.categoryCount;
+                element.textContent = this.formatInterfaceNumber(categoryCounts[key] || 0);
+            });
+
+            const iucnCounts = this.getIucnMenuCounts();
+            this.dropdownMenu.querySelectorAll('[data-iucn-count]').forEach(element => {
+                const key = element.dataset.iucnCount;
+                element.textContent = this.formatInterfaceNumber(iucnCounts[key] || 0);
+            });
+        }
+
+        getCategoryMenuCounts() {
+            // Count categories from the currently loaded language list plus browser-local observed birds.
+            const counts = {
+                all: this.birds.length,
+                water: 0,
+                predator: 0,
+                song: 0,
+                parrot: 0,
+                game: 0,
+                observed: this.getObservedBirdsForCurrentLanguage().length
+            };
+            this.birds.forEach(bird => {
+                ['water', 'predator', 'song', 'parrot', 'game'].forEach(category => {
+                    if (this.birdMatchesCategory(bird, category)) counts[category] += 1;
+                });
+            });
+            return counts;
+        }
+
+        getIucnMenuCounts() {
+            // Count visible loaded birds by locally generated IUCN status code.
+            const counts = {};
+            this.birds.forEach(bird => {
+                const code = this.getLocalIucnStatus(bird.latin)?.code;
+                if (code) counts[code] = (counts[code] || 0) + 1;
+            });
+            return counts;
         }
 
         getLocalIucnStatus(scientificName) {
@@ -4227,6 +5900,34 @@
             this.refreshObservationUi(scientificName);
         }
 
+        async confirmAndDeleteObservationEntry(scientificName, entryId) {
+            // Optionally publish a Nostr deletion event before removing a locally stored diary note.
+            const record = this.getObservationRecord(scientificName);
+            const entry = record?.observations?.find(item => item.id === entryId);
+            if (!entry) return;
+            if (!window.confirm(this.t('diary.confirmDeleteNote'))) return;
+            const eventId = entry.nostrPublishedEventId;
+            if (eventId && window.confirm(this.t('nostr.confirmDeletePublished'))) {
+                try {
+                    await this.publishNostrDeletionEvent(eventId, scientificName, entryId);
+                } catch (error) {
+                    console.warn('Nostr deletion publish failed:', error);
+                    if (!window.confirm(this.t('nostr.deletePublishFailedContinue'))) return;
+                }
+            }
+            if (eventId) {
+                this.addNostrEventToBlockList(eventId, {
+                    kind: 30078,
+                    d: `birds.name:diary:${this.observationKey(scientificName)}:${entryId}`,
+                    scientificName,
+                    entryId,
+                    noteName: entry.name || '',
+                    reason: 'local-diary-delete'
+                });
+            }
+            this.deleteObservationEntry(scientificName, entryId);
+        }
+
         discardEmptyDraftObservations(record) {
             // Drop unsaved empty draft notes so add/close cycles do not create blank diary entries.
             if (!record?.observations) return;
@@ -4281,6 +5982,7 @@
             }
 
             this.refreshDiaryOverviewIfActive();
+            this.updateCategoryMenuCounts();
         }
 
         refreshDiaryOverviewIfActive() {
@@ -4482,16 +6184,22 @@
                         </select>
                     </label>
                     <div class="diary-overview-actions">
-                        <button class="diary-summary-button" type="button" data-diary-summary>
-                            <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
-                            ${this.escapeHtml(this.t('diary.summarize'))}
+                        <div class="diary-overview-summary-controls">
+                            <button class="diary-summary-button" type="button" data-diary-summary>
+                                <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
+                                ${this.escapeHtml(this.t('diary.summarize'))}
+                            </button>
+                            <label class="diary-summary-range">
+                                <span>${this.escapeHtml(this.t('diary.summaryRange'))}</span>
+                                <select data-diary-summary-range>
+                                    ${this.renderDiarySummaryRangeOptions(summaryRange)}
+                                </select>
+                            </label>
+                        </div>
+                        <button class="diary-summary-button diary-publish-button" type="button" data-diary-publish-all>
+                            <i class="fa-solid fa-feather" aria-hidden="true"></i>
+                            ${this.escapeHtml(this.t('nostr.publishAllDiary'))}
                         </button>
-                        <label class="diary-summary-range">
-                            <span>${this.escapeHtml(this.t('diary.summaryRange'))}</span>
-                            <select data-diary-summary-range>
-                                ${this.renderDiarySummaryRangeOptions(summaryRange)}
-                            </select>
-                        </label>
                         <span class="diary-summary-scope">${this.escapeHtml(this.t('diary.summaryScope', {
                             count: this.formatInterfaceNumber(summaryEntries.length)
                         }))}</span>
@@ -4529,6 +6237,8 @@
         renderDiarySummaryRangeOptions(selectedRange) {
             // Render the AI summary time-window choices without affecting the visible diary note list.
             const ranges = [
+                ['1', this.t('diary.summaryLast1Day')],
+                ['3', this.t('diary.summaryLast3Days')],
                 ['10', this.t('diary.summaryLast10Days')],
                 ['30', this.t('diary.summaryLast30Days')],
                 ['90', this.t('diary.summaryLast90Days')],
@@ -4581,6 +6291,11 @@
             const locationText = this.formatDiaryLocation(item.entry.location);
             const imageUrl = item.bird?.apiData?.thumbnail || 'img/origami_bird_B.png';
             const isHidden = this.diaryHiddenSpecies.has(this.observationKey(item.scientificName));
+            const isPublished = this.isDiaryEntryPublished(item.entry);
+            const publishIsCurrent = this.isDiaryEntryPublishCurrent(item.entry);
+            const publishLabel = this.isDiaryEntryPublishOutdated(item.entry)
+                ? this.t('nostr.updatePublishedNote')
+                : this.t('nostr.publishNote');
             return `
                 <article class="diary-overview-card ${isHidden ? 'diary-overview-card-hidden' : ''}">
                     <button class="diary-overview-bird" type="button"
@@ -4601,6 +6316,21 @@
                         <div class="diary-overview-note-heading">
                             <h3>${this.escapeHtml(item.noteName)}</h3>
                             <span class="diary-overview-note-actions">
+                                ${publishIsCurrent ? `
+                                    <span class="diary-overview-note-action diary-overview-note-action-disabled"
+                                        aria-label="${this.escapeHtml(this.t('nostr.alreadyPublished'))}"
+                                        title="${this.escapeHtml(this.t('nostr.alreadyPublished'))}">
+                                        <i class="fa-solid fa-feather" aria-hidden="true"></i>
+                                    </span>
+                                ` : `
+                                    <button class="diary-overview-note-action" type="button"
+                                        aria-label="${this.escapeHtml(publishLabel)}"
+                                        title="${this.escapeHtml(publishLabel)}"
+                                        data-diary-publish-note="${this.escapeHtml(item.entry.id)}"
+                                        data-scientific-name="${this.escapeHtml(item.scientificName)}">
+                                        <i class="fa-solid fa-feather" aria-hidden="true"></i>
+                                    </button>
+                                `}
                                 <button class="diary-overview-note-action" type="button"
                                     aria-label="${this.escapeHtml(this.t('diary.edit'))}"
                                     title="${this.escapeHtml(this.t('diary.edit'))}"
@@ -4618,6 +6348,13 @@
                             </span>
                         </div>
                         <p class="diary-overview-date">${this.escapeHtml(dateLabel)}</p>
+                        ${isPublished ? `
+                            <p class="diary-overview-nostr-id">
+                                <i class="fa-solid fa-feather" aria-hidden="true"></i>
+                                ${this.escapeHtml(this.t('nostr.publishedEvent'))}
+                                <code>${this.escapeHtml(this.shortenNostrKey(item.entry.nostrPublishedEventId))}</code>
+                            </p>
+                        ` : ''}
                         <p>${this.escapeHtml(notePreview)}</p>
                         ${locationText ? `
                             <p class="diary-overview-location">
@@ -4628,6 +6365,637 @@
                     </div>
                 </article>
             `;
+        }
+
+        getDiaryOverviewEntryById(scientificName, entryId) {
+            // Rebuild one publishable diary overview item from the current local diary state.
+            const key = this.observationKey(scientificName);
+            const record = this.getObservationRecord(scientificName);
+            const entry = record?.observations?.find(item => item.id === entryId);
+            if (!record || !entry) return null;
+            const bird = this.getBirdByScientificName(scientificName);
+            const taxonomy = this.taxonomyBySciName.get(key) || {};
+            return {
+                scientificName: record.scientificName || scientificName,
+                englishName: taxonomy.comName || bird?.englishName || bird?.name || '',
+                localName: bird?.name || '',
+                noteName: entry.name || this.getObservationEntryName(scientificName, entry),
+                entry,
+                record,
+                bird
+            };
+        }
+
+        openNostrPublishModal(entries = []) {
+            // Show a review checklist before any diary note is signed or sent to Nostr relays.
+            if (!this.nostrPublishModal || !this.nostrPublishList) return;
+            if (!localStorage.getItem('birdNostrPublicKeyHex')) {
+                this.openNostrKeyModal();
+                this.showNostrStatus(this.t('nostr.loginRequired'), true);
+                return;
+            }
+            const reviewEntries = entries.filter(item => item?.entry && String(item.entry.note || '').trim());
+            const publishEntries = reviewEntries.filter(item => !this.isDiaryEntryPublishCurrent(item.entry));
+            if (!reviewEntries.length) {
+                this.showTemporaryDiaryNotice(this.t('nostr.noPublishableNotes'));
+                return;
+            }
+            this.pendingNostrPublishEntries = publishEntries;
+            this.nostrPublishModal.querySelectorAll('.nostr-published-events').forEach(element => element.remove());
+            this.nostrPublishList.innerHTML = [
+                ...publishEntries.map((item, index) => this.renderNostrPublishOption(item, index)),
+                ...reviewEntries
+                    .filter(item => this.isDiaryEntryPublishCurrent(item.entry))
+                    .map(item => this.renderNostrPublishedOption(item))
+            ].join('');
+            if (this.nostrPublishAggregate) {
+                this.nostrPublishAggregate.checked = Boolean(publishEntries.length);
+                this.nostrPublishAggregate.disabled = !publishEntries.length;
+            }
+            this.updateNostrPublishLocationWarning();
+            this.showNostrPublishStatus(publishEntries.length ? '' : this.t('nostr.allSelectedAlreadyPublished'), !publishEntries.length);
+            this.nostrPublishModal.hidden = false;
+            document.body.classList.add('ai-consent-open');
+            if (this.nostrPublishConfirm) this.nostrPublishConfirm.disabled = !publishEntries.length;
+            (publishEntries.length ? this.nostrPublishConfirm : this.nostrPublishCancel)?.focus();
+        }
+
+        renderNostrPublishOption(item, index) {
+            // Render one selectable Nostr publish item and flag coordinate sharing clearly.
+            const displayName = item.localName || item.englishName || item.scientificName;
+            const hasLocation = this.hasDiaryLocation(item.entry);
+            const isUpdate = this.isDiaryEntryPublishOutdated(item.entry);
+            return `
+                <label class="nostr-publish-option ${hasLocation ? 'has-location' : ''}">
+                    <input type="checkbox" data-nostr-publish-index="${this.escapeHtml(String(index))}" checked>
+                    <span>
+                        <strong>${this.escapeHtml(item.noteName)}</strong>
+                        <small>${this.escapeHtml(displayName)} · ${this.escapeHtml(this.formatObservationDate(item.entry.date))}</small>
+                        ${isUpdate ? `<em class="nostr-update-label">${this.escapeHtml(this.t('nostr.willUpdatePublished'))}</em>` : ''}
+                        ${hasLocation ? `<em><i class="fa-solid fa-location-dot" aria-hidden="true"></i> ${this.escapeHtml(this.t('nostr.includesLocation'))}</em>` : ''}
+                    </span>
+                </label>
+            `;
+        }
+
+        renderNostrPublishedOption(item) {
+            // Show already published diary notes in the review list without allowing duplicate publishing.
+            const displayName = item.localName || item.englishName || item.scientificName;
+            return `
+                <div class="nostr-publish-option nostr-publish-option-published">
+                    <i class="fa-solid fa-feather" aria-hidden="true"></i>
+                    <span>
+                        <strong>${this.escapeHtml(item.noteName)}</strong>
+                        <small>${this.escapeHtml(displayName)} · ${this.escapeHtml(this.formatObservationDate(item.entry.date))}</small>
+                        <em>${this.escapeHtml(this.t('nostr.alreadyPublished'))}</em>
+                    </span>
+                </div>
+            `;
+        }
+
+        isDiaryEntryPublished(entry) {
+            // Treat restored Nostr event IDs as already published so the UI avoids duplicate events.
+            return Boolean(entry?.nostrPublishedEventId);
+        }
+
+        isDiaryEntryPublishCurrent(entry) {
+            // A published note is current only until the local note is edited after its last publish time.
+            if (!this.isDiaryEntryPublished(entry)) return false;
+            if (!entry?.nostrPublishedAt || !entry?.updatedAt) return true;
+            return new Date(entry.updatedAt).getTime() <= new Date(entry.nostrPublishedAt).getTime();
+        }
+
+        isDiaryEntryPublishOutdated(entry) {
+            // Edited published notes can be re-signed with the same NIP-78 d tag to replace the old version.
+            return this.isDiaryEntryPublished(entry) && !this.isDiaryEntryPublishCurrent(entry);
+        }
+
+        closeNostrPublishModal() {
+            // Close the Nostr publish review and discard only the temporary selection.
+            if (!this.nostrPublishModal) return;
+            this.pendingNostrPublishEntries = [];
+            this.nostrPublishModal.hidden = true;
+            if (this.nostrPublishAggregate) this.nostrPublishAggregate.disabled = false;
+            this.showNostrPublishStatus('');
+            document.body.classList.remove('ai-consent-open');
+        }
+
+        updateNostrPublishLocationWarning() {
+            // Warn only when currently checked diary notes contain coordinates.
+            const selectedEntries = this.getSelectedNostrPublishEntries();
+            const hasLocation = selectedEntries.some(item => this.hasDiaryLocation(item.entry));
+            if (this.nostrLocationWarning) this.nostrLocationWarning.hidden = !hasLocation;
+        }
+
+        getSelectedNostrPublishEntries() {
+            // Convert checked publish-modal rows back to their pending diary items.
+            if (!this.nostrPublishList) return [];
+            return [...this.nostrPublishList.querySelectorAll('[data-nostr-publish-index]:checked')]
+                .map(input => this.pendingNostrPublishEntries[Number(input.dataset.nostrPublishIndex)])
+                .filter(Boolean);
+        }
+
+        hasDiaryLocation(entry) {
+            // Detect whether a note carries publishable coordinates.
+            return Boolean(entry?.location && Number.isFinite(Number(entry.location.lat)) && Number.isFinite(Number(entry.location.lng)));
+        }
+
+        showTemporaryDiaryNotice(message) {
+            // Surface short diary-only status messages without opening another modal.
+            const result = this.birdGrid.querySelector('[data-diary-summary-result]');
+            if (!result) return;
+            result.hidden = false;
+            result.textContent = message;
+        }
+
+        showNostrPublishStatus(message, isError = false) {
+            // Report Nostr publish progress in the review modal.
+            if (!this.nostrPublishStatus) return;
+            this.nostrPublishStatus.textContent = message || '';
+            this.nostrPublishStatus.classList.toggle('error', Boolean(isError));
+        }
+
+        async publishSelectedDiaryEntriesToNostr() {
+            // Sign and publish the checked diary entries as NIP-78 application-data events.
+            const selectedEntries = this.getSelectedNostrPublishEntries();
+            if (!selectedEntries.length) {
+                this.showNostrPublishStatus(this.t('nostr.selectAtLeastOne'), true);
+                return;
+            }
+            if (selectedEntries.some(item => this.hasDiaryLocation(item.entry)) && !window.confirm(this.t('nostr.confirmLocationPublish'))) {
+                return;
+            }
+
+            try {
+                this.nostrPublishConfirm.disabled = true;
+                this.nostrPublishModal.querySelectorAll('.nostr-published-events').forEach(element => element.remove());
+                const signedEvents = [];
+                const totalItems = selectedEntries.length + (this.nostrPublishAggregate?.checked ? 1 : 0);
+                let completedItems = 0;
+                let successfulRelayMax = 0;
+                this.renderNostrPublishProgress(completedItems, totalItems);
+
+                for (const item of selectedEntries) {
+                    const event = this.buildDiaryNip78Event(item);
+                    const signedEvent = await this.signNostrEvent(event);
+                    const result = await this.publishNostrEvents([signedEvent]);
+                    successfulRelayMax = Math.max(successfulRelayMax, result.successRelays);
+                    signedEvents.push(signedEvent);
+                    this.markDiaryEntryPublished(item.scientificName, item.entry.id, signedEvent.id);
+                    completedItems += 1;
+                    this.renderNostrPublishProgress(completedItems, totalItems, result.successRelays);
+                    await this.delay(900);
+                }
+
+                if (this.nostrPublishAggregate?.checked) {
+                    const aggregateEvent = await this.signNostrEvent(this.buildDiaryAggregateNip78Event());
+                    const result = await this.publishNostrEvents([aggregateEvent]);
+                    successfulRelayMax = Math.max(successfulRelayMax, result.successRelays);
+                    signedEvents.push(aggregateEvent);
+                    completedItems += 1;
+                    this.renderNostrPublishProgress(completedItems, totalItems, result.successRelays);
+                }
+                const badgeResult = await this.publishEarnedNostrObservationBadges();
+                if (badgeResult.events.length) {
+                    signedEvents.push(...badgeResult.events);
+                    successfulRelayMax = Math.max(successfulRelayMax, badgeResult.successRelays);
+                }
+                this.storePublishedNostrEvents(signedEvents);
+                const status = this.t('nostr.published', {
+                    count: this.formatInterfaceNumber(signedEvents.length),
+                    relays: this.formatInterfaceNumber(successfulRelayMax)
+                });
+                this.showNostrPublishStatus(
+                    badgeResult.awarded
+                        ? `${status} ${this.t('nostr.badgesAwarded', { count: this.formatInterfaceNumber(badgeResult.awarded) })}`
+                        : status,
+                    successfulRelayMax < 1
+                );
+                this.renderPublishedNostrEventIds(signedEvents);
+            } catch (error) {
+                console.warn('Nostr diary publish failed:', error);
+                this.showNostrPublishStatus(error?.message || this.t('nostr.publishFailed'), true);
+            } finally {
+                this.nostrPublishConfirm.disabled = false;
+            }
+        }
+
+        renderNostrPublishProgress(done, total, relays = 0) {
+            // Show sequential bulk-publish progress so users see each diary note publishing separately.
+            if (!this.nostrPublishStatus) return;
+            const percent = total > 0 ? Math.round((done / total) * 100) : 0;
+            this.nostrPublishStatus.innerHTML = `
+                <span>${this.escapeHtml(this.t('nostr.publishProgress', {
+                    done: this.formatInterfaceNumber(done),
+                    total: this.formatInterfaceNumber(total),
+                    relays: this.formatInterfaceNumber(relays)
+                }))}</span>
+                <progress value="${this.escapeHtml(String(done))}" max="${this.escapeHtml(String(Math.max(total, 1)))}">${this.escapeHtml(String(percent))}%</progress>
+            `;
+            this.nostrPublishStatus.classList.remove('error');
+        }
+
+        delay(milliseconds) {
+            // Add a short pause between relay publishes to avoid hammering relays during bulk operations.
+            return new Promise(resolve => window.setTimeout(resolve, milliseconds));
+        }
+
+        markDiaryEntryPublished(scientificName, entryId, eventId) {
+            // Store the latest per-note Nostr event ID so later deletion can target this exact event.
+            const record = this.getObservationRecord(scientificName);
+            const entry = record?.observations?.find(item => item.id === entryId);
+            if (!entry) return;
+            entry.nostrPublishedEventId = eventId;
+            entry.nostrPublishedAt = new Date().toISOString();
+            entry.nostrPublishHistory = [
+                { id: eventId, publishedAt: entry.nostrPublishedAt },
+                ...(Array.isArray(entry.nostrPublishHistory) ? entry.nostrPublishHistory : [])
+            ].slice(0, 10);
+            record.updatedAt = new Date().toISOString();
+            this.saveObservationDiary();
+        }
+
+        storePublishedNostrEvents(events) {
+            // Keep recently published event IDs locally so users can copy or inspect them later.
+            let existing = [];
+            try {
+                existing = JSON.parse(localStorage.getItem('birdNostrPublishedEvents') || '[]');
+            } catch (error) {
+                existing = [];
+            }
+            const next = [
+                ...events.map(event => ({
+                    id: event.id,
+                    kind: event.kind,
+                    d: event.tags?.find(tag => tag[0] === 'd')?.[1] || '',
+                    publishedAt: new Date().toISOString()
+                })),
+                ...(Array.isArray(existing) ? existing : [])
+            ].slice(0, 100);
+            localStorage.setItem('birdNostrPublishedEvents', JSON.stringify(next));
+        }
+
+        getNostrEventBlockList() {
+            // Load locally blocked Nostr event IDs so deleted diary notes do not return from relays.
+            try {
+                const parsed = JSON.parse(localStorage.getItem('nostrEventBlockList') || '{}');
+                if (Array.isArray(parsed)) {
+                    return parsed.reduce((blocked, eventId) => {
+                        if (eventId) blocked[String(eventId)] = { blockedAt: '', reason: 'legacy-blocklist' };
+                        return blocked;
+                    }, {});
+                }
+                return parsed && typeof parsed === 'object' ? parsed : {};
+            } catch (error) {
+                console.warn('Could not read Nostr event blocklist:', error);
+                return {};
+            }
+        }
+
+        saveNostrEventBlockList(blockList) {
+            // Persist the blocklist in normal localStorage so backup and restore include it automatically.
+            localStorage.setItem('nostrEventBlockList', JSON.stringify(blockList || {}));
+        }
+
+        addNostrEventToBlockList(eventId, metadata = {}) {
+            // Remember a deleted Nostr event locally even if some relays ignore the NIP-09 deletion request.
+            if (!eventId) return;
+            const blockList = this.getNostrEventBlockList();
+            blockList[String(eventId)] = {
+                ...blockList[String(eventId)],
+                ...metadata,
+                eventId: String(eventId),
+                blockedAt: new Date().toISOString()
+            };
+            this.saveNostrEventBlockList(blockList);
+        }
+
+        isNostrEventBlocked(eventId, blockList = this.getNostrEventBlockList()) {
+            // Check one event ID against the local blocklist before showing Nostr-fetched diary content.
+            return Boolean(eventId && blockList && blockList[String(eventId)]);
+        }
+
+        filterBlockedNostrEvents(events = []) {
+            // Remove locally blocked events from future Nostr fetch results before they reach the diary UI.
+            const blockList = this.getNostrEventBlockList();
+            return events.filter(event => !this.isNostrEventBlocked(event?.id, blockList));
+        }
+
+        renderPublishedNostrEventIds(events) {
+            // Show copy buttons for the event IDs just published in the current modal.
+            if (!this.nostrPublishStatus) return;
+            const list = document.createElement('div');
+            list.className = 'nostr-published-events';
+            list.innerHTML = `
+                <strong>${this.escapeHtml(this.t('nostr.eventIds'))}</strong>
+                ${events.map(event => `
+                    <span class="nostr-event-id-row">
+                        <button class="nostr-event-id-copy" type="button"
+                            data-copy-nostr-event-id="${this.escapeHtml(event.id)}"
+                            title="${this.escapeHtml(this.t('nostr.copyEventId'))}">
+                            <code>${this.escapeHtml(this.shortenNostrKey(event.id))}</code>
+                            <i class="fa-regular fa-copy" aria-hidden="true"></i>
+                        </button>
+                        <a class="nostr-event-id-open" href="https://njump.me/${this.escapeHtml(event.id)}"
+                            target="_blank" rel="noopener noreferrer"
+                            title="${this.escapeHtml(this.t('nostr.viewOnNjump'))}">
+                            <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+                            <span>${this.escapeHtml(this.t('nostr.viewOnNjump'))}</span>
+                        </a>
+                    </span>
+                `).join('')}
+            `;
+            this.nostrPublishStatus.insertAdjacentElement('afterend', list);
+        }
+
+        buildDiaryNip78Event(item) {
+            // Store one diary note in a replaceable NIP-78 event under a stable app-owned d tag.
+            const publicHex = localStorage.getItem('birdNostrPublicKeyHex');
+            const content = {
+                app: 'birds.name',
+                type: 'diary-note',
+                version: 1,
+                scientificName: item.scientificName,
+                localName: item.localName || '',
+                englishName: item.englishName || '',
+                noteName: item.noteName,
+                observedAt: item.entry.date || item.entry.createdAt || '',
+                note: item.entry.note || '',
+                location: this.hasDiaryLocation(item.entry) ? {
+                    lat: Number(item.entry.location.lat),
+                    lng: Number(item.entry.location.lng),
+                    source: item.entry.location.source || ''
+                } : null,
+                observationCount: this.getObservationCount(item.scientificName),
+                updatedAt: item.entry.updatedAt || new Date().toISOString()
+            };
+            return {
+                kind: 30078,
+                pubkey: publicHex,
+                created_at: Math.floor(Date.now() / 1000),
+                tags: [
+                    ['d', `birds.name:diary:${this.observationKey(item.scientificName)}:${item.entry.id}`],
+                    ['client', 'Birds.name'],
+                    ['species', item.scientificName],
+                    ['published_at', new Date().toISOString()]
+                ],
+                content: JSON.stringify(content)
+            };
+        }
+
+        buildDiaryAggregateNip78Event() {
+            // Publish replaceable observed-species totals for collective Birds.name statistics.
+            const publicHex = localStorage.getItem('birdNostrPublicKeyHex');
+            const species = this.getDiaryObservedSpecies('', 'name').map(item => ({
+                scientificName: item.scientificName,
+                localName: item.localName || '',
+                englishName: item.englishName || '',
+                observationCount: Math.max(Number(item.observationCount) || 0, 1)
+            }));
+            return {
+                kind: 30078,
+                pubkey: publicHex,
+                created_at: Math.floor(Date.now() / 1000),
+                tags: [
+                    ['d', 'birds.name:observed-species:v1'],
+                    ['client', 'Birds.name'],
+                    ['published_at', new Date().toISOString()]
+                ],
+                content: JSON.stringify({
+                    app: 'birds.name',
+                    type: 'observed-species-summary',
+                    version: 1,
+                    species,
+                    totalSpecies: species.length,
+                    totalObservations: species.reduce((sum, item) => sum + item.observationCount, 0)
+                })
+            };
+        }
+
+        getStoredNostrAwardedBadges() {
+            // Track badge awards already signed from this browser so repeated publishes do not duplicate them.
+            try {
+                const parsed = JSON.parse(localStorage.getItem('birdNostrAwardedBadges') || '{}');
+                return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+            } catch (error) {
+                return {};
+            }
+        }
+
+        saveStoredNostrAwardedBadges(badges) {
+            // Store local badge-award history as normal backup-safe app data.
+            localStorage.setItem('birdNostrAwardedBadges', JSON.stringify(badges || {}));
+        }
+
+        async publishEarnedNostrObservationBadges() {
+            // Publish self-attested NIP-58 badges for newly reached Birds.name collector milestones.
+            try {
+                const publicHex = localStorage.getItem('birdNostrPublicKeyHex');
+                if (!publicHex) return { awarded: 0, events: [], successRelays: 0 };
+                const awarded = this.getStoredNostrAwardedBadges();
+                const earnedBadges = this.getEarnedNostrBadgeDefinitions()
+                    .filter(badge => !awarded[badge.id]);
+                if (!earnedBadges.length) return { awarded: 0, events: [], successRelays: 0 };
+
+                const signedEvents = [];
+                for (const badge of earnedBadges) {
+                    const definitionEvent = await this.signNostrEvent(this.buildNostrBadgeDefinitionEvent(badge));
+                    const awardEvent = await this.signNostrEvent(this.buildNostrBadgeAwardEvent(badge, definitionEvent.pubkey));
+                    signedEvents.push(definitionEvent, awardEvent);
+                    awarded[badge.id] = {
+                        id: badge.id,
+                        threshold: badge.threshold,
+                        track: badge.track,
+                        definitionEventId: definitionEvent.id,
+                        awardEventId: awardEvent.id,
+                        awardedAt: new Date().toISOString()
+                    };
+                }
+
+                const result = await this.publishNostrEvents(signedEvents);
+                if (result.successRelays > 0) {
+                    this.saveStoredNostrAwardedBadges(awarded);
+                    if (!this.achievementsModal?.hidden) this.renderAchievements();
+                }
+                return {
+                    awarded: result.successRelays > 0 ? earnedBadges.length : 0,
+                    events: result.successRelays > 0 ? signedEvents : [],
+                    successRelays: result.successRelays
+                };
+            } catch (error) {
+                console.warn('Nostr badge publishing failed:', error);
+                return { awarded: 0, events: [], successRelays: 0 };
+            }
+        }
+
+        getEarnedNostrBadgeDefinitions() {
+            // Compare the local diary against the badge catalog from badges.md and return achieved badges.
+            const progress = this.getBadgeProgressSnapshot();
+            return this.getNostrBadgeCatalog().filter(badge => {
+                if (badge.track === 'unique') return progress.uniqueSpecies >= badge.threshold;
+                if (badge.track === 'category') return (progress.categories[badge.category] || 0) >= badge.threshold;
+                if (badge.track === 'iucn') return (progress.iucn[badge.status] || 0) >= badge.threshold;
+                return false;
+            });
+        }
+
+        getBadgeProgressSnapshot() {
+            // Count unique observed species by total, category, and IUCN status for badge eligibility.
+            const observedBirds = this.getObservedBirdsForBadgeProgress();
+            const uniqueByScientificName = new Map(
+                observedBirds.map(bird => [this.observationKey(bird.latin), bird])
+            );
+            const categories = { water: 0, predator: 0, song: 0, parrot: 0, game: 0 };
+            const iucn = {};
+            uniqueByScientificName.forEach(bird => {
+                Object.keys(categories).forEach(category => {
+                    if (this.birdMatchesCategory(bird, category)) categories[category] += 1;
+                });
+                const code = this.getLocalIucnStatus(bird.latin)?.code;
+                if (code) iucn[code] = (iucn[code] || 0) + 1;
+            });
+            return {
+                uniqueSpecies: uniqueByScientificName.size,
+                categories,
+                iucn
+            };
+        }
+
+        getObservedBirdsForBadgeProgress() {
+            // Use the English master list where possible so badge progress survives language switching.
+            const observedBirds = [];
+            Object.values(this.observationDiary || {}).forEach(record => {
+                if (!record?.seen) return;
+                const key = this.observationKey(record.scientificName);
+                const bird = this.allBirdsBySciName.get(key) || this.getBirdByScientificName(record.scientificName);
+                if (bird) observedBirds.push(bird);
+            });
+            return observedBirds;
+        }
+
+        getNostrBadgeCatalog() {
+            // Keep badge metadata aligned with badges.md and the image files under img/badges.
+            return [
+                ...[
+                    ['B10A', 10],
+                    ['B50A', 50],
+                    ['B100A', 100],
+                    ['B250A', 250],
+                    ['B500A', 500]
+                ].map(([code, threshold]) => ({
+                    id: `birds-name-unique-${code.toLowerCase()}`,
+                    code,
+                    track: 'unique',
+                    threshold,
+                    name: `Birds.name ${threshold} unique birds`,
+                    description: `Seen ${threshold} unique live bird species.`,
+                    image: `img/badges/for_unique_bird_speciments/${code}.png`
+                })),
+                ...this.buildCategoryBadgeCatalog('water', 'Waterbirds', 'waterbirds', 'Waterbirds', [
+                    ['B3W', 3],
+                    ['B7W', 7],
+                    ['B15W', 15],
+                    ['B21W', 21],
+                    ['B42W', 42]
+                ]),
+                ...this.buildCategoryBadgeCatalog('predator', 'Birds of Prey', 'birds of prey', 'Birds_of_Prey', [
+                    ['B3P', 3],
+                    ['B7P', 7],
+                    ['B15P', 15],
+                    ['B21P', 21],
+                    ['B42P', 42]
+                ]),
+                ...this.buildCategoryBadgeCatalog('song', 'Songbirds', 'songbirds', 'Songbirds', [
+                    ['B3S', 3],
+                    ['B7S', 7],
+                    ['B15S', 15],
+                    ['B21S', 21],
+                    ['B42S', 42]
+                ]),
+                ...this.buildCategoryBadgeCatalog('parrot', 'Parrots', 'parrots', 'Parrots', [
+                    ['B3P', 3],
+                    ['B7P', 7],
+                    ['B15P', 15],
+                    ['B21P', 21],
+                    ['B42P', 42]
+                ]),
+                ...this.buildCategoryBadgeCatalog('game', 'Gamebirds', 'gamebirds', 'Gamebirds', [
+                    ['B3G', 3],
+                    ['B7G', 7],
+                    ['B15G', 15],
+                    ['B21G', 21],
+                    ['B42G', 42]
+                ]),
+                ...[
+                    ['B7NT', 'nt', 7, 'near threatened birds'],
+                    ['B5V', 'vu', 5, 'vulnerable birds'],
+                    ['B3E', 'en', 3, 'endangered birds'],
+                    ['B1C', 'cr', 1, 'critically endangered bird']
+                ].map(([code, status, threshold, label]) => ({
+                    id: `birds-name-iucn-${code.toLowerCase()}`,
+                    code,
+                    track: 'iucn',
+                    status,
+                    threshold,
+                    name: `Birds.name ${code} conservation badge`,
+                    description: `Seen ${threshold} ${label}.`,
+                    image: `img/badges/IUCN_statuses_badges_for_seeing_volnurable_bird_species/${code}.png`
+                }))
+            ];
+        }
+
+        buildCategoryBadgeCatalog(category, title, label, folder, entries) {
+            // Generate category badge definitions while preserving the exact image filenames.
+            return entries.map(([code, threshold]) => ({
+                id: `birds-name-${category}-${code.toLowerCase()}`,
+                code,
+                track: 'category',
+                category,
+                threshold,
+                name: `Birds.name ${threshold} ${title}`,
+                description: `Seen ${threshold} unique ${label}.`,
+                image: `img/badges/${folder}/${code}.png`
+            }));
+        }
+
+        buildNostrBadgeDefinitionEvent(badge) {
+            // Define one self-attested Birds.name badge using NIP-58 kind 30009 and the local badge image.
+            const publicHex = localStorage.getItem('birdNostrPublicKeyHex');
+            return {
+                kind: 30009,
+                pubkey: publicHex,
+                created_at: Math.floor(Date.now() / 1000),
+                tags: [
+                    ['d', badge.id],
+                    ['name', badge.name],
+                    ['description', badge.description],
+                    ['image', new URL(badge.image, window.location.href).href],
+                    ['client', 'Birds.name'],
+                    ['achievement', badge.track],
+                    ['threshold', String(badge.threshold)],
+                    ['badge_code', badge.code]
+                ],
+                content: ''
+            };
+        }
+
+        buildNostrBadgeAwardEvent(badge, issuerPubkey) {
+            // Award the achieved badge to the logged-in user as a NIP-58 immutable kind 8 event.
+            const publicHex = localStorage.getItem('birdNostrPublicKeyHex');
+            return {
+                kind: 8,
+                pubkey: publicHex,
+                created_at: Math.floor(Date.now() / 1000),
+                tags: [
+                    ['a', `30009:${issuerPubkey}:${badge.id}`],
+                    ['p', publicHex],
+                    ['client', 'Birds.name'],
+                    ['achievement', badge.track],
+                    ['threshold', String(badge.threshold)],
+                    ['badge_code', badge.code]
+                ],
+                content: `Awarded for ${badge.description}`
+            };
         }
 
         ensureDiaryOverviewImages(items, searchTerm, sortMode) {
@@ -4717,6 +7085,25 @@
                 return;
             }
 
+            const publishAllButton = event.target.closest('[data-diary-publish-all]');
+            if (publishAllButton) {
+                event.preventDefault();
+                const searchInput = this.birdGrid.querySelector('[data-diary-search]');
+                const sortSelect = this.birdGrid.querySelector('[data-diary-sort]');
+                const entries = this.getDiaryOverviewEntries(searchInput?.value || '', sortSelect?.value || 'date')
+                    .filter(item => !this.diaryHiddenSpecies.has(this.observationKey(item.scientificName)));
+                this.openNostrPublishModal(entries);
+                return;
+            }
+
+            const publishNoteButton = event.target.closest('[data-diary-publish-note]');
+            if (publishNoteButton) {
+                event.preventDefault();
+                const item = this.getDiaryOverviewEntryById(publishNoteButton.dataset.scientificName, publishNoteButton.dataset.diaryPublishNote);
+                if (item) this.openNostrPublishModal([item]);
+                return;
+            }
+
             const editNoteButton = event.target.closest('[data-diary-edit-note]');
             if (editNoteButton) {
                 event.preventDefault();
@@ -4732,8 +7119,7 @@
             const deleteNoteButton = event.target.closest('[data-diary-delete-note]');
             if (deleteNoteButton) {
                 event.preventDefault();
-                if (!window.confirm(this.t('diary.confirmDeleteNote'))) return;
-                this.deleteObservationEntry(deleteNoteButton.dataset.scientificName, deleteNoteButton.dataset.diaryDeleteNote);
+                this.confirmAndDeleteObservationEntry(deleteNoteButton.dataset.scientificName, deleteNoteButton.dataset.diaryDeleteNote);
                 return;
             }
 
@@ -4917,12 +7303,32 @@
             const isOpen = entry.id === this.openDiaryEntryId && this.openDiarySpeciesKey === speciesKey;
             const isEditing = entry.id === this.editingDiaryEntryId && this.editingDiarySpeciesKey === speciesKey;
             const locationText = this.formatDiaryLocation(entry.location);
+            const publishIsCurrent = this.isDiaryEntryPublishCurrent(entry);
+            const publishLabel = this.isDiaryEntryPublishOutdated(entry)
+                ? this.t('nostr.updatePublishedNote')
+                : this.t('nostr.publishNote');
             return `
                 <details class="observation-entry" data-observation-entry="${this.escapeHtml(entry.id)}" ${isOpen ? 'open' : ''}>
                     <summary class="observation-entry-summary">
                         <span class="observation-entry-title">
+                            <i class="fa-solid fa-chevron-right observation-entry-chevron" aria-hidden="true"></i>
                             <span>${this.escapeHtml(noteName)}</span>
                             <span class="observation-entry-inline-actions">
+                                ${publishIsCurrent ? `
+                                    <span class="observation-edit-button observation-publish-disabled"
+                                        aria-label="${this.escapeHtml(this.t('nostr.alreadyPublished'))}"
+                                        title="${this.escapeHtml(this.t('nostr.alreadyPublished'))}">
+                                        <i class="fa-solid fa-feather" aria-hidden="true"></i>
+                                    </span>
+                                ` : `
+                                    <button class="observation-edit-button" type="button"
+                                        aria-label="${this.escapeHtml(publishLabel)}"
+                                        title="${this.escapeHtml(publishLabel)}"
+                                        data-observation-publish="${this.escapeHtml(entry.id)}"
+                                        data-scientific-name="${this.escapeHtml(scientificName)}">
+                                        <i class="fa-solid fa-feather" aria-hidden="true"></i>
+                                    </button>
+                                `}
                                 <button class="observation-edit-button" type="button"
                                     aria-label="${this.escapeHtml(this.t('diary.edit'))}"
                                     title="${this.escapeHtml(this.t('diary.edit'))}"
@@ -4939,7 +7345,10 @@
                                 </button>
                             </span>
                         </span>
-                        <small>${this.escapeHtml(this.t('diary.clickToOpen'))}</small>
+                        <small class="observation-entry-state">
+                            <span class="observation-entry-state-open">${this.escapeHtml(this.t('diary.clickToOpen'))}</span>
+                            <span class="observation-entry-state-close">${this.escapeHtml(this.t('diary.clickToClose'))}</span>
+                        </small>
                     </summary>
                     ${isEditing ? `
                         <div class="observation-editor" data-observation-editor="${this.escapeHtml(entry.id)}">
@@ -4983,6 +7392,13 @@
                         </div>
                     ` : ''}
                     <div class="observation-note-preview" data-observation-preview="${this.escapeHtml(entry.id)}">
+                        ${entry.nostrPublishedEventId ? `
+                            <p class="observation-nostr-published">
+                                <i class="fa-solid fa-feather" aria-hidden="true"></i>
+                                ${this.escapeHtml(this.t('nostr.publishedEvent'))}
+                                <code>${this.escapeHtml(this.shortenNostrKey(entry.nostrPublishedEventId))}</code>
+                            </p>
+                        ` : ''}
                         ${renderedNote || `<em>${this.escapeHtml(this.t('diary.previewEmpty'))}</em>`}
                         ${locationText ? `
                             <p class="observation-location-preview">
@@ -5045,8 +7461,16 @@
             if (deleteButton) {
                 event.preventDefault();
                 event.stopPropagation();
-                if (!window.confirm(this.t('diary.confirmDeleteNote'))) return;
-                this.deleteObservationEntry(deleteButton.dataset.scientificName, deleteButton.dataset.observationDelete);
+                this.confirmAndDeleteObservationEntry(deleteButton.dataset.scientificName, deleteButton.dataset.observationDelete);
+                return;
+            }
+
+            const publishButton = event.target.closest('[data-observation-publish]');
+            if (publishButton) {
+                event.preventDefault();
+                event.stopPropagation();
+                const item = this.getDiaryOverviewEntryById(publishButton.dataset.scientificName, publishButton.dataset.observationPublish);
+                if (item) this.openNostrPublishModal([item]);
                 return;
             }
 
@@ -6450,6 +8874,7 @@
 
                 // Set current language
                 this.currentLanguage = langCode;
+                this.updateCategoryMenuCounts();
 
             } catch (error) {
                 console.warn(`Failed to load ${langCode} data, using demo data:`, error);
