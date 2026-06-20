@@ -604,5 +604,11 @@
   "backup.exportFailed": "Izvoz varnostne kopije ni uspel.",
   "backup.importing": "Uvažam varnostno kopijo...",
   "backup.imported": "Varnostna kopija je uvožena. Ponovno nalaganje...",
-  "backup.importFailed": "Uvoz varnostne kopije ni uspel. Preverite, ali je to veljavna JSON varnostna kopija Birds.name."
+  "backup.importFailed": "Uvoz varnostne kopije ni uspel. Preverite, ali je to veljavna JSON varnostna kopija Birds.name.",
+  "diary.observedCount": "Opaženo {count}x",
+  "diary.observationAdjustTitle": "Spremenim število opazovanj?",
+  "diary.addOneObservation": "+1 opaženo",
+  "diary.subtractOneObservation": "-1",
+  "action.cancel": "Prekliči",
+  "nav.settings": "Nastavitve"
 }

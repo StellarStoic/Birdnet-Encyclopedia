@@ -604,5 +604,11 @@
   "backup.exportFailed": "Backup export failed.",
   "backup.importing": "Importing backup...",
   "backup.imported": "Backup imported. Reloading...",
-  "backup.importFailed": "Backup import failed. Check that this is a valid Birds.name backup JSON file."
+  "backup.importFailed": "Backup import failed. Check that this is a valid Birds.name backup JSON file.",
+  "diary.observedCount": "Observé {count}x",
+  "diary.observationAdjustTitle": "Ajuster le nombre d’observations ?",
+  "diary.addOneObservation": "+1 observé",
+  "diary.subtractOneObservation": "-1",
+  "action.cancel": "Annuler",
+  "nav.settings": "Paramètres"
 }

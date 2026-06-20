@@ -375,6 +375,21 @@ body[data-theme="paper"] {
     z-index: 2;
 }
 
+.observation-count-badge {
+    position: absolute;
+    right: -7px;
+    bottom: -7px;
+    min-width: 24px;
+    padding: 2px 5px;
+    border: 2px solid #ffffff;
+    border-radius: 999px;
+    background: #111827;
+    color: #ffffff;
+    font-size: 0.68rem;
+    font-weight: 800;
+    line-height: 1.1;
+}
+
 /* Place the observed toggle in the modal header between the title and close action. */
 .modal-observation-toggle {
     position: relative;
@@ -405,6 +420,21 @@ body[data-theme="paper"] {
     background: rgba(255, 255, 255, 0.28);
 }
 
+.modal-observation-count {
+    position: absolute;
+    right: -9px;
+    bottom: -7px;
+    min-width: 27px;
+    padding: 2px 6px;
+    border: 2px solid rgba(255, 255, 255, 0.96);
+    border-radius: 999px;
+    background: var(--primary);
+    color: #ffffff;
+    font-size: 0.7rem;
+    font-weight: 800;
+    line-height: 1.1;
+}
+
 .modal-observation-toggle.not-seen::after {
     content: "";
     position: absolute;
@@ -414,6 +444,63 @@ body[data-theme="paper"] {
     background: #ffffff;
     transform: rotate(-42deg);
     box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12);
+}
+
+.modal-content:has(.observation-confirmation) {
+    overflow: visible;
+}
+
+.observation-confirmation {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 58px;
+    z-index: 30;
+    width: min(280px, calc(100vw - 32px));
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface-solid);
+    color: var(--text);
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.28);
+}
+
+.observation-confirmation[hidden] {
+    display: none;
+}
+
+.observation-confirmation p {
+    margin: 0 0 10px;
+    font-size: 0.92rem;
+    font-weight: 700;
+}
+
+.observation-confirmation-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.observation-confirmation-actions button {
+    flex: 1;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface-solid);
+    color: var(--text);
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.observation-confirm-add {
+    color: #15803d !important;
+}
+
+.observation-confirm-subtract {
+    color: #b42318 !important;
+}
+
+.observation-confirmation-actions button:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
 }
 
 /* Store local observation notes inside the species modal without mixing them with external data. */
@@ -1068,6 +1155,16 @@ body[data-theme="paper"] {
 .diary-observed-species i,
 .diary-observed-species span {
     color: var(--primary);
+}
+
+.diary-observed-count {
+    padding: 3px 7px;
+    border-radius: 999px;
+    background: var(--primary);
+    color: #ffffff;
+    font-size: 0.72rem;
+    font-weight: 900;
+    line-height: 1.1;
 }
 
 .diary-observed-species small {
@@ -1803,7 +1900,7 @@ body[data-theme="midnight"] .dropdown-toggle.active .menu-bird-open {
             border-radius: 12px;
             max-width: 900px;
             box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
+            overflow: visible;
             animation: modalFadeIn 0.3s ease;
         }
 
@@ -1819,6 +1916,8 @@ body[data-theme="midnight"] .dropdown-toggle.active .menu-bird-open {
         }
 
         .modal-header {
+            position: relative;
+            overflow: visible;
             padding: 20px;
             background: #2c3e50;
             color: white;
@@ -2918,6 +3017,20 @@ body[data-theme="midnight"] .dropdown-toggle.active .menu-bird-open {
 
 .submenu-content {
     padding: 4px 0 2px 12px;
+}
+
+.settings-submenu-content {
+    /* Keep nested preferences visually grouped without adding another top-level menu section. */
+    padding-left: 8px;
+}
+
+.nested-settings-submenu {
+    margin: 0 0 5px;
+}
+
+.nested-settings-submenu .submenu-toggle {
+    font-size: 14px;
+    padding-left: 10px;
 }
 
 /* Separate the taxonomy list from the nested IUCN conservation controls. */

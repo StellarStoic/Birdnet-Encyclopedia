@@ -174,42 +174,6 @@
                         </div>
                     </div>
 
-                    <!-- Language is a separate collapsed section alongside Categories. -->
-                    <div class="submenu menu-section">
-                        <button class="submenu-toggle" id="language-submenu-toggle" type="button" aria-expanded="false" aria-controls="language-submenu">
-                            <span><i class="fa-solid fa-language" aria-hidden="true"></i> <span data-i18n="nav.language">Language</span></span>
-                            <i class="fa-solid fa-chevron-down submenu-chevron" aria-hidden="true"></i>
-                        </button>
-                        <div class="submenu-panel" id="language-submenu">
-                            <div id="language-options">
-                                <!-- Language options will be dynamically inserted here. -->
-                                <div class="dropdown-loading" data-i18n="language.loading">Loading languages...</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Theme choices are shared with the My BirdNET dashboard through local storage. -->
-                    <div class="submenu menu-section">
-                        <button class="submenu-toggle" id="theme-submenu-toggle" type="button" aria-expanded="false" aria-controls="theme-submenu">
-                            <span><i class="fa-solid fa-palette" aria-hidden="true"></i> <span data-i18n="nav.theme">Theme</span></span>
-                            <i class="fa-solid fa-chevron-down submenu-chevron" aria-hidden="true"></i>
-                        </button>
-                        <div class="submenu-panel" id="theme-submenu">
-                            <div class="submenu-content theme-options">
-                                <button class="dropdown-item theme-option" type="button" data-theme-value="forest" data-i18n="theme.forest">Forest</button>
-                                <button class="dropdown-item theme-option" type="button" data-theme-value="midnight" data-i18n="theme.midnight">Midnight</button>
-                                <button class="dropdown-item theme-option" type="button" data-theme-value="sunrise" data-i18n="theme.sunrise">Sunrise</button>
-                                <button class="dropdown-item theme-option" type="button" data-theme-value="paper" data-i18n="theme.paper">Paper</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Open the optional Pollinations translation settings and consent modal. -->
-                    <button class="menu-page-link menu-action-button" id="ai-translation-settings" type="button">
-                        <span><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> <span data-i18n="nav.aiTranslations">AI translations</span></span>
-                        <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
-                    </button>
-
                     <!-- Open the private, browser-only BirdNET observation statistics dashboard. -->
                     <a class="menu-page-link" href="my-birdnet.html">
                         <span><i class="fa-solid fa-chart-column" aria-hidden="true"></i> <span data-i18n="nav.myBirdnet">My BirdNET</span></span>
@@ -222,11 +186,58 @@
                         <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
                     </button>
 
-                    <!-- Export and import browser-local app data without API keys or tokens. -->
-                    <button class="menu-page-link menu-action-button" id="backup-settings" type="button">
-                        <span><i class="fa-solid fa-file-export" aria-hidden="true"></i> <span data-i18n="nav.backup">Backup</span></span>
-                        <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
-                    </button>
+                    <!-- Settings groups preferences and local-data tools in one menu section. -->
+                    <div class="submenu menu-section">
+                        <button class="submenu-toggle" id="settings-submenu-toggle" type="button" aria-expanded="false" aria-controls="settings-submenu">
+                            <span><i class="fa-solid fa-gear" aria-hidden="true"></i> <span data-i18n="nav.settings">Settings</span></span>
+                            <i class="fa-solid fa-chevron-down submenu-chevron" aria-hidden="true"></i>
+                        </button>
+                        <div class="submenu-panel" id="settings-submenu">
+                            <div class="submenu-content settings-submenu-content">
+                                <!-- Language is nested inside Settings so translation choices do not crowd the main menu. -->
+                                <div class="submenu nested-settings-submenu">
+                                    <button class="submenu-toggle" id="language-submenu-toggle" type="button" aria-expanded="false" aria-controls="language-submenu">
+                                        <span><i class="fa-solid fa-language" aria-hidden="true"></i> <span data-i18n="nav.language">Language</span></span>
+                                        <i class="fa-solid fa-chevron-down submenu-chevron" aria-hidden="true"></i>
+                                    </button>
+                                    <div class="submenu-panel" id="language-submenu">
+                                        <div id="language-options">
+                                            <!-- Language options will be dynamically inserted here. -->
+                                            <div class="dropdown-loading" data-i18n="language.loading">Loading languages...</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Theme choices are shared with the My BirdNET dashboard through local storage. -->
+                                <div class="submenu nested-settings-submenu">
+                                    <button class="submenu-toggle" id="theme-submenu-toggle" type="button" aria-expanded="false" aria-controls="theme-submenu">
+                                        <span><i class="fa-solid fa-palette" aria-hidden="true"></i> <span data-i18n="nav.theme">Theme</span></span>
+                                        <i class="fa-solid fa-chevron-down submenu-chevron" aria-hidden="true"></i>
+                                    </button>
+                                    <div class="submenu-panel" id="theme-submenu">
+                                        <div class="submenu-content theme-options">
+                                            <button class="dropdown-item theme-option" type="button" data-theme-value="forest" data-i18n="theme.forest">Forest</button>
+                                            <button class="dropdown-item theme-option" type="button" data-theme-value="midnight" data-i18n="theme.midnight">Midnight</button>
+                                            <button class="dropdown-item theme-option" type="button" data-theme-value="sunrise" data-i18n="theme.sunrise">Sunrise</button>
+                                            <button class="dropdown-item theme-option" type="button" data-theme-value="paper" data-i18n="theme.paper">Paper</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Open the optional Pollinations translation settings and consent modal. -->
+                                <button class="menu-page-link menu-action-button" id="ai-translation-settings" type="button">
+                                    <span><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> <span data-i18n="nav.aiTranslations">AI translations</span></span>
+                                    <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                                </button>
+
+                                <!-- Export and import browser-local app data without API keys or tokens. -->
+                                <button class="menu-page-link menu-action-button" id="backup-settings" type="button">
+                                    <span><i class="fa-solid fa-file-export" aria-hidden="true"></i> <span data-i18n="nav.backup">Backup</span></span>
+                                    <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
 
                     <!-- Explain the website purpose and show optional donation details. -->
                     <button class="menu-page-link menu-action-button" id="about-settings" type="button">
@@ -288,6 +299,14 @@
                     aria-label="Not yet observed" title="Not yet observed">
                     <i class="fa-solid fa-binoculars" aria-hidden="true"></i>
                 </button>
+                <div class="observation-confirmation" id="observation-confirmation" role="dialog" aria-live="polite" hidden>
+                    <p data-i18n="diary.observationAdjustTitle">Adjust observation count?</p>
+                    <div class="observation-confirmation-actions">
+                        <button type="button" class="observation-confirm-add" id="observation-confirm-add" data-i18n="diary.addOneObservation">+1</button>
+                        <button type="button" class="observation-confirm-cancel" id="observation-confirm-cancel" data-i18n="action.cancel">Cancel</button>
+                        <button type="button" class="observation-confirm-subtract" id="observation-confirm-subtract" data-i18n="diary.subtractOneObservation">-1</button>
+                    </div>
+                </div>
                 <button class="modal-close" id="modal-close">&times;</button>
             </div>
             <div class="modal-body" id="modal-body">
@@ -632,6 +651,10 @@
             this.modalBody = document.getElementById('modal-body');
             this.modalBirdName = document.getElementById('modal-bird-name');
             this.modalObservationToggle = document.getElementById('modal-observation-toggle');
+            this.observationConfirmation = document.getElementById('observation-confirmation');
+            this.observationConfirmAdd = document.getElementById('observation-confirm-add');
+            this.observationConfirmSubtract = document.getElementById('observation-confirm-subtract');
+            this.observationConfirmCancel = document.getElementById('observation-confirm-cancel');
             this.modalClose = document.getElementById('modal-close');
             this.diaryLocationModal = document.getElementById('diary-location-modal');
             this.diaryLocationClose = document.getElementById('diary-location-close');
@@ -680,6 +703,8 @@
             this.dropdownMenu = document.getElementById('dropdown-menu');
             this.categoriesSubmenuToggle = document.getElementById('categories-submenu-toggle');
             this.categoriesSubmenu = document.getElementById('categories-submenu');
+            this.settingsSubmenuToggle = document.getElementById('settings-submenu-toggle');
+            this.settingsSubmenu = document.getElementById('settings-submenu');
             this.languageSubmenuToggle = document.getElementById('language-submenu-toggle');
             this.languageSubmenu = document.getElementById('language-submenu');
             this.themeSubmenuToggle = document.getElementById('theme-submenu-toggle');
@@ -779,6 +804,14 @@
                 });
             }
 
+            // Expand or collapse all preferences and local backup tools as one Settings section.
+            if (this.settingsSubmenuToggle) {
+                this.settingsSubmenuToggle.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.toggleSettingsSubmenu();
+                });
+            }
+
             // Expand the shared theme choices without closing the burger menu.
             if (this.themeSubmenuToggle) {
                 this.themeSubmenuToggle.addEventListener('click', (e) => {
@@ -862,19 +895,33 @@
             }
 
             if (this.modalObservationToggle) {
-                this.modalObservationToggle.addEventListener('click', () => {
-                    if (this.currentBirdId) {
-                        this.toggleSeenObservation(this.currentBirdId, {
-                            createEntry: true,
-                            collapseDiary: true
-                        });
-                    }
+                this.modalObservationToggle.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    this.toggleObservationConfirmation();
                 });
             }
+
+            this.observationConfirmAdd?.addEventListener('click', (event) => {
+                event.stopPropagation();
+                if (this.currentBirdId) this.adjustObservationCount(this.currentBirdId, 1);
+            });
+
+            this.observationConfirmSubtract?.addEventListener('click', (event) => {
+                event.stopPropagation();
+                if (this.currentBirdId) this.adjustObservationCount(this.currentBirdId, -1);
+            });
+
+            this.observationConfirmCancel?.addEventListener('click', (event) => {
+                event.stopPropagation();
+                this.hideObservationConfirmation();
+            });
 
             if (this.modal) {
                 this.modal.addEventListener('click', (e) => {
                     if (e.target === this.modal) this.closeModal();
+                    else if (!e.target.closest('.observation-confirmation') && !e.target.closest('.modal-observation-toggle')) {
+                        this.hideObservationConfirmation();
+                    }
                 });
             }
 
@@ -1858,6 +1905,7 @@
             [
                 [this.languageSubmenu, this.languageSubmenuToggle],
                 [this.categoriesSubmenu, this.categoriesSubmenuToggle],
+                [this.settingsSubmenu, this.settingsSubmenuToggle],
                 [this.themeSubmenu, this.themeSubmenuToggle]
             ].forEach(([panel, toggle]) => {
                 panel?.classList.remove('show');
@@ -1881,6 +1929,13 @@
             const isOpen = this.categoriesSubmenu.classList.toggle('show');
             this.categoriesSubmenuToggle.classList.toggle('active', isOpen);
             this.categoriesSubmenuToggle.setAttribute('aria-expanded', String(isOpen));
+        }
+
+        // Toggle the Settings accordion containing language, theme, AI, and backup tools.
+        toggleSettingsSubmenu() {
+            const isOpen = this.settingsSubmenu.classList.toggle('show');
+            this.settingsSubmenuToggle.classList.toggle('active', isOpen);
+            this.settingsSubmenuToggle.setAttribute('aria-expanded', String(isOpen));
         }
 
         // Toggle the Theme accordion and synchronize its accessibility state.
@@ -3991,14 +4046,14 @@
 
         renderObservationCardIndicator(scientificName) {
             // Show a passive binocular marker on grid cards only after this species was observed.
-            const record = this.getObservationRecord(scientificName);
-            const isSeen = Boolean(record?.seen);
-            if (!isSeen) return '';
+            const observationCount = this.getObservationCount(scientificName);
+            if (observationCount < 1) return '';
             return `
                 <span class="observation-card-indicator" data-observation-card-indicator="${this.escapeHtml(scientificName)}"
-                    aria-label="${this.escapeHtml(this.t('diary.observed'))}"
-                    title="${this.escapeHtml(this.t('diary.observed'))}">
+                    aria-label="${this.escapeHtml(this.t('diary.observedCount', { count: this.formatInterfaceNumber(observationCount) }))}"
+                    title="${this.escapeHtml(this.t('diary.observedCount', { count: this.formatInterfaceNumber(observationCount) }))}">
                     <i class="fa-solid fa-binoculars" aria-hidden="true"></i>
+                    <span class="observation-count-badge">${this.escapeHtml(this.formatInterfaceNumber(observationCount))}x</span>
                 </span>
             `;
         }
@@ -4026,7 +4081,9 @@
 
         getObservationRecord(scientificName) {
             // Read one diary record without creating it.
-            return this.observationDiary[this.observationKey(scientificName)] || null;
+            const record = this.observationDiary[this.observationKey(scientificName)] || null;
+            if (record) this.normalizeObservationRecord(record);
+            return record;
         }
 
         ensureObservationRecord(scientificName) {
@@ -4040,7 +4097,28 @@
                     updatedAt: new Date().toISOString()
                 };
             }
-            return this.observationDiary[key];
+            return this.normalizeObservationRecord(this.observationDiary[key]);
+        }
+
+        normalizeObservationRecord(record) {
+            // Migrate older boolean-only seen records into a counted observation model.
+            if (!record || typeof record !== 'object') return record;
+            if (!Array.isArray(record.observations)) record.observations = [];
+            if (!Array.isArray(record.observationEvents)) record.observationEvents = [];
+            const noteCount = record.observations.length;
+            if (!Number.isFinite(Number(record.observationCount))) {
+                record.observationCount = record.seen ? Math.max(1, noteCount) : noteCount;
+            }
+            record.observationCount = Math.max(0, Number(record.observationCount) || 0);
+            record.seen = record.observationCount > 0 || noteCount > 0 || Boolean(record.seen);
+            return record;
+        }
+
+        getObservationCount(scientificName) {
+            // Return the visible observation count for cards, modal button, and future Nostr events.
+            const record = this.getObservationRecord(scientificName);
+            if (!record) return 0;
+            return Math.max(Number(record.observationCount) || 0, record.seen ? 1 : 0);
         }
 
         createObservationEntry(note = '') {
@@ -4058,29 +4136,56 @@
             };
         }
 
-        toggleSeenObservation(scientificName, options = {}) {
-            // Toggle the seen marker and optionally create the first diary entry from the modal header.
+        showObservationConfirmation() {
+            // Ask for explicit +1/-1 confirmation before changing the stored observation count.
+            if (!this.observationConfirmation || !this.currentBirdId) return;
+            const currentCount = this.getObservationCount(this.currentBirdId);
+            this.observationConfirmation.hidden = false;
+            if (this.observationConfirmSubtract) {
+                this.observationConfirmSubtract.disabled = currentCount < 1;
+            }
+        }
+
+        toggleObservationConfirmation() {
+            // Let the binocular button both open and close the count adjustment controls.
+            if (!this.observationConfirmation || this.observationConfirmation.hidden) {
+                this.showObservationConfirmation();
+            } else {
+                this.hideObservationConfirmation();
+            }
+        }
+
+        hideObservationConfirmation() {
+            // Hide the observation count confirmation without changing local data.
+            if (this.observationConfirmation) this.observationConfirmation.hidden = true;
+        }
+
+        adjustObservationCount(scientificName, delta) {
+            // Store one confirmed observation adjustment as a lightweight event for later Nostr publishing.
             const record = this.ensureObservationRecord(scientificName);
-            record.seen = !record.seen;
-            if (options.collapseDiary) {
-                this.openDiaryEntryId = null;
-                this.editingDiaryEntryId = null;
-                this.openDiarySpeciesKey = null;
-                this.editingDiarySpeciesKey = null;
+            const now = new Date().toISOString();
+            const previousCount = Number(record.observationCount) || 0;
+            const nextCount = Math.max(0, previousCount + delta);
+            if (nextCount === previousCount) {
+                this.hideObservationConfirmation();
+                return;
             }
-            if (record.seen && options.createEntry && record.observations.length === 0) {
-                const entry = this.createObservationEntry();
-                entry.name = this.getObservationEntryName(scientificName, entry);
-                record.observations.unshift(entry);
-                if (!options.collapseDiary) {
-                    this.openDiaryEntryId = entry.id;
-                    this.editingDiaryEntryId = entry.id;
-                    this.openDiarySpeciesKey = this.observationKey(scientificName);
-                    this.editingDiarySpeciesKey = this.observationKey(scientificName);
-                }
-            }
-            record.updatedAt = new Date().toISOString();
+            record.observationCount = nextCount;
+            record.seen = nextCount > 0 || record.observations.length > 0;
+            record.observationEvents.unshift({
+                id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+                observedAt: now,
+                delta,
+                countAfter: nextCount,
+                source: 'local-confirmed-click'
+            });
+            record.updatedAt = now;
+            this.openDiaryEntryId = null;
+            this.editingDiaryEntryId = null;
+            this.openDiarySpeciesKey = null;
+            this.editingDiarySpeciesKey = null;
             this.saveObservationDiary();
+            this.hideObservationConfirmation();
             this.refreshObservationUi(scientificName);
         }
 
@@ -4093,6 +4198,7 @@
             const entry = this.createObservationEntry();
             entry.name = this.getObservationEntryName(scientificName, entry);
             record.seen = true;
+            record.observationCount = Math.max(this.getObservationCount(scientificName), 1);
             record.observations.unshift(entry);
             this.openDiaryEntryId = entry.id;
             this.editingDiaryEntryId = entry.id;
@@ -4107,7 +4213,7 @@
             // Remove one diary entry while keeping the species marked as seen if other entries remain.
             const record = this.ensureObservationRecord(scientificName);
             record.observations = record.observations.filter(entry => entry.id !== entryId);
-            record.seen = record.observations.length > 0 ? record.seen : false;
+            record.seen = this.getObservationCount(scientificName) > 0 || record.observations.length > 0;
             if (this.openDiaryEntryId === entryId && this.openDiarySpeciesKey === this.observationKey(scientificName)) {
                 this.openDiaryEntryId = null;
                 this.openDiarySpeciesKey = null;
@@ -4140,6 +4246,7 @@
             Object.assign(entry, changes, { updatedAt: new Date().toISOString() });
             entry.name = this.getObservationEntryName(scientificName, entry);
             record.seen = true;
+            record.observationCount = Math.max(this.getObservationCount(scientificName), 1);
             record.updatedAt = new Date().toISOString();
             this.saveObservationDiary();
         }
@@ -4150,11 +4257,19 @@
                 if (card.getAttribute('data-bird-id') !== scientificName) return;
                 const imageContainer = card.querySelector('.bird-image-container');
                 const indicator = card.querySelector('[data-observation-card-indicator]');
-                const record = this.getObservationRecord(scientificName);
-                const isSeen = Boolean(record?.seen);
-                if (indicator && !isSeen) indicator.remove();
-                if (imageContainer && isSeen && !indicator) {
+                const observationCount = this.getObservationCount(scientificName);
+                if (indicator && observationCount < 1) indicator.remove();
+                if (imageContainer && observationCount > 0 && !indicator) {
                     imageContainer.insertAdjacentHTML('beforeend', this.renderObservationCardIndicator(scientificName));
+                } else if (indicator && observationCount > 0) {
+                    const countBadge = indicator.querySelector('.observation-count-badge');
+                    if (countBadge) countBadge.textContent = `${this.formatInterfaceNumber(observationCount)}x`;
+                    indicator.setAttribute('aria-label', this.t('diary.observedCount', {
+                        count: this.formatInterfaceNumber(observationCount)
+                    }));
+                    indicator.setAttribute('title', this.t('diary.observedCount', {
+                        count: this.formatInterfaceNumber(observationCount)
+                    }));
                 }
             });
 
@@ -4179,12 +4294,30 @@
         updateModalObservationToggle(scientificName) {
             // Keep the modal header binocular toggle aligned with the current bird's local observation state.
             if (!this.modalObservationToggle || this.currentBirdId !== scientificName) return;
-            const isSeen = Boolean(this.getObservationRecord(scientificName)?.seen);
+            const observationCount = this.getObservationCount(scientificName);
+            const isSeen = observationCount > 0;
             this.modalObservationToggle.hidden = false;
             this.modalObservationToggle.classList.toggle('seen', isSeen);
             this.modalObservationToggle.classList.toggle('not-seen', !isSeen);
-            this.modalObservationToggle.setAttribute('aria-label', this.t(isSeen ? 'diary.observed' : 'diary.notYetObserved'));
-            this.modalObservationToggle.setAttribute('title', this.t(isSeen ? 'diary.observed' : 'diary.notYetObserved'));
+            this.modalObservationToggle.setAttribute('aria-label', this.t(isSeen ? 'diary.observedCount' : 'diary.notYetObserved', {
+                count: this.formatInterfaceNumber(observationCount)
+            }));
+            this.modalObservationToggle.setAttribute('title', this.t(isSeen ? 'diary.observedCount' : 'diary.notYetObserved', {
+                count: this.formatInterfaceNumber(observationCount)
+            }));
+            let countBadge = this.modalObservationToggle.querySelector('.modal-observation-count');
+            if (isSeen && !countBadge) {
+                countBadge = document.createElement('span');
+                countBadge.className = 'modal-observation-count';
+                this.modalObservationToggle.appendChild(countBadge);
+            }
+            if (countBadge) {
+                countBadge.textContent = isSeen ? `${this.formatInterfaceNumber(observationCount)}x` : '';
+                countBadge.hidden = !isSeen;
+            }
+            if (this.observationConfirmSubtract) {
+                this.observationConfirmSubtract.disabled = observationCount < 1;
+            }
         }
 
         getBirdByScientificName(scientificName) {
@@ -4246,6 +4379,7 @@
                     scientificName,
                     englishName,
                     localName,
+                    observationCount: this.getObservationCount(scientificName),
                     updatedAt: record.updatedAt || '',
                     latestDate: this.getLatestObservationDate(record)
                 });
@@ -4425,6 +4559,7 @@
             // Render a compact observed-species result that is separate from normal bird cards.
             const displayName = item.localName || item.englishName || item.scientificName;
             const isHidden = this.diaryHiddenSpecies.has(this.observationKey(item.scientificName));
+            const observationCount = Math.max(Number(item.observationCount) || 0, 1);
             return `
                 <button class="diary-observed-species ${isHidden ? 'diary-observed-species-hidden' : ''}" type="button"
                     aria-pressed="${isHidden ? 'true' : 'false'}"
@@ -4432,6 +4567,7 @@
                     data-diary-toggle-species="${this.escapeHtml(item.scientificName)}">
                     <i class="fa-solid fa-binoculars" aria-hidden="true"></i>
                     <span>${this.escapeHtml(displayName)}</span>
+                    <strong class="diary-observed-count">${this.escapeHtml(this.formatInterfaceNumber(observationCount))}x</strong>
                     <small>${this.escapeHtml(item.scientificName)}</small>
                 </button>
             `;
@@ -4736,11 +4872,12 @@
             const record = this.getObservationRecord(scientificName) || {
                 scientificName,
                 seen: false,
+                observationCount: 0,
+                observationEvents: [],
                 observations: []
             };
             this.discardEmptyDraftObservations(record);
             this.saveObservationDiary();
-            const isSeen = Boolean(record.seen);
             const speciesKey = this.observationKey(scientificName);
             const hasOpenEntryForSpecies = this.openDiarySpeciesKey === speciesKey && Boolean(this.openDiaryEntryId);
             const entries = [...(record.observations || [])].sort((a, b) =>
@@ -4988,7 +5125,7 @@
                 entry.updatedAt = new Date().toISOString();
             });
 
-            record.seen = record.observations.length > 0 ? record.seen : false;
+            record.seen = this.getObservationCount(scientificName) > 0 || record.observations.length > 0;
             record.updatedAt = new Date().toISOString();
             this.openDiaryEntryId = null;
             this.openDiarySpeciesKey = null;
@@ -6417,6 +6554,7 @@
             this.currentBirdId = null;
             this.clearActiveDiaryUiState();
             if (this.modalObservationToggle) this.modalObservationToggle.hidden = true;
+            this.hideObservationConfirmation();
         }
 
         clearActiveDiaryUiState() {
