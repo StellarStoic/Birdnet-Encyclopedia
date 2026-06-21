@@ -122,13 +122,18 @@ body[data-theme="paper"] {
         .site-title-link {
             display: inline-flex;
             justify-content: center;
+            min-width: 0;
+            width: 100%;
             max-width: 100%;
+            overflow: hidden;
             text-decoration: none;
         }
 
         .site-title-logo {
             display: block;
-            width: clamp(250px, 48vw, 500px);
+            width: clamp(180px, 52vw, 500px);
+            max-width: min(100%, calc(100vw - 56px));
+            height: auto;
             max-height: 130px;
             object-fit: contain;
         }
@@ -2732,6 +2737,18 @@ body[data-theme="midnight"] .site-title-logo {
         padding-inline: 12px;
     }
 
+    /* Keep the Birds.name logo contained inside the header and burger menu on narrow phones. */
+    .site-title-logo {
+        width: min(78vw, 320px);
+        max-width: calc(100vw - 48px);
+        max-height: 96px;
+    }
+
+    .dropdown-title-logo {
+        width: min(68vw, 180px);
+        max-width: calc(100vw - 104px);
+    }
+
     .bird-grid {
         grid-template-columns: minmax(0, 1fr);
         gap: 16px;
@@ -2960,12 +2977,18 @@ body[data-theme="midnight"] .site-title-logo {
     .dropdown-title-link {
         display: flex;
         justify-content: center;
+        min-width: 0;
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
         text-decoration: none;
     }
 
     .dropdown-title-logo {
         display: block;
-        width: min(190px, 72vw);
+        width: min(190px, calc(100vw - 96px));
+        max-width: 100%;
+        height: auto;
         max-height: 58px;
         object-fit: contain;
         filter: invert(1) brightness(2.2);
