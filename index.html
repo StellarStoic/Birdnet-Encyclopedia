@@ -520,10 +520,29 @@
                         <i class="fa-solid fa-puzzle-piece" aria-hidden="true"></i>
                         <span><strong data-i18n="nostr.loginExtension">Browser extension</strong><small data-i18n="nostr.loginExtensionText">Use Alby, nos2x, or another NIP-07 signer.</small></span>
                     </button>
+                    <button class="nostr-login-option" id="nostr-login-connect" type="button">
+                        <i class="fa-solid fa-link" aria-hidden="true"></i>
+                        <span><strong data-i18n="nostr.loginConnect">Nostr Connect</strong><small data-i18n="nostr.loginConnectText">Use a NIP-46 remote signer over relays.</small></span>
+                    </button>
                     <button class="nostr-login-option" id="nostr-login-amber" type="button">
                         <i class="fa-brands fa-android" aria-hidden="true"></i>
                         <span><strong data-i18n="nostr.loginAmber">Amber</strong><small data-i18n="nostr.loginAmberText">Open Amber for online or offline Android signing.</small></span>
                     </button>
+                </div>
+                <div class="nostr-connect-panel" id="nostr-connect-panel" hidden>
+                    <strong data-i18n="nostr.connectTitle">Nostr Connect request</strong>
+                    <p data-i18n="nostr.connectIntro">Open this request in your signer, then keep this page open while the signer approves the connection.</p>
+                    <div class="nostr-connect-actions">
+                        <a class="ai-primary-button" id="nostr-connect-open" href="#" rel="noopener noreferrer">
+                            <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+                            <span data-i18n="nostr.connectOpen">Open signer</span>
+                        </a>
+                        <button class="ai-secondary-button" id="nostr-connect-copy" type="button">
+                            <i class="fa-regular fa-copy" aria-hidden="true"></i>
+                            <span data-i18n="nostr.connectCopy">Copy request</span>
+                        </button>
+                    </div>
+                    <textarea id="nostr-connect-uri" readonly rows="3" aria-label="Nostr Connect URI" data-i18n-aria-label="nostr.connectUriLabel"></textarea>
                 </div>
                 <details class="nostr-private-login">
                     <summary data-i18n="nostr.loginPrivate">Sign in with private key</summary>
@@ -972,11 +991,19 @@
             this.nostrOpenLogin = document.getElementById('nostr-open-login');
             this.nostrLoginPanel = document.getElementById('nostr-login-panel');
             this.nostrLoginExtension = document.getElementById('nostr-login-extension');
+            this.nostrLoginConnect = document.getElementById('nostr-login-connect');
+            this.nostrConnectPanel = document.getElementById('nostr-connect-panel');
+            this.nostrConnectOpen = document.getElementById('nostr-connect-open');
+            this.nostrConnectCopy = document.getElementById('nostr-connect-copy');
+            this.nostrConnectUri = document.getElementById('nostr-connect-uri');
             this.nostrLoginAmber = document.getElementById('nostr-login-amber');
             this.nostrPrivateLoginKey = document.getElementById('nostr-private-login-key');
             this.nostrLoginPrivate = document.getElementById('nostr-login-private');
             this.nostrAmberClipboard = document.getElementById('nostr-amber-clipboard');
             this.currentNostrKeyPair = null; // Holds the freshly generated key only while the modal is open
+            this.nostrToolsModule = null; // Lazy-loaded nostr-tools module used only for NIP-46 NIP-44 encryption.
+            this.nostrConnectSockets = new Map(); // Active NIP-46 relay listeners keyed by relay URL.
+            this.nostrConnectPendingRequests = new Map(); // Pending NIP-46 request resolvers keyed by request id.
             this.nostrPublishModal = document.getElementById('nostr-publish-modal');
             this.nostrPublishClose = document.getElementById('nostr-publish-close');
             this.nostrPublishCancel = document.getElementById('nostr-publish-cancel');
@@ -2661,6 +2688,8 @@
             this.nostrSavePublic?.addEventListener('click', () => this.saveNostrPublicKey());
             this.nostrOpenLogin?.addEventListener('click', () => this.showNostrLoginPanel());
             this.nostrLoginExtension?.addEventListener('click', () => this.signInWithNostrExtension());
+            this.nostrLoginConnect?.addEventListener('click', () => this.startNostrConnectLogin());
+            this.nostrConnectCopy?.addEventListener('click', () => this.copyNostrValue(this.nostrConnectUri?.value, 'nostr.connectCopied'));
             this.nostrLoginAmber?.addEventListener('click', () => this.signInWithAmber());
             this.nostrLoginPrivate?.addEventListener('click', () => this.signInWithPrivateKey());
             this.nostrAmberClipboard?.addEventListener('click', () => this.completeAmberLoginFromClipboard());
@@ -3045,6 +3074,141 @@
                 console.warn('Nostr extension sign-in failed:', error);
                 this.showNostrStatus(this.t('nostr.extensionFailed'), true);
             }
+        }
+
+        async loadNostrTools() {
+            // Load nostr-tools only when NIP-46 is used so normal encyclopedia browsing stays lightweight.
+            if (!this.nostrToolsModule) {
+                this.nostrToolsModule = await import('https://esm.sh/nostr-tools@2.10.4?bundle');
+            }
+            return this.nostrToolsModule;
+        }
+
+        getNostrConnectRelays() {
+            // Use signer-friendly relays first, then the app's normal publish relays as fallbacks.
+            return [...new Set([
+                'wss://relay.nsec.app',
+                ...this.getNostrPersonalRelays(),
+                ...this.getDefaultNostrPublishRelays()
+            ])].slice(0, 6);
+        }
+
+        getNostrConnectPermissions() {
+            // Request only event kinds Birds.name currently signs: diary data, deletion, and badges.
+            return ['sign_event:30078', 'sign_event:5', 'sign_event:30009', 'sign_event:8'].join(',');
+        }
+
+        async startNostrConnectLogin() {
+            // Start a client-initiated NIP-46 session and listen for the signer response over relays.
+            try {
+                const tools = await this.loadNostrTools();
+                const clientSecretKey = tools.generateSecretKey();
+                const clientPrivateHex = this.bytesToHex(clientSecretKey);
+                const clientPubkey = tools.getPublicKey(clientSecretKey);
+                const relays = this.getNostrConnectRelays();
+                const secret = this.bytesToHex(crypto.getRandomValues(new Uint8Array(16)));
+                const uri = this.buildNostrConnectUri({ clientPubkey, relays, secret });
+                localStorage.setItem('birdNostrConnectClientPrivateKeyHex', clientPrivateHex);
+                localStorage.setItem('birdNostrConnectClientPubkey', clientPubkey);
+                sessionStorage.setItem('birdNostrConnectPendingSecret', secret);
+                sessionStorage.setItem('birdNostrConnectStartedAt', new Date().toISOString());
+                this.renderNostrConnectRequest(uri);
+                this.listenForNostrConnectResponse({ clientPubkey, clientPrivateHex, secret, relays });
+                this.showNostrStatus(this.t('nostr.connectWaiting'));
+                window.location.href = uri;
+            } catch (error) {
+                console.warn('Nostr Connect login failed to start:', error);
+                this.showNostrStatus(this.t('nostr.connectFailed'), true);
+            }
+        }
+
+        buildNostrConnectUri({ clientPubkey, relays, secret }) {
+            // Build the NIP-46 nostrconnect URI consumed by remote signers and bunker apps.
+            const url = new URL(`nostrconnect://${clientPubkey}`);
+            relays.forEach(relay => url.searchParams.append('relay', relay));
+            url.searchParams.set('metadata', JSON.stringify({
+                name: 'Birds.name',
+                url: window.location.origin || 'https://birds.name',
+                description: 'Birds.name diary publishing and observation badges',
+                icons: [`${window.location.origin}/img/origami_bird_B-ICO.png`]
+            }));
+            url.searchParams.set('name', 'Birds.name');
+            url.searchParams.set('url', window.location.origin || 'https://birds.name');
+            url.searchParams.set('secret', secret);
+            url.searchParams.set('perms', this.getNostrConnectPermissions());
+            return url.toString();
+        }
+
+        renderNostrConnectRequest(uri) {
+            // Show the request for copy/open in case the deep link is not handled by the browser.
+            if (this.nostrConnectPanel) this.nostrConnectPanel.hidden = false;
+            if (this.nostrConnectUri) this.nostrConnectUri.value = uri;
+            if (this.nostrConnectOpen) this.nostrConnectOpen.href = uri;
+        }
+
+        listenForNostrConnectResponse({ clientPubkey, clientPrivateHex, secret, relays }) {
+            // Wait for the signer to answer the nostrconnect request with the shared secret.
+            const requestId = `connect-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+            const startedAt = Math.floor(Date.now() / 1000) - 60;
+            relays.forEach(relay => {
+                this.openNostrConnectSocket(relay, clientPubkey, startedAt, async event => {
+                    if (!event?.pubkey || event.pubkey === clientPubkey) return;
+                    try {
+                        const payload = await this.decryptNostrConnectPayload(event, clientPrivateHex, event.pubkey);
+                        if (payload?.result !== secret) return;
+                        localStorage.setItem('birdNostrConnectSignerPubkey', event.pubkey);
+                        localStorage.setItem('birdNostrConnectRelays', JSON.stringify(relays));
+                        localStorage.setItem('birdNostrConnectConnectedAt', new Date().toISOString());
+                        sessionStorage.removeItem('birdNostrConnectPendingSecret');
+                        this.closeNostrConnectSockets();
+                        const userPubkey = await this.sendNostrConnectRequest('get_public_key', []);
+                        if (!/^[0-9a-f]{64}$/i.test(userPubkey || '')) throw new Error('Invalid NIP-46 public key.');
+                        this.saveNostrIdentity({ publicHex: userPubkey, method: 'nip46' });
+                        this.showNostrStatus('');
+                        if (this.nostrConnectPanel) this.nostrConnectPanel.hidden = true;
+                    } catch (error) {
+                        console.warn(`Ignoring invalid NIP-46 connect response from ${relay}:`, error);
+                    }
+                }, requestId);
+            });
+            window.setTimeout(() => {
+                if (sessionStorage.getItem('birdNostrConnectPendingSecret') === secret) {
+                    this.showNostrStatus(this.t('nostr.connectStillWaiting'), true);
+                }
+            }, 45000);
+        }
+
+        openNostrConnectSocket(relay, clientPubkey, since, onEvent, subscriptionId = `nip46-${Date.now()}`) {
+            // Subscribe to NIP-46 events addressed to this browser's temporary client key.
+            const socket = new WebSocket(relay);
+            this.nostrConnectSockets.set(relay, socket);
+            socket.addEventListener('open', () => {
+                socket.send(JSON.stringify(['REQ', subscriptionId, {
+                    kinds: [24133],
+                    '#p': [clientPubkey],
+                    since
+                }]));
+            });
+            socket.addEventListener('message', message => {
+                try {
+                    const data = JSON.parse(message.data);
+                    if (data[0] === 'EVENT' && data[2]) onEvent(data[2], socket);
+                } catch (error) {
+                    console.warn('Invalid NIP-46 relay message:', error);
+                }
+            });
+            socket.addEventListener('error', error => {
+                console.warn(`NIP-46 relay error on ${relay}:`, error);
+            });
+            return socket;
+        }
+
+        closeNostrConnectSockets() {
+            // Close temporary NIP-46 listeners after login or timeout.
+            this.nostrConnectSockets.forEach(socket => {
+                try { socket.close(); } catch (error) {}
+            });
+            this.nostrConnectSockets.clear();
         }
 
         signInWithAmber() {
@@ -3529,13 +3693,21 @@
                 'birdNostrLoginMethod',
                 'birdNostrPublicKeySavedAt',
                 'birdNostrSignerPackage',
+                'birdNostrConnectClientPrivateKeyHex',
+                'birdNostrConnectClientPubkey',
+                'birdNostrConnectSignerPubkey',
+                'birdNostrConnectRelays',
+                'birdNostrConnectConnectedAt',
                 'birdNostrProfile'
             ].forEach(key => localStorage.removeItem(key));
             [
                 'birdNostrSessionPrivateKeyHex',
                 'birdNostrSessionPrivateKeySavedAt',
-                'birdNostrAmberLoginPending'
+                'birdNostrAmberLoginPending',
+                'birdNostrConnectPendingSecret',
+                'birdNostrConnectStartedAt'
             ].forEach(key => sessionStorage.removeItem(key));
+            this.closeNostrConnectSockets();
             this.currentNostrKeyPair = null;
             if (this.nostrPrivateKey) this.nostrPrivateKey.value = '';
             if (this.nostrPublicKey) this.nostrPublicKey.value = '';
@@ -3548,13 +3720,19 @@
         }
 
         async signNostrEvent(event) {
-            // Sign Nostr events with a browser signer first, falling back to this tab's private-key session.
+            // Sign Nostr events with a browser signer, NIP-46 remote signer, or this tab's private-key session.
             const eventWithId = {
                 ...event,
                 id: await this.calculateNostrEventId(event)
             };
+            if (localStorage.getItem('birdNostrLoginMethod') === 'nip46' && this.hasNostrConnectSession()) {
+                return this.signNostrEventWithNostrConnect(event);
+            }
             if (window.nostr?.signEvent) {
                 return window.nostr.signEvent(eventWithId);
+            }
+            if (this.hasNostrConnectSession()) {
+                return this.signNostrEventWithNostrConnect(event);
             }
             const privateHex = sessionStorage.getItem('birdNostrSessionPrivateKeyHex');
             if (!privateHex) throw new Error(this.t('nostr.signerRequired'));
@@ -3562,6 +3740,139 @@
                 ...eventWithId,
                 sig: await this.signNostrEventWithPrivateKey(eventWithId, privateHex)
             };
+        }
+
+        hasNostrConnectSession() {
+            // Detect whether a NIP-46 remote signer is connected and available for future signing requests.
+            return Boolean(
+                localStorage.getItem('birdNostrConnectClientPrivateKeyHex')
+                && localStorage.getItem('birdNostrConnectClientPubkey')
+                && localStorage.getItem('birdNostrConnectSignerPubkey')
+            );
+        }
+
+        getNostrConnectSession() {
+            // Read the persisted disposable NIP-46 client key and signer identity.
+            const clientPrivateHex = localStorage.getItem('birdNostrConnectClientPrivateKeyHex') || '';
+            const clientPubkey = localStorage.getItem('birdNostrConnectClientPubkey') || '';
+            const signerPubkey = localStorage.getItem('birdNostrConnectSignerPubkey') || '';
+            let relays = [];
+            try {
+                relays = JSON.parse(localStorage.getItem('birdNostrConnectRelays') || '[]');
+            } catch (error) {
+                relays = [];
+            }
+            relays = Array.isArray(relays) && relays.length ? relays : this.getNostrConnectRelays();
+            if (!clientPrivateHex || !clientPubkey || !signerPubkey) return null;
+            return { clientPrivateHex, clientPubkey, signerPubkey, relays };
+        }
+
+        async signNostrEventWithNostrConnect(event) {
+            // Ask the connected NIP-46 signer to sign one event without exposing the user's private key.
+            const requestEvent = {
+                kind: event.kind,
+                created_at: event.created_at || Math.floor(Date.now() / 1000),
+                tags: event.tags || [],
+                content: event.content || ''
+            };
+            const result = await this.sendNostrConnectRequest('sign_event', [JSON.stringify(requestEvent)]);
+            const signedEvent = typeof result === 'string' ? JSON.parse(result) : result;
+            if (!signedEvent?.id || !signedEvent?.sig || !signedEvent?.pubkey) {
+                throw new Error(this.t('nostr.connectSignFailed'));
+            }
+            return signedEvent;
+        }
+
+        async sendNostrConnectRequest(method, params = []) {
+            // Send one encrypted NIP-46 request and resolve with the matching encrypted response.
+            const session = this.getNostrConnectSession();
+            if (!session) throw new Error(this.t('nostr.connectMissing'));
+            const tools = await this.loadNostrTools();
+            const requestId = crypto.randomUUID ? crypto.randomUUID() : `req-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+            const content = await this.encryptNostrConnectPayload({
+                id: requestId,
+                method,
+                params
+            }, session.clientPrivateHex, session.signerPubkey);
+            const unsignedEvent = {
+                kind: 24133,
+                pubkey: session.clientPubkey,
+                created_at: Math.floor(Date.now() / 1000),
+                tags: [['p', session.signerPubkey]],
+                content
+            };
+            const signedRequest = tools.finalizeEvent(unsignedEvent, this.hexToBytes(session.clientPrivateHex));
+            const responsePromise = this.waitForNostrConnectResponse(requestId, session);
+            await this.publishNostrEventsToRelays(session.relays, [signedRequest]);
+            return responsePromise;
+        }
+
+        waitForNostrConnectResponse(requestId, session) {
+            // Listen on the NIP-46 relays until the signer replies to the matching request id.
+            return new Promise((resolve, reject) => {
+                const sockets = [];
+                let settled = false;
+                const finish = (callback, value) => {
+                    if (settled) return;
+                    settled = true;
+                    sockets.forEach(socket => {
+                        try { socket.close(); } catch (error) {}
+                        this.nostrConnectSockets.forEach((storedSocket, relay) => {
+                            if (storedSocket === socket) this.nostrConnectSockets.delete(relay);
+                        });
+                    });
+                    callback(value);
+                };
+                const timeout = window.setTimeout(() => {
+                    finish(reject, new Error(this.t('nostr.connectTimeout')));
+                }, 60000);
+                session.relays.forEach(relay => {
+                    const socket = this.openNostrConnectSocket(
+                        relay,
+                        session.clientPubkey,
+                        Math.floor(Date.now() / 1000) - 10,
+                        async event => {
+                            if (event?.pubkey !== session.signerPubkey) return;
+                            try {
+                                const payload = await this.decryptNostrConnectPayload(event, session.clientPrivateHex, session.signerPubkey);
+                                if (payload?.id !== requestId) return;
+                                window.clearTimeout(timeout);
+                                if (payload.error) {
+                                    finish(reject, new Error(String(payload.error)));
+                                } else {
+                                    finish(resolve, payload.result);
+                                }
+                            } catch (error) {
+                                console.warn('Invalid NIP-46 response:', error);
+                            }
+                        },
+                        `nip46-response-${requestId}`
+                    );
+                    sockets.push(socket);
+                });
+            });
+        }
+
+        async publishNostrEventsToRelays(relays, events) {
+            // Publish encrypted NIP-46 transport events to all configured connection relays.
+            const results = await Promise.allSettled(relays.map(relay => this.publishNostrEventsToRelay(relay, events)));
+            const successRelays = results.filter(result => result.status === 'fulfilled' && result.value).length;
+            if (successRelays < 1) throw new Error(this.t('nostr.connectRelayFailed'));
+            return successRelays;
+        }
+
+        async encryptNostrConnectPayload(payload, clientPrivateHex, remotePubkey) {
+            // Encrypt NIP-46 request JSON with NIP-44 using the disposable client key.
+            const tools = await this.loadNostrTools();
+            const conversationKey = tools.nip44.v2.utils.getConversationKey(this.hexToBytes(clientPrivateHex), remotePubkey);
+            return tools.nip44.v2.encrypt(JSON.stringify(payload), conversationKey);
+        }
+
+        async decryptNostrConnectPayload(event, clientPrivateHex, remotePubkey) {
+            // Decrypt one NIP-46 response event and parse its JSON content.
+            const tools = await this.loadNostrTools();
+            const conversationKey = tools.nip44.v2.utils.getConversationKey(this.hexToBytes(clientPrivateHex), remotePubkey);
+            return JSON.parse(tools.nip44.v2.decrypt(event.content, conversationKey));
         }
 
         async calculateNostrEventId(event) {

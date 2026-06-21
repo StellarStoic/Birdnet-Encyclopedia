@@ -2803,6 +2803,7 @@ body[data-theme="midnight"] .site-title-logo {
     .nostr-step-guide,
     .nostr-new-user,
     .nostr-login-panel,
+    .nostr-connect-panel,
     .nostr-signer-options,
     .nostr-current-public,
     .nostr-location-warning,
@@ -3544,6 +3545,50 @@ body[data-theme="midnight"] .site-title-logo {
     margin-top: 12px;
     padding-top: 12px;
     border-top: 1px solid var(--border);
+}
+
+.nostr-connect-panel {
+    display: grid;
+    gap: 10px;
+    margin: 14px 0;
+    padding: 14px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: color-mix(in srgb, var(--primary) 8%, var(--surface-solid));
+}
+
+.nostr-connect-panel[hidden] {
+    display: none;
+}
+
+.nostr-connect-panel p {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.45;
+}
+
+.nostr-connect-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.nostr-connect-actions .ai-primary-button,
+.nostr-connect-actions .ai-secondary-button {
+    flex: 1 1 180px;
+    justify-content: center;
+}
+
+.nostr-connect-panel textarea {
+    width: 100%;
+    min-height: 86px;
+    resize: vertical;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface-solid);
+    color: var(--text);
+    font: 0.78rem/1.45 var(--mono-font);
 }
 
 .nostr-private-login summary {
