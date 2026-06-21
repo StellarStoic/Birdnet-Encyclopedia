@@ -81,6 +81,9 @@ class MyBirdNETDashboard {
         this.activeBirdWeatherController = null;
         this.stationCacheMetadata = new Map();
         this.favouriteStations = new Map();
+        this.favouriteStationsUpdatedAt = '';
+        this.nostrFavouriteSyncTimer = null;
+        this.nostrFavouriteSyncLoading = false;
         this.stationViewMode = 'nearby';
         this.selectedActivitySpeciesKey = '';
         this.availableDateKeys = [];
@@ -109,6 +112,7 @@ class MyBirdNETDashboard {
         document.body.dataset.theme = this.currentTheme;
         this.themeSelect.value = this.currentTheme;
         this.loadFavouriteStations();
+        this.loadNostrFavouriteStations();
 
         this.bindEvents();
         this.initializeChartSnapshots();
@@ -1450,25 +1454,35 @@ class MyBirdNETDashboard {
         // Restore complete station records so favourites remain usable without geolocation or a new API search.
         try {
             const records = JSON.parse(localStorage.getItem('birdWeatherFavouriteStations') || '[]');
+            const savedAt = localStorage.getItem('birdWeatherFavouriteStationsUpdatedAt') || '';
             this.favouriteStations = new Map(
                 records
                     .filter(station => station?.id)
                     .map(station => [String(station.id), station])
             );
+            this.favouriteStationsUpdatedAt = savedAt;
+            if (records.length && !savedAt) {
+                this.favouriteStationsUpdatedAt = new Date().toISOString();
+                localStorage.setItem('birdWeatherFavouriteStationsUpdatedAt', this.favouriteStationsUpdatedAt);
+            }
         } catch (error) {
             console.warn('Favourite stations could not be restored:', error);
             this.favouriteStations = new Map();
+            this.favouriteStationsUpdatedAt = '';
         }
         this.updateFavouriteStationCount();
     }
 
-    persistFavouriteStations() {
+    persistFavouriteStations({ syncNostr = false } = {}) {
         // Favourites are small station metadata records, so localStorage is sufficient and immediately available.
+        this.favouriteStationsUpdatedAt = new Date().toISOString();
         localStorage.setItem(
             'birdWeatherFavouriteStations',
             JSON.stringify([...this.favouriteStations.values()])
         );
+        localStorage.setItem('birdWeatherFavouriteStationsUpdatedAt', this.favouriteStationsUpdatedAt);
         this.updateFavouriteStationCount();
+        if (syncNostr) this.scheduleNostrFavouriteStationSync();
     }
 
     isStationFavourite(stationId) {
@@ -1507,8 +1521,133 @@ class MyBirdNETDashboard {
                 station: station.name || this.t('station.stationWithId', { id })
             }));
         }
-        this.persistFavouriteStations();
+        this.persistFavouriteStations({ syncNostr: true });
         this.refreshFavouriteStationViews();
+    }
+
+    scheduleNostrFavouriteStationSync() {
+        // Publish the compact favourites list as one replaceable NIP-78 event after local star changes settle.
+        window.clearTimeout(this.nostrFavouriteSyncTimer);
+        this.nostrFavouriteSyncTimer = window.setTimeout(() => {
+            this.publishNostrFavouriteStations();
+        }, 600);
+    }
+
+    async loadNostrFavouriteStations() {
+        // Restore the newest Birds.name BirdWeather favourites event for the logged-in Nostr identity.
+        const publicHex = localStorage.getItem('birdNostrPublicKeyHex');
+        if (!/^[0-9a-f]{64}$/i.test(publicHex || '') || this.nostrFavouriteSyncLoading) return;
+        this.nostrFavouriteSyncLoading = true;
+        try {
+            const relays = await this.getNostrApplicationRelays();
+            const events = await this.fetchNostrFavouriteStationEvents(publicHex.toLowerCase(), relays);
+            const latest = events
+                .filter(event => Number(event.kind) === 30078)
+                .map(event => {
+                    try {
+                        return { event, payload: JSON.parse(event.content || '{}') };
+                    } catch (error) {
+                        return null;
+                    }
+                })
+                .filter(item => item?.payload?.app === 'birds.name' && item.payload.type === 'birdweather-favourites')
+                .sort((a, b) => Number(b.event.created_at || 0) - Number(a.event.created_at || 0))[0];
+            if (!latest) return;
+            const remoteUpdatedAt = latest.payload.updatedAt
+                || new Date(Number(latest.event.created_at || 0) * 1000).toISOString();
+            const localTime = Date.parse(this.favouriteStationsUpdatedAt || '') || 0;
+            const remoteTime = Date.parse(remoteUpdatedAt) || 0;
+            if (remoteTime <= localTime) return;
+            const stations = Array.isArray(latest.payload.stations) ? latest.payload.stations : [];
+            this.favouriteStations = new Map(
+                stations
+                    .filter(station => station?.id)
+                    .map(station => [String(station.id), this.normalizeFavouriteStationRecord(station)])
+            );
+            this.favouriteStationsUpdatedAt = remoteUpdatedAt;
+            localStorage.setItem('birdWeatherFavouriteStations', JSON.stringify([...this.favouriteStations.values()]));
+            localStorage.setItem('birdWeatherFavouriteStationsUpdatedAt', this.favouriteStationsUpdatedAt);
+            this.updateFavouriteStationCount();
+            this.refreshFavouriteStationViews();
+            this.setStatus(this.t('station.nostrFavouritesImported', { count: this.favouriteStations.size }));
+        } catch (error) {
+            console.warn('Could not load BirdWeather favourites from Nostr:', error);
+        } finally {
+            this.nostrFavouriteSyncLoading = false;
+        }
+    }
+
+    normalizeFavouriteStationRecord(station) {
+        // Keep only portable BirdWeather station metadata in local and Nostr favourite records.
+        return {
+            id: station.id,
+            name: station.name || '',
+            type: station.type || '',
+            location: station.location || '',
+            state: station.state || '',
+            country: station.country || '',
+            latestDetectionAt: station.latestDetectionAt || '',
+            coords: station.coords && Number.isFinite(Number(station.coords.lat)) && Number.isFinite(Number(station.coords.lon))
+                ? { lat: Number(station.coords.lat), lon: Number(station.coords.lon) }
+                : null,
+            distance: Number.isFinite(Number(station.distance)) ? Number(station.distance) : null
+        };
+    }
+
+    buildNostrFavouriteStationsEvent() {
+        // Publish favourites as replaceable app data so removals replace the previous station list.
+        const publicHex = localStorage.getItem('birdNostrPublicKeyHex');
+        const updatedAt = this.favouriteStationsUpdatedAt || new Date().toISOString();
+        const stations = [...this.favouriteStations.values()]
+            .map(station => this.normalizeFavouriteStationRecord(station))
+            .sort((a, b) => String(a.id).localeCompare(String(b.id)));
+        return {
+            kind: 30078,
+            pubkey: publicHex,
+            created_at: Math.floor(Date.now() / 1000),
+            tags: [
+                ['d', 'birds.name:birdweather-favourites:v1'],
+                ['client', 'Birds.name'],
+                ['published_at', updatedAt]
+            ],
+            content: JSON.stringify({
+                app: 'birds.name',
+                type: 'birdweather-favourites',
+                version: 1,
+                updatedAt,
+                stations
+            })
+        };
+    }
+
+    async publishNostrFavouriteStations() {
+        // Sync favourites only when the visitor has a Nostr public key and a signer/session able to sign.
+        const publicHex = localStorage.getItem('birdNostrPublicKeyHex');
+        if (!/^[0-9a-f]{64}$/i.test(publicHex || '')) return;
+        if (!window.nostr?.signEvent && !sessionStorage.getItem('birdNostrSessionPrivateKeyHex')) {
+            this.setStatus(this.t('station.nostrFavouritesNeedSigner'));
+            return;
+        }
+        try {
+            const event = await this.signNostrEvent(this.buildNostrFavouriteStationsEvent());
+            const result = await this.publishNostrEvents([event]);
+            if (result.successRelays > 0) {
+                localStorage.setItem('birdWeatherFavouriteStationsNostrEvent', JSON.stringify({
+                    id: event.id,
+                    publishedAt: new Date().toISOString(),
+                    relays: result.successRelays
+                }));
+                this.setStatus(this.t('station.nostrFavouritesSynced', {
+                    count: this.favouriteStations.size,
+                    relays: result.successRelays
+                }));
+            } else {
+                this.setStatus(this.t('station.nostrFavouritesSyncFailed'), true);
+            }
+        } catch (error) {
+            console.warn('Could not publish BirdWeather favourites to Nostr:', error);
+            this.setStatus(this.t('station.nostrFavouritesSyncFailed'), true);
+        }
     }
 
     updateFavouriteStationCount() {
@@ -1556,6 +1695,297 @@ class MyBirdNETDashboard {
                 <i class="${favourite ? 'fa-solid' : 'fa-regular'} fa-star" aria-hidden="true"></i>
             </button>
         `;
+    }
+
+    getDefaultNostrPublishRelays() {
+        // Match the encyclopedia defaults so dashboard favourites sync through the same public relays.
+        return [
+            'wss://relay.damus.io',
+            'wss://nos.lol',
+            'wss://relay.primal.net',
+            'wss://relay.nostr.band'
+        ];
+    }
+
+    getDefaultNostrProfileRelays() {
+        // Profile relays are also useful read fallbacks for replaceable app-data events.
+        return [
+            'wss://purplepag.es',
+            'wss://relay.damus.io',
+            'wss://nos.lol',
+            'wss://relay.primal.net',
+            'wss://relay.snort.social'
+        ];
+    }
+
+    shouldUseNostrDefaultRelays() {
+        // Keep advanced relay settings shared with the encyclopedia Nostr settings modal.
+        return localStorage.getItem('birdNostrUseDefaultRelays') !== 'false';
+    }
+
+    getNostrPersonalRelays() {
+        // Read user-configured relays saved from Settings > Nostr > Relays.
+        try {
+            const relays = JSON.parse(localStorage.getItem('birdNostrPersonalRelays') || '[]');
+            return Array.isArray(relays) ? relays.filter(url => /^wss:\/\//i.test(url)) : [];
+        } catch (error) {
+            console.warn('Could not read Nostr personal relays:', error);
+            return [];
+        }
+    }
+
+    async getNostrApplicationRelays({ write = false } = {}) {
+        // Combine personal, signer, and default relays for reading or publishing dashboard app data.
+        const personalRelays = this.getNostrPersonalRelays();
+        const signerRelays = [];
+        try {
+            if (window.nostr?.getRelays) {
+                const relays = await window.nostr.getRelays();
+                Object.entries(relays || {}).forEach(([url, policy]) => {
+                    if (!/^wss:\/\//i.test(url)) return;
+                    if (write && policy?.write === false) return;
+                    signerRelays.push(url);
+                });
+            }
+        } catch (error) {
+            console.warn('Could not read Nostr signer relays:', error);
+        }
+        const defaultRelays = this.shouldUseNostrDefaultRelays()
+            ? [...this.getDefaultNostrPublishRelays(), ...this.getDefaultNostrProfileRelays()]
+            : [];
+        return [...new Set([...personalRelays, ...signerRelays, ...defaultRelays])].slice(0, 12);
+    }
+
+    fetchNostrFavouriteStationEvents(publicHex, relays) {
+        // Read only the replaceable Birds.name favourites event for this Nostr account.
+        return new Promise(resolve => {
+            const requestId = Math.random().toString(36).slice(2);
+            const eventsById = new Map();
+            const sockets = [];
+            const finishedRelays = new Set();
+            let openedRelays = 0;
+            let settled = false;
+            const closeAll = () => sockets.forEach(socket => {
+                try { socket.close(); } catch (error) { /* Ignore relay close errors. */ }
+            });
+            const finish = () => {
+                if (settled) return;
+                settled = true;
+                closeAll();
+                resolve([...eventsById.values()]);
+            };
+            const timer = window.setTimeout(finish, 6500);
+            const markRelayDone = relay => {
+                if (finishedRelays.has(relay)) return;
+                finishedRelays.add(relay);
+                if (openedRelays > 0 && finishedRelays.size >= openedRelays) {
+                    window.clearTimeout(timer);
+                    finish();
+                }
+            };
+            relays.forEach(relay => {
+                try {
+                    const socket = new WebSocket(relay);
+                    sockets.push(socket);
+                    socket.addEventListener('open', () => {
+                        openedRelays += 1;
+                        socket.send(JSON.stringify(['REQ', requestId, {
+                            kinds: [30078],
+                            authors: [publicHex],
+                            '#d': ['birds.name:birdweather-favourites:v1'],
+                            limit: 12
+                        }]));
+                    });
+                    socket.addEventListener('message', event => {
+                        try {
+                            const message = JSON.parse(event.data);
+                            if (message[1] !== requestId) return;
+                            if (message[0] === 'EVENT' && message[2]?.id) {
+                                eventsById.set(message[2].id, { ...message[2], relay });
+                            }
+                            if (message[0] === 'EOSE') markRelayDone(relay);
+                        } catch (error) {
+                            console.warn('Could not parse Nostr favourite response:', error);
+                        }
+                    });
+                    socket.addEventListener('error', () => markRelayDone(relay));
+                    socket.addEventListener('close', () => {
+                        if (socket.readyState !== WebSocket.OPEN) markRelayDone(relay);
+                    });
+                } catch (error) {
+                    console.warn(`Could not connect to Nostr relay ${relay}:`, error);
+                }
+            });
+            if (!relays.length) {
+                window.clearTimeout(timer);
+                finish();
+            }
+        });
+    }
+
+    async signNostrEvent(event) {
+        // Sign with a browser signer first, falling back to this tab's private-key session.
+        const eventWithId = {
+            ...event,
+            id: await this.calculateNostrEventId(event)
+        };
+        if (window.nostr?.signEvent) return window.nostr.signEvent(eventWithId);
+        const privateHex = sessionStorage.getItem('birdNostrSessionPrivateKeyHex');
+        if (!privateHex) throw new Error(this.t('nostr.signerRequired'));
+        return {
+            ...eventWithId,
+            sig: await this.signNostrEventWithPrivateKey(eventWithId, privateHex)
+        };
+    }
+
+    async calculateNostrEventId(event) {
+        // Nostr event IDs are SHA-256 hashes of the canonical serialized event array.
+        const serialized = JSON.stringify([0, event.pubkey, event.created_at, event.kind, event.tags, event.content]);
+        return this.bytesToHex(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(serialized))));
+    }
+
+    async signNostrEventWithPrivateKey(event, privateHex) {
+        // Sign a Nostr event ID with BIP-340 Schnorr using the temporary session private key.
+        const privateScalar = this.bytesToBigInt(this.hexToBytes(privateHex));
+        const publicPoint = this.secp256k1Multiply(privateScalar);
+        const curveOrder = BigInt('0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141');
+        const effectivePrivate = (publicPoint.y & 1n) === 0n ? privateScalar : curveOrder - privateScalar;
+        const publicKeyBytes = this.hexToBytes(publicPoint.x.toString(16).padStart(64, '0'));
+        const aux = new Uint8Array(32);
+        crypto.getRandomValues(aux);
+        const auxHash = await this.nostrTaggedHash('BIP0340/aux', aux);
+        const privateEffectiveBytes = this.hexToBytes(effectivePrivate.toString(16).padStart(64, '0'));
+        const t = privateEffectiveBytes.map((value, index) => value ^ auxHash[index]);
+        const messageBytes = this.hexToBytes(event.id);
+        const nonceHash = await this.nostrTaggedHash('BIP0340/nonce', new Uint8Array([...t, ...publicKeyBytes, ...messageBytes]));
+        let nonce = this.bytesToBigInt(nonceHash) % curveOrder;
+        if (nonce === 0n) throw new Error('Schnorr nonce was zero.');
+        const noncePoint = this.secp256k1Multiply(nonce);
+        const effectiveNonce = (noncePoint.y & 1n) === 0n ? nonce : curveOrder - nonce;
+        const rBytes = this.hexToBytes(noncePoint.x.toString(16).padStart(64, '0'));
+        const challengeHash = await this.nostrTaggedHash('BIP0340/challenge', new Uint8Array([...rBytes, ...publicKeyBytes, ...messageBytes]));
+        const challenge = this.bytesToBigInt(challengeHash) % curveOrder;
+        const signatureScalar = this.mod(effectiveNonce + challenge * effectivePrivate, curveOrder);
+        return `${this.bytesToHex(rBytes)}${signatureScalar.toString(16).padStart(64, '0')}`;
+    }
+
+    async nostrTaggedHash(tag, message) {
+        // Compute BIP-340 tagged hashes used by Schnorr nonce and challenge generation.
+        const encoder = new TextEncoder();
+        const tagHash = new Uint8Array(await crypto.subtle.digest('SHA-256', encoder.encode(tag)));
+        return new Uint8Array(await crypto.subtle.digest('SHA-256', new Uint8Array([...tagHash, ...tagHash, ...message])));
+    }
+
+    async publishNostrEvents(events) {
+        // Publish signed dashboard app-data events to the configured Nostr relays.
+        const relays = await this.getNostrApplicationRelays({ write: true });
+        const results = await Promise.allSettled(relays.map(relay => this.publishNostrEventsToRelay(relay, events)));
+        return {
+            successRelays: results.filter(result => result.status === 'fulfilled' && result.value).length,
+            attemptedRelays: relays.length
+        };
+    }
+
+    publishNostrEventsToRelay(relay, events) {
+        // Resolve true when a relay acknowledges at least one event before timeout.
+        return new Promise(resolve => {
+            let accepted = 0;
+            let settled = false;
+            let socket;
+            const finish = value => {
+                if (settled) return;
+                settled = true;
+                try { socket?.close(); } catch (error) { /* Ignore relay close errors. */ }
+                resolve(value);
+            };
+            try {
+                socket = new WebSocket(relay);
+                const timer = window.setTimeout(() => finish(accepted > 0), 6500);
+                socket.addEventListener('open', () => {
+                    events.forEach(event => socket.send(JSON.stringify(['EVENT', event])));
+                });
+                socket.addEventListener('message', messageEvent => {
+                    try {
+                        const message = JSON.parse(messageEvent.data);
+                        if (message[0] === 'OK' && message[2] === true) accepted += 1;
+                        if (accepted >= events.length) {
+                            window.clearTimeout(timer);
+                            finish(true);
+                        }
+                    } catch (error) {
+                        console.warn('Could not parse Nostr publish response:', error);
+                    }
+                });
+                socket.addEventListener('error', () => finish(false));
+            } catch (error) {
+                console.warn(`Could not publish to Nostr relay ${relay}:`, error);
+                resolve(false);
+            }
+        });
+    }
+
+    secp256k1Multiply(privateScalar) {
+        // Use double-and-add scalar multiplication over secp256k1 without external libraries.
+        const generator = {
+            x: BigInt('0x79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798'),
+            y: BigInt('0x483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8')
+        };
+        let result = null;
+        let addend = generator;
+        let scalar = privateScalar;
+        while (scalar > 0n) {
+            if (scalar & 1n) result = this.secp256k1Add(result, addend);
+            addend = this.secp256k1Add(addend, addend);
+            scalar >>= 1n;
+        }
+        return result;
+    }
+
+    secp256k1Add(firstPoint, secondPoint) {
+        // Add two curve points; null represents the point at infinity.
+        if (!firstPoint) return secondPoint;
+        if (!secondPoint) return firstPoint;
+        const fieldPrime = BigInt('0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F');
+        if (firstPoint.x === secondPoint.x && this.mod(firstPoint.y + secondPoint.y, fieldPrime) === 0n) return null;
+        const slope = firstPoint.x === secondPoint.x && firstPoint.y === secondPoint.y
+            ? this.mod(3n * firstPoint.x * firstPoint.x * this.modInverse(2n * firstPoint.y, fieldPrime), fieldPrime)
+            : this.mod((secondPoint.y - firstPoint.y) * this.modInverse(secondPoint.x - firstPoint.x, fieldPrime), fieldPrime);
+        const x = this.mod(slope * slope - firstPoint.x - secondPoint.x, fieldPrime);
+        const y = this.mod(slope * (firstPoint.x - x) - firstPoint.y, fieldPrime);
+        return { x, y };
+    }
+
+    mod(value, modulo) {
+        // Normalize BigInt modulo results because JavaScript keeps the sign of negative dividends.
+        return ((value % modulo) + modulo) % modulo;
+    }
+
+    modInverse(value, modulo) {
+        // Compute a modular inverse with the extended Euclidean algorithm.
+        let [oldRemainder, remainder] = [modulo, this.mod(value, modulo)];
+        let [oldCoefficient, coefficient] = [0n, 1n];
+        while (remainder !== 0n) {
+            const quotient = oldRemainder / remainder;
+            [oldRemainder, remainder] = [remainder, oldRemainder - quotient * remainder];
+            [oldCoefficient, coefficient] = [coefficient, oldCoefficient - quotient * coefficient];
+        }
+        if (oldRemainder !== 1n) throw new Error('Value has no modular inverse.');
+        return this.mod(oldCoefficient, modulo);
+    }
+
+    bytesToBigInt(bytes) {
+        // Convert random key bytes to a scalar without losing leading zeroes.
+        return BigInt(`0x${this.bytesToHex(bytes)}`);
+    }
+
+    bytesToHex(bytes) {
+        // Format bytes as lower-case hexadecimal for Nostr event IDs and signatures.
+        return [...bytes].map(value => value.toString(16).padStart(2, '0')).join('');
+    }
+
+    hexToBytes(hex) {
+        // Convert a fixed-width hexadecimal Nostr key or event ID into bytes.
+        return new Uint8Array(String(hex || '').match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
     }
 
     showSavedFile() {

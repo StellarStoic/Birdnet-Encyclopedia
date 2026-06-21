@@ -261,7 +261,7 @@
   "encyclopedia.loadingBirdData": "Loading bird data...",
   "encyclopedia.loadingMoreBirds": "Loading more birds...",
   "encyclopedia.searchPlaceholder": "ค้นหานก...",
-  "encyclopedia.subtitle": "ค้นพบนกมากกว่า 6,000 ตัวและสัตว์อื่นๆ อีกสองสามสายพันธุ์",
+  "encyclopedia.subtitle": "ค้นพบนก {speciesCount} ตัวและสัตว์อื่นๆ อีกสองสามสายพันธุ์",
   "encyclopedia.translationFailedStats": "การวิเคราะห์การแปลล้มเหลว",
   "encyclopedia.translationLoadingStats": "กำลังวิเคราะห์ความสมบูรณ์ของการแปล...",
   "encyclopedia.translationLoadingTitle": "การแปล {language}",
@@ -746,5 +746,9 @@
   "achievements.status": "{unlocked} of {total} badges unlocked.",
   "achievements.progress": "{current}/{target} progress",
   "achievements.unlocked": "Unlocked and issued to Nostr",
-  "achievements.readyToIssue": "Unlocked locally. Will be issued on your next Nostr diary publish."
+  "achievements.readyToIssue": "Unlocked locally. Will be issued on your next Nostr diary publish.",
+  "station.nostrFavouritesImported": "Imported {count} favourite stations from Nostr.",
+  "station.nostrFavouritesNeedSigner": "Favourite saved locally. Open Birds.name Nostr login with a signer or private-key session to sync favourites.",
+  "station.nostrFavouritesSynced": "Synced {count} favourite stations to {relays} Nostr relays.",
+  "station.nostrFavouritesSyncFailed": "Favourite stations were saved locally, but Nostr sync failed."
 }

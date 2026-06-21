@@ -113,12 +113,16 @@ extension, Amber, or a temporary private-key session.
   deleted.
 - The observed-species totals are published as one replaceable NIP-78 summary
   when the visitor chooses to include them.
+- BirdWeather favourite stations are published as one replaceable NIP-78
+  favourites list. Removing a favourite republishes the list without that
+  station.
 - Publishing warns before coordinates are shared from diary notes.
 - Published event IDs can be copied or opened on `njump.me`.
 - NIP-09 deletion requests are sent when deleting published diary notes, and a
   local blocklist hides deleted events even if some relays keep old copies.
 - Signing in fetches previously published Birds.name diary data, observed
-  species totals, deletions, and badge awards from the configured relays.
+  species totals, BirdWeather favourites, deletions, and badge awards from the
+  configured relays.
 - Relay settings are available under `Settings > Nostr`, with default relays
   enabled for normal visitors and optional personal relays for advanced users.
 - Achievements use NIP-58 self-attested badges. Locked badges are blurred;
@@ -152,6 +156,9 @@ The website does not save the visitor's coordinates.
 
 Clearing site data in the browser removes saved files, station caches,
 preferences, favourites, diary data, Nostr state, and AI credentials.
+
+Large BirdWeather station-history caches are not published to Nostr. They stay
+browser-local and are included only in explicit backup JSON exports.
 
 ## Description and Translation Logic
 

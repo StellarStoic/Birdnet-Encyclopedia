@@ -261,7 +261,7 @@
   "encyclopedia.loadingBirdData": "Loading bird data...",
   "encyclopedia.loadingMoreBirds": "Loading more birds...",
   "encyclopedia.searchPlaceholder": "Szukaj ptaków...",
-  "encyclopedia.subtitle": "Odkryj ponad 6000 ptaków i kilka innych gatunków",
+  "encyclopedia.subtitle": "Odkryj {speciesCount} ptaków i kilka innych gatunków",
   "encyclopedia.translationFailedStats": "Analiza tłumaczenia nie powiodła się",
   "encyclopedia.translationLoadingStats": "Analizowanie kompletności tłumaczenia...",
   "encyclopedia.translationLoadingTitle": "Tłumaczenie {language}",
@@ -746,5 +746,9 @@
   "achievements.status": "{unlocked} of {total} badges unlocked.",
   "achievements.progress": "{current}/{target} progress",
   "achievements.unlocked": "Unlocked and issued to Nostr",
-  "achievements.readyToIssue": "Unlocked locally. Will be issued on your next Nostr diary publish."
+  "achievements.readyToIssue": "Unlocked locally. Will be issued on your next Nostr diary publish.",
+  "station.nostrFavouritesImported": "Imported {count} favourite stations from Nostr.",
+  "station.nostrFavouritesNeedSigner": "Favourite saved locally. Open Birds.name Nostr login with a signer or private-key session to sync favourites.",
+  "station.nostrFavouritesSynced": "Synced {count} favourite stations to {relays} Nostr relays.",
+  "station.nostrFavouritesSyncFailed": "Favourite stations were saved locally, but Nostr sync failed."
 }

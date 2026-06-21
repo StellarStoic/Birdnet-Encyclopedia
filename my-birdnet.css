@@ -16,6 +16,8 @@
     --chart-4: #5b8f9f;
     --chart-5: #8e6c9d;
     --chart-6: #c96c55;
+    --app-font: "Fragment Mono", monospace, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    --mono-font: "Fragment Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
 }
 
 body[data-theme="midnight"] {
@@ -91,7 +93,7 @@ body {
         radial-gradient(circle at top right, color-mix(in srgb, var(--secondary) 22%, transparent), transparent 38%),
         var(--background);
     color: var(--text);
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    font-family: var(--app-font);
     transition: background 0.25s ease, color 0.25s ease;
 }
 
@@ -184,6 +186,7 @@ select,
 #species-filter,
 #birdweather-station-id,
 #activity-species-select {
+    min-width: 0;
     border: 1px solid var(--border);
     border-radius: 10px;
     background: var(--surface-solid);
@@ -557,6 +560,7 @@ main {
 
 .station-id-form {
     margin-top: 22px;
+    min-width: 0;
     padding-top: 18px;
     border-top: 1px solid var(--border);
 }
@@ -570,6 +574,16 @@ main {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     gap: 8px;
+    min-width: 0;
+}
+
+#birdweather-station-id {
+    width: 100%;
+}
+
+#load-station-id {
+    min-width: max-content;
+    white-space: nowrap;
 }
 
 .station-results {
@@ -1716,6 +1730,7 @@ tbody tr:hover {
 
     select,
     #species-filter,
+    #birdweather-station-id,
     .secondary-button,
     .danger-button,
     .primary-button {
@@ -1776,6 +1791,11 @@ tbody tr:hover {
     .station-id-form > div,
     .station-result {
         grid-template-columns: 1fr;
+    }
+
+    #load-station-id {
+        min-width: 0;
+        white-space: normal;
     }
 
     .drop-icon {

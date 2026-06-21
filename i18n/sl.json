@@ -261,7 +261,7 @@
   "encyclopedia.loadingBirdData": "Nalaganje podatkov o pticah...",
   "encyclopedia.loadingMoreBirds": "Nalaganje več ptic...",
   "encyclopedia.searchPlaceholder": "Išči ptice ...",
-  "encyclopedia.subtitle": "Odkrijte več kot 6000 ptic in nekaj drugih vrst",
+  "encyclopedia.subtitle": "Odkrijte {speciesCount} ptic in nekaj drugih vrst",
   "encyclopedia.translationFailedStats": "Analiza prevoda ni uspela",
   "encyclopedia.translationLoadingStats": "Analiziranje popolnosti prevoda...",
   "encyclopedia.translationLoadingTitle": "Prevod za {language}",
@@ -746,5 +746,9 @@
   "achievements.status": "Odklenjenih {unlocked} od {total} značk.",
   "achievements.progress": "Napredek {current}/{target}",
   "achievements.unlocked": "Odklenjeno in izdano na Nostr",
-  "achievements.readyToIssue": "Lokalno odklenjeno. Izdano bo ob naslednji objavi dnevnika na Nostr."
+  "achievements.readyToIssue": "Lokalno odklenjeno. Izdano bo ob naslednji objavi dnevnika na Nostr.",
+  "station.nostrFavouritesImported": "Imported {count} favourite stations from Nostr.",
+  "station.nostrFavouritesNeedSigner": "Favourite saved locally. Open Birds.name Nostr login with a signer or private-key session to sync favourites.",
+  "station.nostrFavouritesSynced": "Synced {count} favourite stations to {relays} Nostr relays.",
+  "station.nostrFavouritesSyncFailed": "Favourite stations were saved locally, but Nostr sync failed."
 }

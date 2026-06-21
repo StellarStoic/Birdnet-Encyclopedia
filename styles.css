@@ -10,6 +10,8 @@
     --accent: #d7a84b;
     --border: rgba(45, 92, 53, 0.15);
     --shadow: 0 18px 50px rgba(31, 68, 38, 0.12);
+    --app-font: 'Fragment Mono', monospace, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --mono-font: 'Fragment Mono', ui-monospace, SFMono-Regular, Consolas, monospace;
 }
 
 body[data-theme="midnight"] {
@@ -58,7 +60,7 @@ body[data-theme="paper"] {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: var(--app-font);
         }
 
         body {
@@ -109,6 +111,26 @@ body[data-theme="paper"] {
             font-size: 2.5rem;
             color: #2c3e50;
             margin-bottom: 10px;
+        }
+
+        .site-title {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .site-title-link {
+            display: inline-flex;
+            justify-content: center;
+            max-width: 100%;
+            text-decoration: none;
+        }
+
+        .site-title-logo {
+            display: block;
+            width: clamp(250px, 48vw, 500px);
+            max-height: 130px;
+            object-fit: contain;
         }
 
         .subtitle {
@@ -1763,6 +1785,11 @@ body[data-theme="midnight"] .dropdown-toggle.active .menu-bird-open {
     filter: invert(1);
 }
 
+body[data-theme="midnight"] .site-title-logo {
+    /* Invert the black Birds.name logo so it remains visible on the midnight header. */
+    filter: invert(1) brightness(1.8);
+}
+
 .dropdown-menu {
     scrollbar-color: var(--primary) var(--background);
 }
@@ -2930,10 +2957,18 @@ body[data-theme="midnight"] .dropdown-toggle.active .menu-bird-open {
         border-radius: 21px 21px 0 0;
     }
 
-    .dropdown-header h3 {
-        margin: 0;
-        font-size: 1.2rem;
-        font-weight: 600;
+    .dropdown-title-link {
+        display: flex;
+        justify-content: center;
+        text-decoration: none;
+    }
+
+    .dropdown-title-logo {
+        display: block;
+        width: min(190px, 72vw);
+        max-height: 58px;
+        object-fit: contain;
+        filter: invert(1) brightness(2.2);
     }
 
     .dropdown-content {
@@ -3416,7 +3451,7 @@ body[data-theme="midnight"] .dropdown-toggle.active .menu-bird-open {
     border-radius: 10px;
     background: var(--surface-solid);
     color: var(--text);
-    font: 0.86rem/1.35 ui-monospace, SFMono-Regular, Consolas, monospace;
+    font: 0.86rem/1.35 var(--mono-font);
 }
 
 .nostr-actions {
@@ -3437,7 +3472,7 @@ body[data-theme="midnight"] .dropdown-toggle.active .menu-bird-open {
     border-radius: 10px;
     background: color-mix(in srgb, var(--primary) 8%, var(--surface-solid));
     color: var(--text);
-    font: 0.82rem/1.45 ui-monospace, SFMono-Regular, Consolas, monospace;
+    font: 0.82rem/1.45 var(--mono-font);
     overflow-wrap: anywhere;
 }
 
@@ -3722,7 +3757,7 @@ body[data-theme="midnight"] .dropdown-toggle.active .menu-bird-open {
     border-radius: 10px;
     background: var(--surface-solid);
     color: var(--text);
-    font: 0.9rem/1.35 ui-monospace, SFMono-Regular, Consolas, monospace;
+    font: 0.9rem/1.35 var(--mono-font);
 }
 
 .nostr-relay-list {
@@ -3863,7 +3898,7 @@ body[data-theme="midnight"] .dropdown-toggle.active .menu-bird-open {
     border-radius: 10px;
     background: color-mix(in srgb, var(--surface-solid) 92%, var(--primary) 8%);
     color: var(--text);
-    font: 0.82rem/1.45 ui-monospace, SFMono-Regular, Consolas, monospace;
+    font: 0.82rem/1.45 var(--mono-font);
 }
 
 .nostr-private-row textarea {
@@ -3973,7 +4008,7 @@ body[data-theme="midnight"] .dropdown-toggle.active .menu-bird-open {
     border-radius: 9px;
     background: color-mix(in srgb, var(--surface-solid) 88%, var(--primary) 12%);
     color: var(--text);
-    font: 0.78rem/1.35 ui-monospace, SFMono-Regular, Consolas, monospace;
+    font: 0.78rem/1.35 var(--mono-font);
     text-align: left;
     overflow-wrap: anywhere;
     cursor: copy;
