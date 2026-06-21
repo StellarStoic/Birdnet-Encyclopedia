@@ -2737,6 +2737,88 @@ body[data-theme="midnight"] .site-title-logo {
         padding-inline: 12px;
     }
 
+    /* Let every modal, notification, and text-heavy overlay use the phone width instead of desktop gutters. */
+    .modal {
+        padding: 0;
+    }
+
+    .modal-content {
+        width: 100%;
+        max-width: none;
+        min-height: 100dvh;
+        margin: 0;
+        border-radius: 0;
+    }
+
+    .ai-consent-modal,
+    .diary-location-modal {
+        align-items: stretch;
+        place-items: stretch;
+        padding: 0;
+    }
+
+    .ai-consent-card,
+    .credits-card,
+    .about-card,
+    .backup-card,
+    .nostr-card,
+    .nostr-publish-card,
+    .nostr-relay-card,
+    .achievements-card,
+    .diary-location-card {
+        width: 100%;
+        max-width: none;
+        min-height: 100dvh;
+        max-height: none;
+        padding: 16px 10px;
+        border-radius: 0;
+        overflow-y: auto;
+    }
+
+    .modal-header {
+        grid-template-columns: minmax(0, 1fr) auto auto;
+        gap: 10px;
+        padding: 14px 12px;
+    }
+
+    .modal-title {
+        font-size: 1.2rem;
+        overflow-wrap: anywhere;
+    }
+
+    .modal-body {
+        padding: 10px 6px 16px;
+    }
+
+    .ai-consent-card h2 {
+        margin-right: 38px;
+        font-size: 1.28rem;
+    }
+
+    .ai-consent-card > p,
+    .ai-consent-info,
+    .credits-highlight,
+    .backup-warning,
+    .nostr-warning,
+    .nostr-step-guide,
+    .nostr-new-user,
+    .nostr-login-panel,
+    .nostr-signer-options,
+    .nostr-current-public,
+    .nostr-location-warning,
+    .nostr-relay-explainer,
+    .nostr-relay-default-toggle,
+    .nostr-relay-help {
+        padding: 10px;
+    }
+
+    .ai-consent-actions,
+    .backup-actions,
+    .nostr-publish-actions,
+    .nostr-entry-actions {
+        gap: 8px;
+    }
+
     /* Keep the Birds.name logo contained inside the header and burger menu on narrow phones. */
     .site-title-logo {
         width: min(78vw, 320px);
@@ -2888,7 +2970,12 @@ body[data-theme="midnight"] .site-title-logo {
     .observation-diary-heading {
         grid-template-columns: 1fr;
         gap: 10px;
-        padding: 14px;
+        padding: 12px 10px;
+    }
+
+    .observation-diary-panel {
+        margin-inline: 0;
+        border-radius: 12px;
     }
 
     .observation-diary-actions,
@@ -2899,13 +2986,13 @@ body[data-theme="midnight"] .site-title-logo {
     }
 
     .observation-entry-list {
-        padding: 0 12px 12px;
+        padding: 0 8px 10px;
     }
 
     .observation-entry-summary {
         align-items: flex-start;
         flex-wrap: wrap;
-        padding: 11px 12px;
+        padding: 10px;
     }
 
     .observation-entry-title {
@@ -2926,7 +3013,7 @@ body[data-theme="midnight"] .site-title-logo {
     .observation-location-row,
     .markdown-toolbar,
     .observation-save-row {
-        padding-inline: 12px;
+        padding-inline: 8px;
     }
 
     .observation-location-row,
@@ -2936,12 +3023,23 @@ body[data-theme="midnight"] .site-title-logo {
     }
 
     .observation-note-input {
-        width: calc(100% - 24px);
-        margin-inline: 12px;
+        width: calc(100% - 16px);
+        min-height: 220px;
+        margin-inline: 8px;
     }
 
     .observation-note-preview {
-        margin-inline: 12px;
+        margin-inline: 8px;
+    }
+
+    .markdown-toolbar {
+        gap: 6px;
+    }
+
+    .markdown-tool-button {
+        flex: 1 1 calc(33.333% - 6px);
+        min-height: 38px;
+        padding: 8px 6px;
     }
 }
 
