@@ -3035,13 +3035,13 @@
             const callbackUrl = new URL(`${window.location.origin}${window.location.pathname}`);
             callbackUrl.searchParams.set('nostr_callback', 'amber');
             callbackUrl.searchParams.set('nostr_action', 'get_public_key');
+            callbackUrl.searchParams.set('result', '');
             const signerParams = new URLSearchParams({
                 type: 'get_public_key',
-                compressionType: 'none',
-                returnType: 'signature',
                 callbackUrl: callbackUrl.toString()
             });
             const signerUrl = `nostrsigner:?${signerParams.toString()}`;
+            sessionStorage.setItem('birdNostrAmberLoginPending', new Date().toISOString());
             localStorage.setItem('birdNostrLoginMethod', 'amber');
             this.showNostrStatus(this.t('nostr.amberOpening'));
             window.location.href = signerUrl;
@@ -3076,22 +3076,40 @@
         handleNostrSignerCallback() {
             // Store a returned signer public key if Amber or another app redirects back with one.
             const params = new URLSearchParams(`${window.location.search}&${window.location.hash.replace(/^#/, '')}`);
+            const isAmberCallback = params.get('nostr_callback') === 'amber' || params.get('nostr_action') === 'get_public_key';
             const candidate = this.extractNostrPublicKeyFromCallback(params);
-            if (!candidate) return;
+            if (!candidate) {
+                if (isAmberCallback) {
+                    this.openNostrKeyModal();
+                    this.showNostrStatus(this.t('nostr.amberFailed'), true);
+                    sessionStorage.removeItem('birdNostrAmberLoginPending');
+                    this.clearNostrSignerCallbackUrl();
+                }
+                return;
+            }
             try {
                 const identity = /^npub1/i.test(candidate)
                     ? { npub: candidate.toLowerCase(), method: 'amber' }
                     : { publicHex: candidate.toLowerCase(), method: 'amber' };
                 this.saveNostrIdentity(identity);
+                this.openNostrKeyModal();
+                this.showNostrStatus('');
+                sessionStorage.removeItem('birdNostrAmberLoginPending');
                 this.clearNostrSignerCallbackUrl();
             } catch (error) {
                 console.warn('Could not save Nostr signer callback:', error);
+                if (isAmberCallback) {
+                    this.openNostrKeyModal();
+                    this.showNostrStatus(this.t('nostr.amberFailed'), true);
+                    sessionStorage.removeItem('birdNostrAmberLoginPending');
+                    this.clearNostrSignerCallbackUrl();
+                }
             }
         }
 
         extractNostrPublicKeyFromCallback(params) {
             // Accept the field names used by NIP-55 Android signers, including Amber's signature/result responses.
-            const callbackFields = ['pubkey', 'publicKey', 'npub', 'nostr_pubkey', 'signature', 'result', 'response', 'data'];
+            const callbackFields = ['result', 'pubkey', 'publicKey', 'npub', 'nostr_pubkey', 'signature', 'response', 'data', 'event'];
             for (const field of callbackFields) {
                 const candidate = this.extractNostrPublicKeyFromValue(params.get(field));
                 if (candidate) return candidate;
@@ -3123,7 +3141,7 @@
                             if (nestedCandidate) return nestedCandidate;
                         }
                     }
-                    const jsonFields = ['pubkey', 'publicKey', 'npub', 'nostr_pubkey', 'signature', 'result', 'response', 'data'];
+                    const jsonFields = ['result', 'pubkey', 'publicKey', 'npub', 'nostr_pubkey', 'signature', 'response', 'data', 'event'];
                     for (const field of jsonFields) {
                         const nestedCandidate = this.extractNostrPublicKeyFromValue(payload[field], depth + 1);
                         if (nestedCandidate) return nestedCandidate;
@@ -3147,7 +3165,7 @@
         clearNostrSignerCallbackUrl() {
             // Remove Amber/NIP-55 callback parameters after login so refreshes do not repeat the same import.
             const cleanUrl = new URL(window.location.href);
-            ['nostr_callback', 'nostr_action', 'pubkey', 'publicKey', 'npub', 'nostr_pubkey', 'signature', 'result', 'response', 'data'].forEach(key => {
+            ['nostr_callback', 'nostr_action', 'pubkey', 'publicKey', 'npub', 'nostr_pubkey', 'signature', 'result', 'response', 'data', 'event', 'rejected', 'package'].forEach(key => {
                 cleanUrl.searchParams.delete(key);
             });
             cleanUrl.hash = '';

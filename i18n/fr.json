@@ -664,6 +664,7 @@
   "nostr.extensionSignedIn": "Signed in with browser extension. Public key saved in this browser.",
   "nostr.extensionFailed": "Browser extension sign-in failed or was rejected.",
   "nostr.amberOpening": "Opening Amber. Approve the connection there, then return to Birds.name.",
+  "nostr.amberFailed": "Amber did not return a usable public key. Try again, or log in with a private key for this session.",
   "nostr.privateSignedIn": "Signed in with private key for this browser session. Public key saved.",
   "nostr.privateSignInFailed": "Private-key sign-in failed. Check that the key starts with nsec1 or is a valid 64-character hex key.",
   "nostr.loggedInAs": "Logged in as",
