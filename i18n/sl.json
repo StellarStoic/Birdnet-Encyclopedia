@@ -663,12 +663,12 @@
   "nostr.extensionMissing": "Nostr brskalniški podpisovalnik ni bil najden. Namestite Alby, nos2x ali drugo NIP-07 razširitev in poskusite znova.",
   "nostr.extensionSignedIn": "Prijavljeni ste z brskalniško razširitvijo. Javni ključ je shranjen v tem brskalniku.",
   "nostr.extensionFailed": "Prijava z brskalniško razširitvijo ni uspela ali je bila zavrnjena.",
-  "nostr.amberOpening": "Odpiram Amber. Tam potrdite povezavo in se nato vrnite na Birds.name.",
-  "nostr.amberFailed": "Amber ni vrnil uporabnega javnega klju?a. Poskusite znova ali se za to sejo prijavite z zasebnim klju?em.",
+  "nostr.amberOpening": "Odpiram Amber. Tam potrdite povezavo, nato se vrnite na Birds.name in prijavo dokončajte z gumbom za lepljenje ali odložišče.",
+  "nostr.amberFailed": "Amber ni vrnil uporabnega javnega ključa. Poskusite z gumbom za lepljenje ali odložišče ali se za to sejo prijavite z zasebnim ključem.",
   "nostr.amberRejected": "Amber je zavrnil zahtevo za povezavo.",
-  "nostr.amberNoCallback": "Amber se je vrnil v brskalnik brez povratnega klica. ?e je Amber kopiral rezultat, uporabite spodnji gumb za odlo?i??e.",
-  "nostr.amberClipboardButton": "Dokon?aj Amber prijavo iz odlo?i??a",
-  "nostr.amberClipboardFailed": "Odlo?i??e ne vsebuje uporabnega Amber rezultata za prijavo.",
+  "nostr.amberNoCallback": "Amber se je vrnil brez povratnega klica. Za dokončanje prijave uporabite spodnji gumb za lepljenje ali odložišče.",
+  "nostr.amberClipboardButton": "Prilepi Amber rezultat",
+  "nostr.amberClipboardFailed": "Uporabnega Amber rezultata za prijavo ni bilo mogoče najti. Poskusite prijavo z Amberjem znova, nato prilepite kopiran javni ključ ali rezultat, ko vas stran vpraša.",
   "nostr.privateSignedIn": "Prijavljeni ste z zasebnim ključem za to sejo brskalnika. Javni ključ je shranjen.",
   "nostr.privateSignInFailed": "Prijava z zasebnim ključem ni uspela. Preverite, da se ključ začne z nsec1 ali je veljaven 64-mestni hex ključ.",
   "nostr.loggedInAs": "Prijavljeni kot",
@@ -755,5 +755,7 @@
   "station.nostrFavouritesImported": "Imported {count} favourite stations from Nostr.",
   "station.nostrFavouritesNeedSigner": "Favourite saved locally. Open Birds.name Nostr login with a signer or private-key session to sync favourites.",
   "station.nostrFavouritesSynced": "Synced {count} favourite stations to {relays} Nostr relays.",
-  "station.nostrFavouritesSyncFailed": "Favourite stations were saved locally, but Nostr sync failed."
+  "station.nostrFavouritesSyncFailed": "Favourite stations were saved locally, but Nostr sync failed.",
+  "nostr.amberClipboardReady": "Če je Amber kopiral javni ključ, uporabite spodnji gumb. Če je dostop do odložišča blokiran, ga lahko prilepite ročno.",
+  "nostr.amberPastePrompt": "Prilepite javni ključ ali rezultat, ki ga je kopiral Amber. Lahko je ključ npub1, 64-mestni hex javni ključ ali niz result=... iz povratnega klica."
 }

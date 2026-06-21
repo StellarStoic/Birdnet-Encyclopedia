@@ -3048,21 +3048,16 @@
         }
 
         signInWithAmber() {
-            // Open Amber's Android signer scheme for online/offline signing and accept callback pubkeys.
-            const callbackUrl = new URL(`${window.location.origin}${window.location.pathname}`);
-            callbackUrl.searchParams.set('nostr_callback', 'amber');
-            callbackUrl.searchParams.set('nostr_action', 'get_public_key');
-            callbackUrl.searchParams.set('result', '');
+            // Open Amber in NIP-55 clipboard mode because some Android browsers do not deliver callbackUrl back to the page.
             const signerParams = new URLSearchParams({
-                type: 'get_public_key',
-                callbackUrl: callbackUrl.toString()
+                type: 'get_public_key'
             });
             const signerUrl = `nostrsigner:?${signerParams.toString()}`;
             sessionStorage.setItem('birdNostrAmberLoginPending', JSON.stringify({
                 startedAt: new Date().toISOString(),
                 href: window.location.href
             }));
-            if (this.nostrAmberClipboard) this.nostrAmberClipboard.hidden = true;
+            if (this.nostrAmberClipboard) this.nostrAmberClipboard.hidden = false;
             localStorage.setItem('birdNostrLoginMethod', 'amber');
             this.showNostrStatus(this.t('nostr.amberOpening'));
             window.location.href = signerUrl;
@@ -3142,13 +3137,13 @@
         }
 
         handleAmberReturnWithoutCallback() {
-            // If Android returns focus without navigating to callbackUrl, offer the clipboard fallback described by NIP-55.
+            // In clipboard mode, returning from Amber means the visitor should complete login from the copied result.
             const pending = this.getPendingAmberLogin();
             if (!pending || localStorage.getItem('birdNostrPublicKeyHex')) return;
             const startedAt = new Date(pending.startedAt || 0).getTime();
             if (!startedAt || Date.now() - startedAt < 1800) return;
             this.openNostrKeyModal();
-            this.showNostrStatus(this.t('nostr.amberNoCallback'), true);
+            this.showNostrStatus(this.t('nostr.amberClipboardReady'));
             if (this.nostrAmberClipboard) this.nostrAmberClipboard.hidden = false;
         }
 
@@ -3162,23 +3157,38 @@
         }
 
         async completeAmberLoginFromClipboard() {
-            // Some Android browsers return from Amber without opening callbackUrl; in that case Amber may have copied the result.
+            // NIP-55 web flows cannot receive Android intent results directly, so try clipboard and then manual paste.
             try {
-                if (!navigator.clipboard?.readText) throw new Error('Clipboard read is unavailable.');
-                const clipboardText = await navigator.clipboard.readText();
+                let clipboardText = '';
+                try {
+                    clipboardText = navigator.clipboard?.readText ? await navigator.clipboard.readText() : '';
+                } catch (clipboardError) {
+                    console.warn('Amber clipboard read was blocked:', clipboardError);
+                }
                 const candidate = this.extractNostrPublicKeyFromValue(clipboardText);
-                if (!candidate) throw new Error('Clipboard did not contain a Nostr public key.');
-                const identity = /^npub1/i.test(candidate)
-                    ? { npub: candidate.toLowerCase(), method: 'amber' }
-                    : { publicHex: candidate.toLowerCase(), method: 'amber' };
-                this.saveNostrIdentity(identity);
-                sessionStorage.removeItem('birdNostrAmberLoginPending');
-                if (this.nostrAmberClipboard) this.nostrAmberClipboard.hidden = true;
-                this.showNostrStatus('');
+                if (candidate) {
+                    this.saveAmberLoginCandidate(candidate);
+                    return;
+                }
+                const pastedText = window.prompt(this.t('nostr.amberPastePrompt'), '') || '';
+                const pastedCandidate = this.extractNostrPublicKeyFromValue(pastedText);
+                if (!pastedCandidate) throw new Error('Clipboard or pasted text did not contain a Nostr public key.');
+                this.saveAmberLoginCandidate(pastedCandidate);
             } catch (error) {
                 console.warn('Amber clipboard login failed:', error);
                 this.showNostrStatus(this.t('nostr.amberClipboardFailed'), true);
             }
+        }
+
+        saveAmberLoginCandidate(candidate) {
+            // Save a public key returned by Amber clipboard mode and immediately repaint the logged-in profile panel.
+            const identity = /^npub1/i.test(candidate)
+                ? { npub: candidate.toLowerCase(), method: 'amber' }
+                : { publicHex: candidate.toLowerCase(), method: 'amber' };
+            this.saveNostrIdentity(identity);
+            sessionStorage.removeItem('birdNostrAmberLoginPending');
+            if (this.nostrAmberClipboard) this.nostrAmberClipboard.hidden = true;
+            this.showNostrStatus('');
         }
 
         extractNostrPublicKeyFromCallback(params) {

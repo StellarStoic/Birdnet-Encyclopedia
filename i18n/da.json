@@ -663,12 +663,12 @@
   "nostr.extensionMissing": "No Nostr browser signer was found. Install Alby, nos2x, or another NIP-07 extension and try again.",
   "nostr.extensionSignedIn": "Signed in with browser extension. Public key saved in this browser.",
   "nostr.extensionFailed": "Browser extension sign-in failed or was rejected.",
-  "nostr.amberOpening": "Opening Amber. Approve the connection there, then return to Birds.name.",
-  "nostr.amberFailed": "Amber did not return a usable public key. Try again, or log in with a private key for this session.",
+  "nostr.amberOpening": "Opening Amber. Approve the connection there, then return to Birds.name and finish with the paste/clipboard button.",
+  "nostr.amberFailed": "Amber did not return a usable public key. Try the paste/clipboard button, or log in with a private key for this session.",
   "nostr.amberRejected": "Amber rejected the connection request.",
-  "nostr.amberNoCallback": "Amber returned to the browser without sending a callback. If Amber copied the result, use the clipboard button below.",
-  "nostr.amberClipboardButton": "Complete Amber login from clipboard",
-  "nostr.amberClipboardFailed": "The clipboard did not contain a usable Amber login result.",
+  "nostr.amberNoCallback": "Amber returned without opening a callback. Use the clipboard button below to finish login.",
+  "nostr.amberClipboardButton": "Paste Amber result",
+  "nostr.amberClipboardFailed": "No usable Amber login result was found. Try Amber login again, then paste the copied public key or result when asked.",
   "nostr.privateSignedIn": "Signed in with private key for this browser session. Public key saved.",
   "nostr.privateSignInFailed": "Private-key sign-in failed. Check that the key starts with nsec1 or is a valid 64-character hex key.",
   "nostr.loggedInAs": "Logged in as",
@@ -755,5 +755,7 @@
   "station.nostrFavouritesImported": "Imported {count} favourite stations from Nostr.",
   "station.nostrFavouritesNeedSigner": "Favourite saved locally. Open Birds.name Nostr login with a signer or private-key session to sync favourites.",
   "station.nostrFavouritesSynced": "Synced {count} favourite stations to {relays} Nostr relays.",
-  "station.nostrFavouritesSyncFailed": "Favourite stations were saved locally, but Nostr sync failed."
+  "station.nostrFavouritesSyncFailed": "Favourite stations were saved locally, but Nostr sync failed.",
+  "nostr.amberClipboardReady": "If Amber copied the public key, use the button below. If clipboard access is blocked, you can paste it manually.",
+  "nostr.amberPastePrompt": "Paste the public key or result copied by Amber. It can be an npub1 key, a 64-character hex pubkey, or a result=... callback string."
 }
