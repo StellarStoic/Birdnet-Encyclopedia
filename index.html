@@ -586,6 +586,10 @@
                 </div>
             </div>
             <p class="backup-status" id="nostr-status" role="status" aria-live="polite"></p>
+            <button class="ai-secondary-button nostr-amber-clipboard" id="nostr-amber-clipboard" type="button" hidden>
+                <i class="fa-regular fa-clipboard" aria-hidden="true"></i>
+                <span data-i18n="nostr.amberClipboardButton">Complete Amber login from clipboard</span>
+            </button>
         </div>
     </div>
 
@@ -971,6 +975,7 @@
             this.nostrLoginAmber = document.getElementById('nostr-login-amber');
             this.nostrPrivateLoginKey = document.getElementById('nostr-private-login-key');
             this.nostrLoginPrivate = document.getElementById('nostr-login-private');
+            this.nostrAmberClipboard = document.getElementById('nostr-amber-clipboard');
             this.currentNostrKeyPair = null; // Holds the freshly generated key only while the modal is open
             this.nostrPublishModal = document.getElementById('nostr-publish-modal');
             this.nostrPublishClose = document.getElementById('nostr-publish-close');
@@ -2658,7 +2663,12 @@
             this.nostrLoginExtension?.addEventListener('click', () => this.signInWithNostrExtension());
             this.nostrLoginAmber?.addEventListener('click', () => this.signInWithAmber());
             this.nostrLoginPrivate?.addEventListener('click', () => this.signInWithPrivateKey());
+            this.nostrAmberClipboard?.addEventListener('click', () => this.completeAmberLoginFromClipboard());
             this.nostrLogout?.addEventListener('click', () => this.logoutNostr());
+            window.addEventListener('focus', () => this.handleAmberReturnWithoutCallback());
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden) this.handleAmberReturnWithoutCallback();
+            });
             this.nostrPublishClose?.addEventListener('click', () => this.closeNostrPublishModal());
             this.nostrPublishCancel?.addEventListener('click', () => this.closeNostrPublishModal());
             this.nostrPublishConfirm?.addEventListener('click', () => this.publishSelectedDiaryEntriesToNostr());
@@ -2704,6 +2714,7 @@
             if (!this.nostrModal) return;
             this.renderSavedNostrPublicKey();
             if (this.nostrLoginPanel) this.nostrLoginPanel.hidden = true;
+            if (this.nostrAmberClipboard) this.nostrAmberClipboard.hidden = true;
             this.showNostrStatus('');
             this.nostrModal.hidden = false;
             document.body.classList.add('ai-consent-open');
@@ -3002,6 +3013,12 @@
             this.loadNostrApplicationData(normalizedPublicHex);
         }
 
+        getNostrSignerPackageFromCallback(params) {
+            // Remember the Android signer package Amber returns so future NIP-55 requests can target it directly.
+            const packageName = params.get('package') || params.get('app') || params.get('signer');
+            return /^[a-z0-9_.]+$/i.test(packageName || '') ? packageName : '';
+        }
+
         saveNostrPublicKey() {
             // Save the generated public key while leaving its matching private key outside persistent storage.
             if (!this.currentNostrKeyPair?.npub) return;
@@ -3041,7 +3058,11 @@
                 callbackUrl: callbackUrl.toString()
             });
             const signerUrl = `nostrsigner:?${signerParams.toString()}`;
-            sessionStorage.setItem('birdNostrAmberLoginPending', new Date().toISOString());
+            sessionStorage.setItem('birdNostrAmberLoginPending', JSON.stringify({
+                startedAt: new Date().toISOString(),
+                href: window.location.href
+            }));
+            if (this.nostrAmberClipboard) this.nostrAmberClipboard.hidden = true;
             localStorage.setItem('birdNostrLoginMethod', 'amber');
             this.showNostrStatus(this.t('nostr.amberOpening'));
             window.location.href = signerUrl;
@@ -3077,23 +3098,35 @@
             // Store a returned signer public key if Amber or another app redirects back with one.
             const params = new URLSearchParams(`${window.location.search}&${window.location.hash.replace(/^#/, '')}`);
             const isAmberCallback = params.get('nostr_callback') === 'amber' || params.get('nostr_action') === 'get_public_key';
+            if (isAmberCallback && (params.has('rejected') || params.get('error'))) {
+                this.openNostrKeyModal();
+                this.showNostrStatus(this.t('nostr.amberRejected'), true);
+                if (this.nostrAmberClipboard) this.nostrAmberClipboard.hidden = false;
+                sessionStorage.removeItem('birdNostrAmberLoginPending');
+                this.clearNostrSignerCallbackUrl();
+                return;
+            }
             const candidate = this.extractNostrPublicKeyFromCallback(params);
             if (!candidate) {
                 if (isAmberCallback) {
                     this.openNostrKeyModal();
                     this.showNostrStatus(this.t('nostr.amberFailed'), true);
+                    if (this.nostrAmberClipboard) this.nostrAmberClipboard.hidden = false;
                     sessionStorage.removeItem('birdNostrAmberLoginPending');
                     this.clearNostrSignerCallbackUrl();
                 }
                 return;
             }
             try {
+                const packageName = this.getNostrSignerPackageFromCallback(params);
+                if (packageName) localStorage.setItem('birdNostrSignerPackage', packageName);
                 const identity = /^npub1/i.test(candidate)
                     ? { npub: candidate.toLowerCase(), method: 'amber' }
                     : { publicHex: candidate.toLowerCase(), method: 'amber' };
                 this.saveNostrIdentity(identity);
                 this.openNostrKeyModal();
                 this.showNostrStatus('');
+                if (this.nostrAmberClipboard) this.nostrAmberClipboard.hidden = true;
                 sessionStorage.removeItem('birdNostrAmberLoginPending');
                 this.clearNostrSignerCallbackUrl();
             } catch (error) {
@@ -3101,9 +3134,50 @@
                 if (isAmberCallback) {
                     this.openNostrKeyModal();
                     this.showNostrStatus(this.t('nostr.amberFailed'), true);
+                    if (this.nostrAmberClipboard) this.nostrAmberClipboard.hidden = false;
                     sessionStorage.removeItem('birdNostrAmberLoginPending');
                     this.clearNostrSignerCallbackUrl();
                 }
+            }
+        }
+
+        handleAmberReturnWithoutCallback() {
+            // If Android returns focus without navigating to callbackUrl, offer the clipboard fallback described by NIP-55.
+            const pending = this.getPendingAmberLogin();
+            if (!pending || localStorage.getItem('birdNostrPublicKeyHex')) return;
+            const startedAt = new Date(pending.startedAt || 0).getTime();
+            if (!startedAt || Date.now() - startedAt < 1800) return;
+            this.openNostrKeyModal();
+            this.showNostrStatus(this.t('nostr.amberNoCallback'), true);
+            if (this.nostrAmberClipboard) this.nostrAmberClipboard.hidden = false;
+        }
+
+        getPendingAmberLogin() {
+            // Read the short-lived Amber login marker used only to recover from missing Android callbacks.
+            try {
+                return JSON.parse(sessionStorage.getItem('birdNostrAmberLoginPending') || 'null');
+            } catch (error) {
+                return null;
+            }
+        }
+
+        async completeAmberLoginFromClipboard() {
+            // Some Android browsers return from Amber without opening callbackUrl; in that case Amber may have copied the result.
+            try {
+                if (!navigator.clipboard?.readText) throw new Error('Clipboard read is unavailable.');
+                const clipboardText = await navigator.clipboard.readText();
+                const candidate = this.extractNostrPublicKeyFromValue(clipboardText);
+                if (!candidate) throw new Error('Clipboard did not contain a Nostr public key.');
+                const identity = /^npub1/i.test(candidate)
+                    ? { npub: candidate.toLowerCase(), method: 'amber' }
+                    : { publicHex: candidate.toLowerCase(), method: 'amber' };
+                this.saveNostrIdentity(identity);
+                sessionStorage.removeItem('birdNostrAmberLoginPending');
+                if (this.nostrAmberClipboard) this.nostrAmberClipboard.hidden = true;
+                this.showNostrStatus('');
+            } catch (error) {
+                console.warn('Amber clipboard login failed:', error);
+                this.showNostrStatus(this.t('nostr.amberClipboardFailed'), true);
             }
         }
 
@@ -3165,7 +3239,7 @@
         clearNostrSignerCallbackUrl() {
             // Remove Amber/NIP-55 callback parameters after login so refreshes do not repeat the same import.
             const cleanUrl = new URL(window.location.href);
-            ['nostr_callback', 'nostr_action', 'pubkey', 'publicKey', 'npub', 'nostr_pubkey', 'signature', 'result', 'response', 'data', 'event', 'rejected', 'package'].forEach(key => {
+            ['nostr_callback', 'nostr_action', 'pubkey', 'publicKey', 'npub', 'nostr_pubkey', 'signature', 'result', 'response', 'data', 'event', 'rejected', 'package', 'app', 'signer', 'error'].forEach(key => {
                 cleanUrl.searchParams.delete(key);
             });
             cleanUrl.hash = '';
@@ -3444,11 +3518,13 @@
                 'birdNostrPublicKeyHex',
                 'birdNostrLoginMethod',
                 'birdNostrPublicKeySavedAt',
+                'birdNostrSignerPackage',
                 'birdNostrProfile'
             ].forEach(key => localStorage.removeItem(key));
             [
                 'birdNostrSessionPrivateKeyHex',
-                'birdNostrSessionPrivateKeySavedAt'
+                'birdNostrSessionPrivateKeySavedAt',
+                'birdNostrAmberLoginPending'
             ].forEach(key => sessionStorage.removeItem(key));
             this.currentNostrKeyPair = null;
             if (this.nostrPrivateKey) this.nostrPrivateKey.value = '';

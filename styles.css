@@ -3558,6 +3558,13 @@ body[data-theme="midnight"] .site-title-logo {
     color: #b42318;
 }
 
+.nostr-amber-clipboard {
+    /* Keep the Amber recovery action close to the status text and hidden until a callback fails. */
+    margin-top: 10px;
+    width: 100%;
+    justify-content: center;
+}
+
 .nostr-publish-card {
     width: min(100%, 760px);
 }
