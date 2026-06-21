@@ -72,6 +72,7 @@ class MyBirdNETDashboard {
         this.stationMap = null;
         this.stationMapLayer = null;
         this.currentMapLocation = null;
+        this.defaultMapLocation = { latitude: 46.0569, longitude: 14.5058, zoom: 6, isFallback: true };
         this.mapStationController = null;
         this.mapStationRequestId = 0;
         this.mapMoveTimer = null;
@@ -2034,16 +2035,10 @@ class MyBirdNETDashboard {
     }
 
     async chooseStationFromMap() {
-        // Open a viewport-driven map; its station query intentionally ignores the nearby-list radius.
+        // Open a viewport-driven map without asking for device location; visitors can search or pan manually.
         this.setStatus(this.t('map.preparingStationMap'));
-        try {
-            const location = await this.getCurrentLocation();
-            this.currentMapLocation = location;
-            this.openStationMap();
-            this.setStatus('');
-        } catch (error) {
-            this.setStatus(error.message, true);
-        }
+        this.openStationMap();
+        this.setStatus('');
     }
 
     getCurrentLocation() {
@@ -2128,11 +2123,6 @@ class MyBirdNETDashboard {
             this.setStatus(this.t('map.libraryFailed'), true);
             return;
         }
-        if (!this.currentMapLocation) {
-            this.setStatus(this.t('map.locationNeeded'), true);
-            return;
-        }
-
         this.stationMapModal.hidden = false;
         document.body.classList.add('modal-open');
 
@@ -2151,9 +2141,21 @@ class MyBirdNETDashboard {
             });
         }
 
-        const { latitude, longitude } = this.currentMapLocation;
-        this.stationMap.setView([latitude, longitude], 9);
+        const mapLocation = this.currentMapLocation || this.defaultMapLocation;
+        const { latitude, longitude } = mapLocation;
+        this.stationMap.setView([latitude, longitude], mapLocation.zoom || 9);
         this.stationMapLayer.clearLayers();
+        this.renderMapSourceMarker();
+        setTimeout(() => {
+            this.stationMap.invalidateSize();
+            this.loadStationsInMapViewport();
+        }, 0);
+    }
+
+    renderMapSourceMarker() {
+        // Show a location marker only when the visitor explicitly used device location or a known dataset position.
+        if (!this.currentMapLocation || this.currentMapLocation.isFallback) return;
+        const { latitude, longitude } = this.currentMapLocation;
         L.circleMarker([latitude, longitude], {
             radius: 8,
             color: '#ffffff',
@@ -2161,10 +2163,6 @@ class MyBirdNETDashboard {
             fillColor: '#2678d8',
             fillOpacity: 1
         }).bindTooltip(this.t('map.yourApproximateLocation')).addTo(this.stationMapLayer);
-        setTimeout(() => {
-            this.stationMap.invalidateSize();
-            this.loadStationsInMapViewport();
-        }, 0);
     }
 
     scheduleMapPlaceSearch() {
@@ -2430,14 +2428,7 @@ class MyBirdNETDashboard {
     renderMapStations(stations) {
         // Replace map markers without changing the viewport or triggering another bounds request.
         this.stationMapLayer.clearLayers();
-        const { latitude, longitude } = this.currentMapLocation;
-        L.circleMarker([latitude, longitude], {
-            radius: 8,
-            color: '#ffffff',
-            weight: 3,
-            fillColor: '#2678d8',
-            fillOpacity: 1
-        }).bindTooltip(this.t('map.yourApproximateLocation')).addTo(this.stationMapLayer);
+        this.renderMapSourceMarker();
 
         stations.forEach(station => {
             if (!Number.isFinite(station.coords?.lat) || !Number.isFinite(station.coords?.lon)) return;
