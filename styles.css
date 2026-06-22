@@ -3893,6 +3893,11 @@ body[data-theme="midnight"] .site-title-logo {
     color: var(--text);
 }
 
+.nostr-relay-help[hidden] {
+    /* Let the Nostr settings modal hide relay-discovery help outside the Relays section. */
+    display: none;
+}
+
 .nostr-relay-section {
     margin-top: 18px;
 }
@@ -3909,6 +3914,33 @@ body[data-theme="midnight"] .site-title-logo {
     margin: 0 0 8px;
     color: var(--text);
     font-size: 0.98rem;
+}
+
+.nostr-featheration-setting {
+    display: grid;
+    gap: 8px;
+    margin-top: 14px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface-solid);
+}
+
+.nostr-featheration-setting label,
+.nostr-featheration-setting h4 {
+    margin: 0;
+    color: var(--text);
+    font-weight: 800;
+}
+
+.nostr-featheration-setting input[type="range"] {
+    width: 100%;
+    accent-color: var(--primary);
+}
+
+.nostr-featheration-setting output,
+.nostr-featheration-setting small {
+    color: var(--muted);
 }
 
 .nostr-relay-section-note {

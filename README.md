@@ -123,6 +123,17 @@ extension, Amber, or a temporary private-key session.
 - Signing in fetches previously published Birds.name diary data, observed
   species totals, BirdWeather favourites, deletions, and badge awards from the
   configured relays.
+- The standalone Featheration page reads public Nostr notes from configured
+  relays, searches bird-related words, hashtags, and translated bird names, and
+  highlights matching terms in the current theme.
+- Feed moderation is local: obvious NSFW/spam words are blocked, notes must pass
+  a visible WOT-style score, and hidden users stay collapsed instead of being
+  silently removed.
+- Featheration relay, WOT, maximum-hashtag, and hidden-user settings are kept in
+  one place under `Settings > Nostr` so the public notes page does not have a
+  separate settings surface.
+- Signed-in visitors can reply, repost, and react with five emoji reactions
+  through a browser signer, NIP-46 signer, or temporary private-key session.
 - Relay settings are available under `Settings > Nostr`, with default relays
   enabled for normal visitors and optional personal relays for advanced users.
 - Achievements use NIP-58 self-attested badges. Locked badges are blurred;
@@ -149,6 +160,7 @@ The browser stores:
 | BirdWeather cache metadata | IndexedDB | Show which stations are saved locally |
 | Observation diary and counters | `localStorage` | Keep seen birds and private diary notes |
 | Nostr public identity, relay settings, published event references, blocklist, and badge awards | `localStorage` | Restore optional Featheration features |
+| Featheration hidden users | `localStorage` | Keep locally hidden Nostr authors collapsed in Featheration |
 | Temporary Nostr private-key session | `sessionStorage` | Sign events only for the current browser tab session |
 
 Browser geolocation is requested only when finding nearby BirdWeather stations.
@@ -386,6 +398,8 @@ timestamps, and each row must identify a species.
   BirdNET-Pi gzip exports.
 - [Leaflet 1.9.4](https://leafletjs.com/) for station maps.
 - [Font Awesome 6.4.0](https://fontawesome.com/) for interface icons.
+- [nostr-tools 2.10.4](https://github.com/nbd-wtf/nostr-tools) for optional
+  Nostr signing, NIP-46 transport encryption, and event publishing.
 
 These libraries are currently loaded from public CDNs.
 
@@ -397,6 +411,9 @@ These libraries are currently loaded from public CDNs.
 |-- index.html                 # Main encyclopedia
 |-- index copy.html            # Synchronized copy of the encyclopedia page
 |-- styles.css                 # Encyclopedia and AI modal styles
+|-- featheration.html          # Standalone bird-focused Nostr page
+|-- featheration.css           # Featheration themes and responsive layout
+|-- featheration.js            # Relay fetching, local WOT filter, and Nostr actions
 |-- my-birdnet.html            # Observation dashboard markup
 |-- my-birdnet.css             # Responsive dashboard themes and layout
 |-- my-birdnet.js              # Imports, BirdWeather, caching, and statistics
