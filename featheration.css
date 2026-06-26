@@ -575,6 +575,18 @@ body[data-theme="midnight"] .featheration-logo {
     font-weight: 800;
 }
 
+.featheration-author-nip05 {
+    /* Keep NIP-05 readable as a secondary identity line below the author display name. */
+    display: block;
+    overflow: hidden;
+    max-width: 100%;
+    color: var(--primary-strong);
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .featheration-author-meta {
     display: flex;
     flex-wrap: wrap;
@@ -959,6 +971,299 @@ body.featheration-modal-open {
     font-weight: 900;
 }
 
+.featheration-action-count {
+    display: inline-grid;
+    place-items: center;
+    min-width: 1.5em;
+    margin-left: 5px;
+    padding: 1px 6px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--primary) 14%, var(--surface-solid));
+    color: var(--primary-strong);
+    font-size: 0.78rem;
+    font-weight: 900;
+}
+
+.featheration-replies {
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: color-mix(in srgb, var(--surface) 80%, transparent);
+}
+
+.featheration-replies summary {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 10px 12px;
+    color: var(--primary-strong);
+    font-weight: 900;
+    cursor: pointer;
+    list-style: none;
+}
+
+.featheration-replies summary::-webkit-details-marker {
+    display: none;
+}
+
+.featheration-replies-chevron {
+    transition: transform 0.2s ease;
+}
+
+.featheration-replies[open] .featheration-replies-chevron {
+    transform: rotate(90deg);
+}
+
+.featheration-reply-list {
+    display: grid;
+    gap: 10px;
+    padding: 0 12px 12px;
+}
+
+.featheration-reply {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 10px;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface-solid);
+}
+
+.featheration-reply-avatar {
+    width: 34px;
+    height: 34px;
+}
+
+.featheration-reply-body {
+    min-width: 0;
+}
+
+.featheration-reply-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: baseline;
+    margin-bottom: 4px;
+    color: var(--muted);
+    font-size: 0.84rem;
+}
+
+.featheration-reply-meta strong {
+    color: var(--text);
+}
+
+.featheration-compose-fab {
+    /* Floating feather compose action mirrors the round burger-menu treatment. */
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    z-index: 920;
+    display: inline-grid;
+    grid-template-columns: 1fr;
+    place-items: center;
+    width: 58px;
+    height: 58px;
+    border: 1px solid color-mix(in srgb, var(--primary) 45%, transparent);
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--primary) 88%, transparent);
+    color: #fff;
+    box-shadow: 0 14px 34px color-mix(in srgb, var(--primary-strong) 35%, transparent);
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.featheration-compose-fab[hidden] {
+    display: none;
+}
+
+.featheration-compose-fab:hover,
+.featheration-compose-fab:focus-visible {
+    transform: translateY(-2px);
+    background: var(--primary-strong);
+    outline: none;
+}
+
+.featheration-compose-fab i {
+    font-size: 1.25rem;
+}
+
+.featheration-compose-fab span {
+    position: absolute;
+    right: 10px;
+    bottom: 8px;
+    display: inline-grid;
+    place-items: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--text);
+    font-size: 0.8rem;
+    font-weight: 900;
+}
+
+.featheration-compose-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    background: rgba(0, 0, 0, 0.48);
+}
+
+.featheration-compose-modal[hidden] {
+    display: none;
+}
+
+.featheration-compose-card {
+    position: relative;
+    display: grid;
+    gap: 12px;
+    width: min(640px, 100%);
+    max-height: calc(100vh - 36px);
+    overflow-y: auto;
+    padding: 22px;
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    background: var(--surface-solid);
+    box-shadow: var(--shadow);
+}
+
+.featheration-compose-close {
+    /* Round close button follows the other Featheration modal controls. */
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    display: inline-grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+}
+
+.featheration-compose-card h2 {
+    margin: 0;
+    padding-right: 42px;
+}
+
+.featheration-compose-intro,
+.featheration-compose-row small {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.featheration-compose-login-warning {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 10px 12px;
+    border: 1px solid color-mix(in srgb, #b73535 28%, var(--border));
+    border-radius: 14px;
+    background: color-mix(in srgb, #b73535 10%, var(--surface-solid));
+    color: #b73535;
+    font-weight: 800;
+}
+
+.featheration-compose-login-warning[hidden] {
+    display: none;
+}
+
+.featheration-compose-card label {
+    font-size: 0.85rem;
+    font-weight: 900;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.featheration-compose-card textarea,
+.featheration-compose-card input {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
+}
+
+.featheration-compose-card textarea {
+    min-height: 180px;
+    resize: vertical;
+    padding: 14px;
+}
+
+.featheration-compose-card input {
+    min-height: 44px;
+    padding: 10px 12px;
+}
+
+.featheration-compose-row {
+    display: grid;
+    gap: 7px;
+}
+
+.featheration-cloudinary-settings {
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    background: color-mix(in srgb, var(--surface) 78%, transparent);
+}
+
+.featheration-cloudinary-settings summary {
+    /* Keep optional upload setup compact until the visitor needs it. */
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    color: var(--primary-strong);
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.featheration-cloudinary-settings p {
+    margin: 10px 0 0;
+    color: var(--muted);
+    font-size: 0.88rem;
+}
+
+.featheration-cloudinary-upload-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
+    align-items: center;
+    margin-top: 12px;
+}
+
+.featheration-cloudinary-upload-row input[type="file"] {
+    min-height: auto;
+    padding: 9px;
+}
+
+.featheration-cloudinary-status {
+    min-height: 1.2em;
+}
+
+.featheration-cloudinary-status.error {
+    color: #b73535;
+}
+
+.featheration-compose-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
+.featheration-compose-actions {
+    justify-content: flex-end;
+}
+
 .featheration-note-action[disabled] {
     cursor: not-allowed;
     opacity: 0.55;
@@ -1075,5 +1380,35 @@ body.featheration-modal-open {
         border-radius: 18px;
         flex-wrap: wrap;
         justify-content: center;
+    }
+
+    .featheration-compose-fab {
+        right: 12px;
+        bottom: 12px;
+        width: 54px;
+        height: 54px;
+    }
+
+    .featheration-compose-modal {
+        align-items: stretch;
+        padding: 0;
+    }
+
+    .featheration-compose-card {
+        width: 100%;
+        max-height: 100vh;
+        border-radius: 0;
+        border-left: 0;
+        border-right: 0;
+        padding: 18px 12px;
+    }
+
+    .featheration-compose-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+
+    .featheration-cloudinary-upload-row {
+        grid-template-columns: 1fr;
     }
 }

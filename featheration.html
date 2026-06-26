@@ -212,6 +212,51 @@
         </section>
     </main>
 
+    <!-- Floating compose button starts a normal public Nostr kind-1 note from Featheration. -->
+    <button class="featheration-compose-fab" id="featheration-compose-fab" type="button" aria-label="Write a Nostr note" data-i18n-aria-label="featheration.compose">
+        <i class="fa-solid fa-feather-pointed" aria-hidden="true"></i>
+        <span aria-hidden="true">+</span>
+    </button>
+
+    <!-- Compose modal keeps posting in-page and supports media by appending image links to note content. -->
+    <div class="featheration-compose-modal" id="featheration-compose-modal" hidden role="dialog" aria-modal="true" aria-labelledby="featheration-compose-title">
+        <div class="featheration-compose-card" role="document">
+            <button class="featheration-compose-close" id="featheration-compose-close" type="button" aria-label="Close compose" data-i18n-aria-label="action.cancel">
+                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
+            <h2 id="featheration-compose-title" data-i18n="featheration.composeTitle">Write a note</h2>
+            <p class="featheration-compose-intro" data-i18n="featheration.composeIntro">Post a public Nostr note to the relays configured in Settings > Nostr.</p>
+            <div class="featheration-compose-login-warning" id="featheration-compose-login-warning" hidden>
+                <i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i>
+                <span data-i18n="featheration.composeLoginRequired">Log in with Nostr before writing a note.</span>
+            </div>
+            <label for="featheration-compose-text" data-i18n="featheration.composeTextLabel">Note</label>
+            <textarea id="featheration-compose-text" rows="8" maxlength="4000" placeholder="What bird did you see?" data-i18n-placeholder="featheration.composePlaceholder"></textarea>
+            <details class="featheration-cloudinary-settings">
+                <summary>
+                    <i class="fa-solid fa-cloud-arrow-up" aria-hidden="true"></i>
+                    <span data-i18n="featheration.cloudinaryTitle">Upload image</span>
+                </summary>
+                <p data-i18n="featheration.cloudinaryIntro">Choose an image and upload it to the website image host. The returned URL is added to your note.</p>
+                <div class="featheration-cloudinary-upload-row">
+                    <input id="featheration-cloudinary-file" type="file" accept="image/*">
+                    <button class="featheration-secondary-button" id="featheration-cloudinary-upload" type="button">
+                        <i class="fa-solid fa-cloud-arrow-up" aria-hidden="true"></i>
+                        <span data-i18n="featheration.cloudinaryUpload">Upload image</span>
+                    </button>
+                </div>
+                <p class="featheration-cloudinary-status" id="featheration-cloudinary-status" role="status" aria-live="polite"></p>
+            </details>
+            <div class="featheration-compose-actions">
+                <button class="featheration-secondary-button" id="featheration-compose-cancel" type="button" data-i18n="action.cancel">Cancel</button>
+                <button class="featheration-primary-button" id="featheration-compose-publish" type="button">
+                    <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
+                    <span data-i18n="featheration.composePublish">Publish note</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Featheration bird details modal opens clicked purple bird-name matches without leaving this page. -->
     <div class="featheration-bird-modal" id="featheration-bird-modal" hidden role="dialog" aria-modal="true" aria-labelledby="featheration-bird-modal-title">
         <div class="featheration-bird-modal-card" role="document">

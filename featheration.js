@@ -8,6 +8,9 @@
     const LOOKBACK_KEY = 'birdFeatherationLookback';
     const THEME_KEY = 'birdEncyclopediaTheme';
     const LANGUAGE_KEY = 'birdEncyclopediaLanguage';
+    // Public Cloudinary unsigned-upload settings for the Birds.name image uploader.
+    const CLOUDINARY_CLOUD_NAME = 'dxlvcnmub';
+    const CLOUDINARY_UNSIGNED_UPLOAD_PRESET = 'birds_name_featheration_unsigned';
     const NOSTR_TOOLS_URL = 'https://esm.sh/nostr-tools@2.10.4?bundle';
     const RELAY_INFO_CACHE_KEY = 'birdFeatherationRelayInfo';
 
@@ -36,6 +39,7 @@
             this.lastEvents = [];
             this.eventMap = new Map();
             this.reactionSummary = new Map();
+            this.engagementSummary = new Map();
             this.renderTimer = null;
             this.activeSearchToken = 0;
             this.lastSearchTerms = [...this.defaultTerms];
@@ -47,6 +51,16 @@
             this.birdModalClose = document.getElementById('featheration-bird-modal-close');
             this.birdModalTitle = document.getElementById('featheration-bird-modal-title');
             this.birdDetailsFrame = document.getElementById('featheration-bird-details-frame');
+            this.composeFab = document.getElementById('featheration-compose-fab');
+            this.composeModal = document.getElementById('featheration-compose-modal');
+            this.composeClose = document.getElementById('featheration-compose-close');
+            this.composeCancel = document.getElementById('featheration-compose-cancel');
+            this.composePublish = document.getElementById('featheration-compose-publish');
+            this.composeText = document.getElementById('featheration-compose-text');
+            this.composeLoginWarning = document.getElementById('featheration-compose-login-warning');
+            this.cloudinaryFile = document.getElementById('featheration-cloudinary-file');
+            this.cloudinaryUpload = document.getElementById('featheration-cloudinary-upload');
+            this.cloudinaryStatus = document.getElementById('featheration-cloudinary-status');
             this.birdGroupOverlay = null;
             this.currentQueryLabel = 'bird topics';
             this.localFilterTerms = [];
@@ -60,6 +74,7 @@
             await window.BirdI18n?.ready;
             this.bindEvents();
             this.updateMenuIdentity();
+            this.updateComposeAvailability();
             localStorage.removeItem('birdFeatherationLastSearch');
             await this.loadLoggedInContacts();
             await this.loadBirdTerms();
@@ -96,14 +111,31 @@
                 this.search(this.quickSearchInput.value);
             });
             this.feed?.addEventListener('click', event => this.handleFeedClick(event));
+            this.feed?.addEventListener('error', event => this.handleFeedImageError(event), true);
             this.birdModalClose?.addEventListener('click', () => this.closeBirdDetailsModal());
             this.birdModal?.addEventListener('click', event => {
                 if (event.target === this.birdModal) this.closeBirdDetailsModal();
             });
+            this.composeFab?.addEventListener('click', () => this.openComposeModal());
+            this.composeClose?.addEventListener('click', () => this.closeComposeModal());
+            this.composeCancel?.addEventListener('click', () => this.closeComposeModal());
+            this.composePublish?.addEventListener('click', () => this.publishComposeNote());
+            this.cloudinaryUpload?.addEventListener('click', () => this.uploadComposeImageToCloudinary());
+            this.composeModal?.addEventListener('click', event => {
+                if (event.target === this.composeModal) this.closeComposeModal();
+            });
             document.addEventListener('keydown', event => {
                 if (event.key === 'Escape' && this.birdModal && !this.birdModal.hidden) this.closeBirdDetailsModal();
+                if (event.key === 'Escape' && this.composeModal && !this.composeModal.hidden) this.closeComposeModal();
             });
             window.addEventListener('message', event => this.handleBirdDetailsMessage(event));
+            window.addEventListener('storage', event => {
+                // Keep Nostr-only controls in sync when login state changes from another app page.
+                if (event.key === 'birdNostrPublicKeyHex') {
+                    this.updateMenuIdentity();
+                    this.updateComposeAvailability();
+                }
+            });
             document.addEventListener('click', event => {
                 if (this.menu?.classList.contains('show') && !event.target.closest('.dropdown-container')) {
                     this.closeMenu();
@@ -194,6 +226,13 @@
             this.menuNostrAvatar.onerror = () => {
                 this.menuNostrAvatar.src = 'img/origami_bird_B-ICO.png';
             };
+        }
+
+        updateComposeAvailability() {
+            // Only show public-note composing after a Nostr identity is saved in this browser.
+            const loggedIn = Boolean(localStorage.getItem('birdNostrPublicKeyHex'));
+            if (this.composeFab) this.composeFab.hidden = !loggedIn;
+            if (!loggedIn) this.closeComposeModal();
         }
 
         getCachedNostrProfile(publicHex) {
@@ -353,6 +392,8 @@
             this.activeSearchToken = searchToken;
             this.eventMap = new Map();
             this.lastEvents = [];
+            this.reactionSummary = new Map();
+            this.engagementSummary = new Map();
             this.setStatus(this.t('featheration.loading'));
             this.renderEmpty(this.t('featheration.loading'));
             const relays = await this.getReadRelays();
@@ -375,7 +416,7 @@
                 this.loadProfilesForEvents(accumulatedEvents).then(() => {
                     if (this.activeSearchToken === searchToken) this.renderFeed(this.lastEvents);
                 });
-                this.loadReactionsForEvents(accumulatedEvents, relays, searchToken);
+                this.loadEngagementForEvents(accumulatedEvents, relays, searchToken);
                 this.setStatus(this.t('featheration.loaded', {
                     count: this.formatNumber(this.getVisibleEvents(accumulatedEvents).length),
                     relays: this.formatNumber(relayPlans.length)
@@ -622,23 +663,47 @@
         }
 
         async loadProfilesForEvents(events) {
-            // Fetch author metadata for rendered notes so names, avatars, and WOT scoring can use it.
-            const pubkeys = [...new Set(events.map(event => event.pubkey).filter(Boolean))].slice(0, 35);
-            await Promise.all(pubkeys.map(pubkey => this.loadProfile(pubkey)));
+            // Fetch visible author metadata in batches so avatars are not lost to many tiny relay requests.
+            const pubkeys = [...new Set(events.map(event => event.pubkey).filter(Boolean))];
+            await this.loadProfilesForPubkeys(pubkeys);
         }
 
-        async loadReactionsForEvents(events, relays, searchToken) {
-            // Fetch kind-7 reactions for visible notes so like counts and current-user state survive reloads.
+        async loadProfilesForPubkeys(pubkeys) {
+            // Fetch a compact set of missing profile records for note and reply authors.
+            const missingPubkeys = [...new Set(pubkeys.filter(Boolean))]
+                .filter(pubkey => !this.profiles.has(pubkey) && !this.profilePromises.has(pubkey))
+                .slice(0, 60);
+            if (!missingPubkeys.length) return;
+            const promise = this.fetchProfilesForPubkeys(missingPubkeys).then(profileMap => {
+                missingPubkeys.forEach(pubkey => {
+                    this.profiles.set(pubkey, profileMap.get(pubkey) || {});
+                    this.profilePromises.delete(pubkey);
+                });
+                return profileMap;
+            });
+            missingPubkeys.forEach(pubkey => this.profilePromises.set(pubkey, promise.then(map => map.get(pubkey) || {})));
+            await promise;
+        }
+
+        async loadEngagementForEvents(events, relays, searchToken) {
+            // Fetch reactions, replies, and reposts for visible notes so action counts survive reloads.
             const eventIds = [...new Set(events.map(event => event.id).filter(Boolean))].slice(0, 140);
             if (!eventIds.length) return;
             const chunks = [];
             for (let index = 0; index < eventIds.length; index += 40) {
                 chunks.push(eventIds.slice(index, index + 40));
             }
-            const filters = chunks.map(ids => ({ kinds: [7], '#e': ids, limit: 500 }));
-            const reactionEvents = await this.fetchEventsFromRelays(relays, filters, 3200);
+            const filters = chunks.flatMap(ids => [
+                { kinds: [7], '#e': ids, limit: 500 },
+                { kinds: [6], '#e': ids, limit: 500 },
+                { kinds: [1], '#e': ids, limit: 500 }
+            ]);
+            const engagementEvents = await this.fetchEventsFromRelays(relays, filters, 4200);
             if (this.activeSearchToken !== searchToken) return;
-            this.reactionSummary = this.buildReactionSummary(reactionEvents, eventIds);
+            this.reactionSummary = this.buildReactionSummary(engagementEvents.filter(event => Number(event.kind) === 7), eventIds);
+            this.engagementSummary = this.buildEngagementSummary(engagementEvents, eventIds);
+            const replyAuthors = [...new Set([...this.engagementSummary.values()].flatMap(summary => summary.replies.map(reply => reply.pubkey)).filter(Boolean))];
+            await this.loadProfilesForPubkeys(replyAuthors);
             this.renderFeed(this.lastEvents);
         }
 
@@ -655,10 +720,38 @@
             return summary;
         }
 
+        buildEngagementSummary(events, knownEventIds) {
+            // Group kind-1 replies and kind-6 reposts by the root note they reference.
+            const known = new Set(knownEventIds);
+            const summary = new Map([...known].map(id => [id, { replies: [], reposts: new Set() }]));
+            events.forEach(event => {
+                const targetId = this.getEventTagValues(event, 'e').find(id => known.has(id));
+                if (!targetId || !known.has(targetId)) return;
+                const entry = summary.get(targetId) || { replies: [], reposts: new Set() };
+                if (Number(event.kind) === 6 && event.pubkey) {
+                    entry.reposts.add(event.pubkey);
+                } else if (Number(event.kind) === 1 && event.id && !known.has(event.id)) {
+                    entry.replies.push(event);
+                }
+                summary.set(targetId, entry);
+            });
+            summary.forEach(entry => {
+                entry.replies = this.sortAndDedupeEvents(entry.replies).slice(0, 8);
+            });
+            return summary;
+        }
+
         getEventTagValue(event, tagName) {
             // Return the first tag value for compact Nostr relation lookups.
             const tag = (event.tags || []).find(item => item[0] === tagName && item[1]);
             return tag?.[1] || '';
+        }
+
+        getEventTagValues(event, tagName) {
+            // Return all tag values for relation lookups where replies can include root and parent event IDs.
+            return (event.tags || [])
+                .filter(item => item[0] === tagName && item[1])
+                .map(item => item[1]);
         }
 
         loadProfile(pubkey) {
@@ -688,9 +781,35 @@
             }
         }
 
+        async fetchProfilesForPubkeys(pubkeys) {
+            // Request kind-0 metadata for many authors at once and keep the newest profile per author.
+            const relays = this.getProfileRelays();
+            const filters = [];
+            for (let index = 0; index < pubkeys.length; index += 20) {
+                filters.push({ kinds: [0], authors: pubkeys.slice(index, index + 20), limit: 80 });
+            }
+            const events = await this.fetchEventsFromRelays(relays, filters, 4200);
+            const latestByPubkey = new Map();
+            events.forEach(event => {
+                if (!event?.pubkey || !event?.content) return;
+                const existing = latestByPubkey.get(event.pubkey);
+                if (existing && Number(existing.created_at || 0) >= Number(event.created_at || 0)) return;
+                latestByPubkey.set(event.pubkey, event);
+            });
+            const profiles = new Map();
+            latestByPubkey.forEach((event, pubkey) => {
+                try {
+                    profiles.set(pubkey, JSON.parse(event.content));
+                } catch (error) {
+                    profiles.set(pubkey, {});
+                }
+            });
+            return profiles;
+        }
+
         getProfileRelays() {
-            // Keep profile lookups cheap so they do not flood public relays while the stream loads.
-            return ['wss://purplepag.es', 'wss://nos.lol'];
+            // Query common profile-heavy relays plus broad relays used by the feed.
+            return [...new Set(['wss://purplepag.es', 'wss://user.kindpag.es', 'wss://nos.lol', ...this.getDefaultRelays()])].slice(0, 6);
         }
 
         async loadLoggedInContacts() {
@@ -816,20 +935,14 @@
         }
 
         calculateWotScore(event) {
-            // Score public notes with transparent local signals instead of pretending to have a global WOT graph.
+            // Score authors with stable local signals so the same user gets the same WoT value on every note.
+            const pubkey = String(event?.pubkey || '').toLowerCase();
             const profile = this.profiles.get(event.pubkey) || {};
-            const text = this.normalizeText(event.content || '');
-            const tokens = this.getNormalizedTokens(event.content || '');
             let score = 0;
-            if (this.eventMatchesLocalSearch(event)) score += 1;
             if (profile.name || profile.display_name) score += 2;
-            if (profile.picture) score += 1;
+            if (profile.picture || profile.image || profile.avatar) score += 1;
             if (profile.nip05) score += 1;
-            if (this.followedPubkeys.has(String(event.pubkey || '').toLowerCase())) score += 6;
-            if (this.defaultTerms.some(term => this.normalizedTermMatches(text, tokens, this.normalizeText(term)))) score += 2;
-            if ((this.birdTerms || []).some(term => this.normalizedTermMatches(text, tokens, term))) score += 3;
-            if ((event.tags || []).some(tag => tag[0] === 't' && this.defaultTags.map(value => value.toLowerCase()).includes(String(tag[1] || '').toLowerCase()))) score += 2;
-            if (String(event.content || '').length > 1200) score -= 1;
+            if (this.followedPubkeys.has(pubkey)) score += 6;
             return Math.max(0, Math.min(10, score));
         }
 
@@ -855,9 +968,11 @@
             const isHidden = Boolean(hiddenUsers[event.pubkey]);
             const name = this.getProfileName(profile, event.pubkey);
             const npub = this.formatNpub(event.pubkey);
+            const nip05 = this.getProfileNip05(profile);
             const score = this.calculateWotScore(event);
             const media = this.extractMediaAttachments(event);
             const visibleContent = this.removeDisplayedMediaUrls(event.content || '', media);
+            const engagement = this.engagementSummary.get(event.id) || { replies: [], reposts: new Set() };
             if (isHidden) {
                 return `
                     <article class="featheration-note hidden-author" data-event-id="${this.escapeHtml(event.id)}" data-pubkey="${this.escapeHtml(event.pubkey)}">
@@ -871,9 +986,10 @@
             return `
                 <article class="featheration-note" data-event-id="${this.escapeHtml(event.id)}" data-pubkey="${this.escapeHtml(event.pubkey)}">
                     <header class="featheration-note-header">
-                        <img class="featheration-author-avatar" src="${this.escapeHtml(profile.picture || 'img/origami_bird_B-ICO.png')}" alt="">
+                        <img class="featheration-author-avatar" src="${this.escapeHtml(this.getProfileImageUrl(profile))}" alt="">
                         <div class="featheration-author-copy">
                             <span class="featheration-author-name">${this.escapeHtml(name)}</span>
+                            ${nip05 ? `<span class="featheration-author-nip05">${this.escapeHtml(nip05)}</span>` : ''}
                             <div class="featheration-author-meta">
                                 <span class="featheration-author-npub">${this.escapeHtml(npub)}</span>
                                 <span class="featheration-wot">${this.escapeHtml(this.t('featheration.wotScore', { score }))}</span>
@@ -884,6 +1000,7 @@
                     </header>
                     <div class="featheration-note-content">${this.highlightText(visibleContent)}</div>
                     ${this.renderMediaAttachments(media)}
+                    ${this.renderRepliesSection(event, engagement)}
                     ${this.renderNoteActions(event)}
                 </article>
             `;
@@ -1012,6 +1129,27 @@
             return `<a class="featheration-media-link" href="${url}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i><span>${this.escapeHtml(item.label || item.url)}</span></a>`;
         }
 
+        getProfileImageUrl(profile) {
+            // Accept common Nostr metadata image fields and fall back when the URL is missing or invalid.
+            const imageUrl = profile?.picture || profile?.image || profile?.avatar || '';
+            if (!imageUrl) return 'img/origami_bird_B-ICO.png';
+            try {
+                const parsed = new URL(String(imageUrl));
+                if (!['http:', 'https:'].includes(parsed.protocol)) return 'img/origami_bird_B-ICO.png';
+                return parsed.toString();
+            } catch (error) {
+                return 'img/origami_bird_B-ICO.png';
+            }
+        }
+
+        handleFeedImageError(event) {
+            // Replace broken author avatars with the local fallback instead of leaving an empty circle.
+            const image = event.target.closest?.('.featheration-author-avatar');
+            if (!image || image.dataset.fallbackApplied === 'true') return;
+            image.dataset.fallbackApplied = 'true';
+            image.src = 'img/origami_bird_B-ICO.png';
+        }
+
         renderNoteMenu(event, isHidden) {
             // Keep copy and moderation actions behind a compact three-dot menu.
             const hideKey = isHidden ? 'featheration.unhideUser' : 'featheration.hideUser';
@@ -1034,8 +1172,11 @@
             // Show Nostr interactions only when this browser has a saved Nostr identity.
             const publicHex = localStorage.getItem('birdNostrPublicKeyHex');
             const likePubkeys = this.reactionSummary.get(event.id) || new Set();
+            const engagement = this.engagementSummary.get(event.id) || { replies: [], reposts: new Set() };
             const likedByUser = Boolean(publicHex && likePubkeys.has(publicHex));
             const likeCount = likePubkeys.size;
+            const replyCount = engagement.replies?.length || 0;
+            const repostCount = engagement.reposts?.size || 0;
             if (!publicHex) {
                 return `
                     <div class="featheration-note-actions">
@@ -1053,9 +1194,48 @@
                         <i class="fa-solid fa-feather-pointed" aria-hidden="true"></i>
                         <span class="featheration-like-count">${this.escapeHtml(this.formatNumber(likeCount))}</span>
                     </button>
-                    <button class="featheration-note-action" type="button" data-repost>${this.escapeHtml(this.t('featheration.repost'))}</button>
-                    <button class="featheration-note-action" type="button" data-reply>${this.escapeHtml(this.t('featheration.reply'))}</button>
+                    <button class="featheration-note-action" type="button" data-repost>${this.escapeHtml(this.t('featheration.repost'))}${repostCount ? ` <span class="featheration-action-count">${this.escapeHtml(this.formatNumber(repostCount))}</span>` : ''}</button>
+                    <button class="featheration-note-action" type="button" data-reply>${this.escapeHtml(this.t('featheration.reply'))}${replyCount ? ` <span class="featheration-action-count">${this.escapeHtml(this.formatNumber(replyCount))}</span>` : ''}</button>
                 </div>
+            `;
+        }
+
+        renderRepliesSection(event, engagement) {
+            // Render fetched replies in a native collapsible block when the note has public replies.
+            const replies = engagement?.replies || [];
+            if (!replies.length) return '';
+            return `
+                <details class="featheration-replies">
+                    <summary>
+                        <i class="fa-solid fa-chevron-right featheration-replies-chevron" aria-hidden="true"></i>
+                        <span>${this.escapeHtml(this.t('featheration.repliesCount', { count: this.formatNumber(replies.length) }))}</span>
+                    </summary>
+                    <div class="featheration-reply-list">
+                        ${replies.map(reply => this.renderReply(reply)).join('')}
+                    </div>
+                </details>
+            `;
+        }
+
+        renderReply(reply) {
+            // Render a compact reply preview with author metadata and media links.
+            const profile = this.profiles.get(reply.pubkey) || {};
+            const nip05 = this.getProfileNip05(profile);
+            const media = this.extractMediaAttachments(reply);
+            const visibleContent = this.removeDisplayedMediaUrls(reply.content || '', media);
+            return `
+                <article class="featheration-reply" data-event-id="${this.escapeHtml(reply.id)}">
+                    <img class="featheration-author-avatar featheration-reply-avatar" src="${this.escapeHtml(this.getProfileImageUrl(profile))}" alt="">
+                    <div class="featheration-reply-body">
+                        <div class="featheration-reply-meta">
+                            <strong>${this.escapeHtml(this.getProfileName(profile, reply.pubkey))}</strong>
+                            ${nip05 ? `<span class="featheration-author-nip05">${this.escapeHtml(nip05)}</span>` : ''}
+                            <time datetime="${this.escapeHtml(this.eventDate(reply).toISOString())}">${this.escapeHtml(this.relativeTime(reply))}</time>
+                        </div>
+                        <div class="featheration-note-content">${this.highlightText(visibleContent)}</div>
+                        ${this.renderMediaAttachments(media)}
+                    </div>
+                </article>
             `;
         }
 
@@ -1085,6 +1265,7 @@
             }
             const note = event.target.closest('.featheration-note');
             if (!note) return;
+            if (event.target.closest('.featheration-replies summary')) return;
             const originalEvent = this.lastEvents.find(item => item.id === note.dataset.eventId);
             if (!originalEvent) return;
             if (event.target.closest('[data-open-note-menu]')) {
@@ -1308,6 +1489,118 @@
                 ['p', event.pubkey]
             ]);
             await this.signAndPublish(unsigned, button, this.t('featheration.replySent'));
+        }
+
+        openComposeModal() {
+            // Open the public-note composer and disable publishing until a Nostr identity is available.
+            if (!this.composeModal) return;
+            const loggedIn = Boolean(localStorage.getItem('birdNostrPublicKeyHex'));
+            this.composeModal.hidden = false;
+            document.body.classList.add('featheration-modal-open');
+            if (this.composeLoginWarning) this.composeLoginWarning.hidden = loggedIn;
+            if (this.composePublish) this.composePublish.disabled = !loggedIn;
+            if (loggedIn) {
+                window.setTimeout(() => this.composeText?.focus(), 30);
+            } else {
+                this.setStatus(this.t('featheration.composeLoginRequired'), true);
+            }
+        }
+
+        closeComposeModal() {
+            // Close the composer without clearing text so accidental backdrop taps do not lose drafts.
+            if (!this.composeModal) return;
+            this.composeModal.hidden = true;
+            document.body.classList.remove('featheration-modal-open');
+        }
+
+        async publishComposeNote() {
+            // Publish a standalone public kind-1 note, optionally appending a direct media URL.
+            const content = this.buildComposeContent();
+            if (!content) {
+                this.setStatus(this.t('featheration.composeEmpty'), true);
+                this.composeText?.focus();
+                return;
+            }
+            const unsigned = this.baseEvent(1, content, []);
+            const signed = await this.signAndPublish(unsigned, this.composePublish, this.t('featheration.composeSent'));
+            if (!signed) return;
+            this.composeText.value = '';
+            this.closeComposeModal();
+            this.addEventIfRelevant(signed);
+            this.renderFeed(this.lastEvents);
+        }
+
+        buildComposeContent() {
+            // Publish the textarea exactly as the author composed it, including any uploaded media URLs.
+            return this.composeText?.value?.trim() || '';
+        }
+
+        async uploadComposeImageToCloudinary() {
+            // Upload one selected image through Cloudinary's unsigned browser upload endpoint.
+            const cloudName = this.normalizeCloudinaryCloudName(CLOUDINARY_CLOUD_NAME);
+            const uploadPreset = String(CLOUDINARY_UNSIGNED_UPLOAD_PRESET || '').trim();
+            const file = this.cloudinaryFile?.files?.[0];
+            if (!cloudName || !uploadPreset) {
+                this.setCloudinaryStatus(this.t('featheration.cloudinaryNotConfigured'), true);
+                return;
+            }
+            if (!file) {
+                this.setCloudinaryStatus(this.t('featheration.cloudinaryMissingFile'), true);
+                return;
+            }
+            if (!file.type.startsWith('image/')) {
+                this.setCloudinaryStatus(this.t('featheration.cloudinaryInvalidFile'), true);
+                return;
+            }
+
+            this.setCloudinaryStatus(this.t('featheration.cloudinaryUploading'));
+            if (this.cloudinaryUpload) this.cloudinaryUpload.disabled = true;
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('upload_preset', uploadPreset);
+                const response = await fetch(`https://api.cloudinary.com/v1_1/${encodeURIComponent(cloudName)}/image/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const payload = await response.json().catch(() => ({}));
+                if (!response.ok || !payload.secure_url) {
+                    throw new Error(payload.error?.message || this.t('featheration.cloudinaryUploadFailed'));
+                }
+                this.appendComposeMediaUrl(payload.secure_url);
+                this.setCloudinaryStatus(this.t('featheration.cloudinaryUploaded'));
+            } catch (error) {
+                console.warn('Cloudinary upload failed:', error);
+                this.setCloudinaryStatus(error?.message || this.t('featheration.cloudinaryUploadFailed'), true);
+            } finally {
+                if (this.cloudinaryUpload) this.cloudinaryUpload.disabled = false;
+            }
+        }
+
+        appendComposeMediaUrl(url) {
+            // Add uploaded media links to the note body so multiple uploads form a gallery-style note.
+            if (!this.composeText || !url) return;
+            const currentText = this.composeText.value.trimEnd();
+            this.composeText.value = currentText ? `${currentText}\n\n${url}` : url;
+            this.composeText.focus();
+            this.composeText.selectionStart = this.composeText.selectionEnd = this.composeText.value.length;
+        }
+
+        setCloudinaryStatus(message, isError = false) {
+            // Show upload progress or setup errors inside the compose modal.
+            if (!this.cloudinaryStatus) return;
+            this.cloudinaryStatus.textContent = message || '';
+            this.cloudinaryStatus.classList.toggle('error', Boolean(isError));
+        }
+
+        normalizeCloudinaryCloudName(value) {
+            // Accept either a raw cloud name or pasted res.cloudinary.com URL and keep only the cloud segment.
+            const rawValue = String(value || '').trim();
+            const match = rawValue.match(/res\.cloudinary\.com\/([^/?#]+)/i);
+            return (match ? match[1] : rawValue)
+                .replace(/^https?:\/\//i, '')
+                .replace(/\/.*$/, '')
+                .trim();
         }
 
         baseEvent(kind, content, tags) {
@@ -1544,6 +1837,13 @@
         getProfileName(profile, pubkey) {
             // Prefer display names, then fallback to a shortened Nostr public key.
             return profile.display_name || profile.name || this.formatNpub(pubkey);
+        }
+
+        getProfileNip05(profile) {
+            // Display a compact NIP-05 identifier from metadata without trying to verify it client-side.
+            const nip05 = String(profile?.nip05 || '').trim();
+            if (!nip05 || nip05.length > 120 || !nip05.includes('@')) return '';
+            return nip05;
         }
 
         formatNpub(pubkey) {
