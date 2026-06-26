@@ -714,6 +714,20 @@
                     <small data-i18n="featheration.maxHashtagsHelp">Hide notes with more than this many hashtags. Set 0 to disable this filter.</small>
                 </div>
                 <div class="nostr-featheration-setting">
+                    <label for="nostr-featheration-lookback" data-i18n="featheration.lookback">Search post age</label>
+                    <select id="nostr-featheration-lookback">
+                        <option value="today" data-i18n="featheration.lookbackToday">Today</option>
+                        <option value="week" data-i18n="featheration.lookbackWeek">Week</option>
+                        <option value="month" data-i18n="featheration.lookbackMonth">Month</option>
+                        <option value="3months" data-i18n="featheration.lookback3Months">3 months</option>
+                        <option value="6months" data-i18n="featheration.lookback6Months">6 months</option>
+                        <option value="1year" data-i18n="featheration.lookback1Year">1 year</option>
+                        <option value="3years" data-i18n="featheration.lookback3Years">3 years</option>
+                        <option value="all" data-i18n="featheration.lookbackAll">All</option>
+                    </select>
+                    <small data-i18n="featheration.lookbackHelp">Older searches ask relays for a wider time range and can be slower or return fewer results depending on each relay.</small>
+                </div>
+                <div class="nostr-featheration-setting">
                     <h4 data-i18n="featheration.hiddenUsers">Hidden users</h4>
                     <p class="nostr-relay-section-note" data-i18n="featheration.hiddenUsersHelp">Hidden users remain collapsed in Featheration. This list is stored only in this browser.</p>
                     <div class="nostr-blocked-diary-list" id="nostr-featheration-hidden-user-list"></div>
@@ -946,6 +960,8 @@
             
             // Timeout for auto-hiding
             this.searchTimeout = null;
+            this.isBirdDetailEmbed = new URLSearchParams(window.location.search).get('embed') === 'bird';
+            document.body.classList.toggle('bird-detail-embed', this.isBirdDetailEmbed);
 
             this.modal = document.getElementById('bird-modal');
             this.modalBody = document.getElementById('modal-body');
@@ -1064,6 +1080,7 @@
             this.nostrFeatherationMinWotValue = document.getElementById('nostr-featheration-min-wot-value');
             this.nostrFeatherationMaxHashtags = document.getElementById('nostr-featheration-max-hashtags');
             this.nostrFeatherationMaxHashtagsValue = document.getElementById('nostr-featheration-max-hashtags-value');
+            this.nostrFeatherationLookback = document.getElementById('nostr-featheration-lookback');
             this.nostrFeatherationHiddenUserList = document.getElementById('nostr-featheration-hidden-user-list');
             this.nostrRelayHelp = document.getElementById('nostr-relay-help');
             this.nostrRelayStatus = document.getElementById('nostr-relay-status');
@@ -2772,6 +2789,7 @@
             });
             this.nostrFeatherationMinWot?.addEventListener('input', () => this.saveFeatherationNostrSetting('birdFeatherationMinWot', this.nostrFeatherationMinWot.value));
             this.nostrFeatherationMaxHashtags?.addEventListener('input', () => this.saveFeatherationNostrSetting('birdFeatherationMaxHashtags', this.nostrFeatherationMaxHashtags.value));
+            this.nostrFeatherationLookback?.addEventListener('change', () => this.saveFeatherationNostrSetting('birdFeatherationLookback', this.nostrFeatherationLookback.value));
             document.addEventListener('keydown', event => {
                 if (event.key === 'Escape' && !this.nostrModal?.hidden) this.closeNostrKeyModal();
                 if (event.key === 'Escape' && !this.achievementsModal?.hidden) this.closeAchievementsModal();
@@ -3630,6 +3648,11 @@
 
         async handleInitialHashRoute() {
             // Deep-link from standalone pages into the encyclopedia menu actions and modals.
+            const birdRoute = new URLSearchParams(window.location.search).get('bird');
+            if (this.isBirdDetailEmbed && birdRoute) {
+                await this.openBirdDetailsFromRoute(birdRoute);
+                return;
+            }
             const route = window.location.hash;
             if (!route) return;
             const categoryRoutes = {
@@ -3691,6 +3714,19 @@
             window.history.replaceState(null, '', window.location.pathname);
         }
 
+        async openBirdDetailsFromRoute(scientificName) {
+            // Reuse the full encyclopedia modal for standalone pages that embed one bird detail view.
+            const bird = this.getBirdByScientificName(decodeURIComponent(String(scientificName || '')));
+            if (!bird) {
+                this.modal.style.display = 'block';
+                this.modalBirdName.textContent = this.t('common.notAvailable');
+                this.modalBody.innerHTML = `<p class="no-results">${this.escapeHtml(this.t('featheration.birdDetailsUnavailable'))}</p>`;
+                document.body.style.overflow = 'hidden';
+                return;
+            }
+            await this.showBirdDetails(bird);
+        }
+
         closeNostrRelayModal() {
             // Close Nostr settings without changing any saved relay or blocklist values.
             if (this.nostrRelayModal) this.nostrRelayModal.hidden = true;
@@ -3738,10 +3774,12 @@
             // Render Featheration filters from the same localStorage keys used by the public notes page.
             const minWot = localStorage.getItem('birdFeatherationMinWot') || '0';
             const maxHashtags = localStorage.getItem('birdFeatherationMaxHashtags') || '8';
+            const lookback = localStorage.getItem('birdFeatherationLookback') || 'month';
             if (this.nostrFeatherationMinWot) this.nostrFeatherationMinWot.value = minWot;
             if (this.nostrFeatherationMinWotValue) this.nostrFeatherationMinWotValue.textContent = minWot;
             if (this.nostrFeatherationMaxHashtags) this.nostrFeatherationMaxHashtags.value = maxHashtags;
             if (this.nostrFeatherationMaxHashtagsValue) this.nostrFeatherationMaxHashtagsValue.textContent = maxHashtags;
+            if (this.nostrFeatherationLookback) this.nostrFeatherationLookback.value = lookback;
             this.renderFeatherationHiddenUsers();
         }
 
@@ -9662,6 +9700,9 @@
             this.clearActiveDiaryUiState();
             if (this.modalObservationToggle) this.modalObservationToggle.hidden = true;
             this.hideObservationConfirmation();
+            if (this.isBirdDetailEmbed && window.parent !== window) {
+                window.parent.postMessage({ type: 'birds-name-bird-modal-closed' }, window.location.origin);
+            }
         }
 
         clearActiveDiaryUiState() {

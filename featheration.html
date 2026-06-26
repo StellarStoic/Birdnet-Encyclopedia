@@ -212,6 +212,18 @@
         </section>
     </main>
 
+    <!-- Featheration bird details modal opens clicked purple bird-name matches without leaving this page. -->
+    <div class="featheration-bird-modal" id="featheration-bird-modal" hidden role="dialog" aria-modal="true" aria-labelledby="featheration-bird-modal-title">
+        <div class="featheration-bird-modal-card" role="document">
+            <button class="featheration-bird-modal-close" id="featheration-bird-modal-close" type="button" aria-label="Close bird details">
+                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
+            <h2 id="featheration-bird-modal-title" data-i18n="featheration.birdDetails">Bird details</h2>
+            <!-- The iframe reuses the real encyclopedia bird modal instead of maintaining a second details view. -->
+            <iframe class="featheration-bird-details-frame" id="featheration-bird-details-frame" title="Bird details" loading="lazy"></iframe>
+        </div>
+    </div>
+
     <script src="i18n.js"></script>
     <script src="featheration.js"></script>
 </body>

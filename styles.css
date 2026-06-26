@@ -72,6 +72,34 @@ body[data-theme="paper"] {
             transition: background-color 0.25s ease, color 0.25s ease;
         }
 
+        /* Embedded bird details mode hides page chrome when Featheration reuses the real modal. */
+        body.bird-detail-embed {
+            background: transparent !important;
+            overflow: hidden !important;
+        }
+
+        body.bird-detail-embed > .background,
+        body.bird-detail-embed > .dropdown-container,
+        body.bird-detail-embed > .container,
+        body.bird-detail-embed > #load-more-button,
+        body.bird-detail-embed > #scroll-to-top {
+            display: none !important;
+        }
+
+        body.bird-detail-embed .modal {
+            background: transparent !important;
+            padding: 0 !important;
+        }
+
+        body.bird-detail-embed .modal-content {
+            width: 100% !important;
+            max-width: none !important;
+            min-height: 100dvh !important;
+            margin: 0 !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+        }
+
         .background {
             position: fixed;
             top: 0;
@@ -3936,6 +3964,17 @@ body[data-theme="midnight"] .site-title-logo {
 .nostr-featheration-setting input[type="range"] {
     width: 100%;
     accent-color: var(--primary);
+}
+
+.nostr-featheration-setting select {
+    width: 100%;
+    min-height: 42px;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
 }
 
 .nostr-featheration-setting output,

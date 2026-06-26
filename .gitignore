@@ -5,3 +5,9 @@ tools/*.checkpoint.json*
 # Ignore Python interpreter caches generated while running maintenance scripts.
 __pycache__/
 *.py[cod]
+
+# Keep full-size generated bird images local, but allow the compact thumbnail set used by Featheration.
+data/bird-images/*
+!data/bird-images/README.md
+!data/bird-images/thumbnails/
+!data/bird-images/thumbnails/**

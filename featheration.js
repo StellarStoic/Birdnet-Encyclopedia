@@ -5,6 +5,7 @@
     const HIDDEN_USERS_KEY = 'birdFeatherationHiddenUsers';
     const MIN_WOT_KEY = 'birdFeatherationMinWot';
     const MAX_HASHTAGS_KEY = 'birdFeatherationMaxHashtags';
+    const LOOKBACK_KEY = 'birdFeatherationLookback';
     const THEME_KEY = 'birdEncyclopediaTheme';
     const LANGUAGE_KEY = 'birdEncyclopediaLanguage';
     const NOSTR_TOOLS_URL = 'https://esm.sh/nostr-tools@2.10.4?bundle';
@@ -34,9 +35,19 @@
             this.followedPubkeys = new Set();
             this.lastEvents = [];
             this.eventMap = new Map();
+            this.reactionSummary = new Map();
             this.renderTimer = null;
             this.activeSearchToken = 0;
             this.lastSearchTerms = [...this.defaultTerms];
+            this.birdHighlightTerms = [];
+            this.birdHighlightRecords = [];
+            this.birdLookupByScientificName = new Map();
+            this.birdGroupLookup = new Map();
+            this.birdModal = document.getElementById('featheration-bird-modal');
+            this.birdModalClose = document.getElementById('featheration-bird-modal-close');
+            this.birdModalTitle = document.getElementById('featheration-bird-modal-title');
+            this.birdDetailsFrame = document.getElementById('featheration-bird-details-frame');
+            this.birdGroupOverlay = null;
             this.currentQueryLabel = 'bird topics';
             this.localFilterTerms = [];
             this.localFilterTags = [];
@@ -85,9 +96,20 @@
                 this.search(this.quickSearchInput.value);
             });
             this.feed?.addEventListener('click', event => this.handleFeedClick(event));
+            this.birdModalClose?.addEventListener('click', () => this.closeBirdDetailsModal());
+            this.birdModal?.addEventListener('click', event => {
+                if (event.target === this.birdModal) this.closeBirdDetailsModal();
+            });
+            document.addEventListener('keydown', event => {
+                if (event.key === 'Escape' && this.birdModal && !this.birdModal.hidden) this.closeBirdDetailsModal();
+            });
+            window.addEventListener('message', event => this.handleBirdDetailsMessage(event));
             document.addEventListener('click', event => {
                 if (this.menu?.classList.contains('show') && !event.target.closest('.dropdown-container')) {
                     this.closeMenu();
+                }
+                if (this.birdGroupOverlay && !event.target.closest('.bird-group-trigger') && !event.target.closest('.bird-group-cloud')) {
+                    this.closeBirdGroupCloud();
                 }
                 if (!event.target.closest('.featheration-note-menu')) this.closeAllMenus();
             });
@@ -154,31 +176,49 @@
             });
         }
 
-        updateMenuIdentity() {
-            // Show the saved Nostr avatar in the burger button when a profile picture is already cached.
-            const publicHex = localStorage.getItem('birdNostrPublicKeyHex');
-            const profile = publicHex ? this.getCachedProfile(publicHex) : null;
-            const imageUrl = profile?.picture || profile?.image || '';
+        async updateMenuIdentity() {
+            // Show the same logged-in Nostr avatar used by the encyclopedia burger menu.
+            const publicHex = localStorage.getItem('birdNostrPublicKeyHex') || '';
             if (!this.menuNostrAvatar || !this.menuToggle) return;
-            if (imageUrl) {
-                this.menuNostrAvatar.src = imageUrl;
-                this.menuNostrAvatar.hidden = false;
-                this.menuToggle.classList.add('nostr-logged-in');
-                this.menuNostrAvatar.onerror = () => {
-                    this.menuNostrAvatar.hidden = true;
-                    this.menuToggle.classList.remove('nostr-logged-in');
-                };
+            if (!publicHex) {
+                this.menuNostrAvatar.hidden = true;
+                this.menuToggle.classList.remove('nostr-logged-in');
+                return;
             }
+
+            const profile = this.getCachedNostrProfile(publicHex) || await this.loadAndCacheOwnProfile(publicHex);
+            const imageUrl = profile?.picture || profile?.image || 'img/origami_bird_B-ICO.png';
+            this.menuNostrAvatar.src = imageUrl;
+            this.menuNostrAvatar.hidden = false;
+            this.menuToggle.classList.add('nostr-logged-in');
+            this.menuNostrAvatar.onerror = () => {
+                this.menuNostrAvatar.src = 'img/origami_bird_B-ICO.png';
+            };
         }
 
-        getCachedProfile(pubkey) {
-            // Read any locally cached Nostr profile without doing network work for the menu button.
+        getCachedNostrProfile(publicHex) {
+            // Read the same browser-local Nostr metadata cache used by index.html.
             try {
-                const cache = JSON.parse(localStorage.getItem('birdNostrProfileCache') || '{}');
-                return cache?.[pubkey] || null;
+                const profile = JSON.parse(localStorage.getItem('birdNostrProfile') || 'null');
+                return profile?.publicHex === publicHex ? profile : null;
             } catch (error) {
                 return null;
             }
+        }
+
+        async loadAndCacheOwnProfile(publicHex) {
+            // Fetch and cache the logged-in user's kind-0 metadata when Featheration opens first.
+            try {
+                const profile = await this.fetchLatestProfile(publicHex);
+                if (profile && Object.keys(profile).length) {
+                    const cachedProfile = { ...profile, publicHex };
+                    localStorage.setItem('birdNostrProfile', JSON.stringify(cachedProfile));
+                    return cachedProfile;
+                }
+            } catch (error) {
+                console.warn('Could not load Nostr profile for Featheration menu:', error);
+            }
+            return null;
         }
 
         t(key, values = {}) {
@@ -190,36 +230,117 @@
             // Load selected-language and English bird names so matching and highlighting know local names too.
             const language = localStorage.getItem(LANGUAGE_KEY) || 'en';
             const files = [...new Set(['en', language])]
-                .map(code => `lang/labels_${code}.txt`);
+                .map(code => ({ code, url: `lang/labels_${code}.txt` }));
             const termSet = new Set(this.defaultTerms.map(term => this.normalizeText(term)).filter(Boolean));
+            const highlightSet = new Set();
+            const highlightRecords = new Map();
             await Promise.all(files.map(async file => {
                 try {
-                    const response = await fetch(file);
+                    const response = await fetch(file.url);
                     if (!response.ok) return;
                     const text = await response.text();
-                    this.extractBirdTerms(text).forEach(term => termSet.add(term));
+                    const terms = this.extractBirdTerms(text);
+                    terms.matchTerms.forEach(term => termSet.add(term));
+                    terms.highlightTerms.forEach(term => highlightSet.add(term));
+                    terms.highlightRecords.forEach(record => {
+                        record.sourceLanguage = file.code;
+                        const recordKey = `${record.scientificName.toLowerCase()}|${this.normalizeText(record.term)}`;
+                        if (!highlightRecords.has(recordKey)) highlightRecords.set(recordKey, record);
+                        this.rememberBirdRecord(record);
+                    });
                 } catch (error) {
-                    console.warn(`Could not load bird terms from ${file}:`, error);
+                    console.warn(`Could not load bird terms from ${file.url}:`, error);
                 }
             }));
             this.birdTerms = [...termSet]
                 .filter(term => term.length >= 4)
                 .slice(0, 900);
+            this.birdHighlightRecords = [...highlightRecords.values()]
+                .filter(record => String(record.term || '').trim().length >= 4)
+                .sort((a, b) => b.term.length - a.term.length);
+            this.birdHighlightTerms = [...highlightSet]
+                .filter(term => term.length >= 4)
+                .sort((a, b) => b.length - a.length);
+            this.buildBirdGroupLookup();
         }
 
         extractBirdTerms(labelsText) {
-            // Convert BirdNET label rows into searchable common-name terms while avoiding tiny fragments.
+            // Convert BirdNET label rows into searchable and highlightable scientific/local name terms.
             const ignored = new Set(['the', 'and', 'with', 'bird', 'birds', 'common', 'greater', 'lesser', 'northern', 'southern', 'eastern', 'western']);
-            const terms = new Set();
+            const matchTerms = new Set();
+            const highlightTerms = new Set();
+            const highlightRecords = [];
             labelsText.split(/\r?\n/).forEach(line => {
-                const [, commonName] = line.split('_');
-                const normalizedName = this.normalizeText(commonName || '');
-                if (normalizedName.length >= 5) terms.add(normalizedName);
-                normalizedName.split(/\s+/).forEach(word => {
-                    if (word.length >= 5 && !ignored.has(word)) terms.add(word);
+                const [scientificName = '', commonName = ''] = line.split('_');
+                const baseRecord = {
+                    scientificName: String(scientificName || '').trim(),
+                    commonName: String(commonName || '').trim()
+                };
+                [scientificName, commonName].forEach(name => {
+                    const displayName = String(name || '').trim();
+                    const normalizedName = this.normalizeText(displayName);
+                    if (!baseRecord.scientificName || !displayName) return;
+                    if (normalizedName.length >= 5) {
+                        matchTerms.add(normalizedName);
+                        highlightTerms.add(displayName);
+                        highlightTerms.add(displayName.replace(/[\s_-]+/g, ''));
+                        highlightRecords.push({ ...baseRecord, term: displayName });
+                        highlightRecords.push({ ...baseRecord, term: displayName.replace(/[\s_-]+/g, '') });
+                    }
+                    normalizedName.split(/\s+/).forEach(word => {
+                        if (word.length >= 5 && !ignored.has(word)) {
+                            matchTerms.add(word);
+                        }
+                    });
                 });
             });
-            return [...terms];
+            return {
+                matchTerms: [...matchTerms],
+                highlightTerms: [...highlightTerms],
+                highlightRecords
+            };
+        }
+
+        rememberBirdRecord(record) {
+            // Merge repeated English/local label rows into one lookup entry keyed by scientific name.
+            const scientificName = String(record?.scientificName || '').trim();
+            if (!scientificName) return;
+            const key = scientificName.toLowerCase();
+            const existing = this.birdLookupByScientificName.get(key) || { scientificName };
+            const commonName = String(record.commonName || '').trim();
+            const isEnglish = record.sourceLanguage === 'en';
+            this.birdLookupByScientificName.set(key, {
+                ...existing,
+                scientificName,
+                commonName: isEnglish ? (commonName || existing.commonName || '') : (existing.commonName || ''),
+                localName: isEnglish ? (existing.localName || commonName || '') : (commonName || existing.localName || existing.commonName || '')
+            });
+        }
+
+        buildBirdGroupLookup() {
+            // Build blue broad-group triggers only from common-name nouns that point to many species.
+            const ignored = new Set([
+                'black', 'white', 'brown', 'gray', 'grey', 'green', 'blue', 'red', 'yellow', 'orange',
+                'golden', 'spotted', 'striped', 'streaked', 'rufous', 'pale', 'dark', 'little', 'lovely',
+                'common', 'greater', 'lesser', 'northern', 'southern', 'eastern', 'western', 'coconut',
+                'bird', 'birds'
+            ]);
+            const groups = new Map();
+            this.birdLookupByScientificName.forEach(record => {
+                const name = record.commonName || record.localName || '';
+                this.normalizeText(name).split(/\s+/).forEach(word => {
+                    if (word.length < 5 || ignored.has(word)) return;
+                    if (!groups.has(word)) groups.set(word, new Map());
+                    groups.get(word).set(record.scientificName.toLowerCase(), record);
+                });
+            });
+            this.birdGroupLookup = new Map(
+                [...groups.entries()]
+                    .filter(([, records]) => records.size >= 8)
+                    .map(([term, records]) => [term, [...records.values()].sort((a, b) => (a.commonName || a.localName || a.scientificName).localeCompare(b.commonName || b.localName || b.scientificName))])
+            );
+            const woodpeckers = this.birdGroupLookup.get('woodpecker');
+            if (woodpeckers?.length) this.birdGroupLookup.set('woodpacker', woodpeckers);
         }
 
         async search(rawQuery = '') {
@@ -254,6 +375,7 @@
                 this.loadProfilesForEvents(accumulatedEvents).then(() => {
                     if (this.activeSearchToken === searchToken) this.renderFeed(this.lastEvents);
                 });
+                this.loadReactionsForEvents(accumulatedEvents, relays, searchToken);
                 this.setStatus(this.t('featheration.loaded', {
                     count: this.formatNumber(this.getVisibleEvents(accumulatedEvents).length),
                     relays: this.formatNumber(relayPlans.length)
@@ -278,13 +400,14 @@
                 .map(word => word.replace(/^#+/, ''))
                 .filter(Boolean)
                 .slice(0, query ? 5 : 4);
-            const tagFilter = [...new Set(query ? [...tags, ...plainWords] : ['bird', 'birds', 'birding', 'birdphotography'])].slice(0, 10);
-            const since = Math.floor(Date.now() / 1000) - 30 * 24 * 60 * 60;
+            const joinedQueryTag = plainWords.length > 1 ? plainWords.join('') : '';
+            const tagFilter = [...new Set(query ? [...tags, ...plainWords, joinedQueryTag].filter(Boolean) : ['bird', 'birds', 'birding', 'birdphotography'])].slice(0, 10);
+            const since = this.getLookbackSince();
             const tagFilters = [];
-            if (tagFilter.length) tagFilters.push({ kinds: [1], '#t': tagFilter, since, limit: query ? 100 : 150 });
+            if (tagFilter.length) tagFilters.push(this.withLookback({ kinds: [1], '#t': tagFilter, limit: query ? 100 : 150 }, since));
             const fallbackFilters = [
                 ...tagFilters,
-                { kinds: [1], since, limit: query ? 260 : 220 }
+                this.withLookback({ kinds: [1], limit: query ? 260 : 220 }, since)
             ];
             const searchFilters = plainWords.length
                 ? [{ kinds: [1], search: plainWords.join(' OR '), limit: query ? 100 : 80 }]
@@ -292,8 +415,8 @@
             return {
                 fallbackFilters,
                 searchFilters,
-                highlightTerms: [...new Set([...words.map(word => word.replace(/^#+/, '')), ...this.defaultTerms])],
-                localTerms: plainWords.map(word => this.normalizeText(word)).filter(Boolean),
+                highlightTerms: [...new Set([...words.map(word => word.replace(/^#+/, '')), joinedQueryTag, ...this.defaultTerms].filter(Boolean))],
+                localTerms: [...plainWords.map(word => this.normalizeText(word)).filter(Boolean), this.normalizeText(joinedQueryTag)].filter(Boolean),
                 localTags: tagFilter.map(tag => this.normalizeText(tag)).filter(Boolean)
             };
         }
@@ -504,6 +627,40 @@
             await Promise.all(pubkeys.map(pubkey => this.loadProfile(pubkey)));
         }
 
+        async loadReactionsForEvents(events, relays, searchToken) {
+            // Fetch kind-7 reactions for visible notes so like counts and current-user state survive reloads.
+            const eventIds = [...new Set(events.map(event => event.id).filter(Boolean))].slice(0, 140);
+            if (!eventIds.length) return;
+            const chunks = [];
+            for (let index = 0; index < eventIds.length; index += 40) {
+                chunks.push(eventIds.slice(index, index + 40));
+            }
+            const filters = chunks.map(ids => ({ kinds: [7], '#e': ids, limit: 500 }));
+            const reactionEvents = await this.fetchEventsFromRelays(relays, filters, 3200);
+            if (this.activeSearchToken !== searchToken) return;
+            this.reactionSummary = this.buildReactionSummary(reactionEvents, eventIds);
+            this.renderFeed(this.lastEvents);
+        }
+
+        buildReactionSummary(reactionEvents, knownEventIds) {
+            // Count unique positive reaction authors per event and ignore explicit dislike reactions.
+            const known = new Set(knownEventIds);
+            const summary = new Map();
+            reactionEvents.forEach(reaction => {
+                const targetId = this.getEventTagValue(reaction, 'e');
+                if (!targetId || !known.has(targetId) || !reaction.pubkey || String(reaction.content || '+').trim() === '-') return;
+                if (!summary.has(targetId)) summary.set(targetId, new Set());
+                summary.get(targetId).add(reaction.pubkey);
+            });
+            return summary;
+        }
+
+        getEventTagValue(event, tagName) {
+            // Return the first tag value for compact Nostr relation lookups.
+            const tag = (event.tags || []).find(item => item[0] === tagName && item[1]);
+            return tag?.[1] || '';
+        }
+
         loadProfile(pubkey) {
             // Cache profile lookups per page load to avoid repeated kind-0 subscriptions.
             if (this.profiles.has(pubkey)) return Promise.resolve(this.profiles.get(pubkey));
@@ -579,6 +736,28 @@
             return Number(localStorage.getItem(MAX_HASHTAGS_KEY) || 8);
         }
 
+        getLookbackSince() {
+            // Convert the central Featheration post-age setting into a Nostr since timestamp.
+            const daysByKey = {
+                today: 1,
+                week: 7,
+                month: 30,
+                '3months': 90,
+                '6months': 183,
+                '1year': 365,
+                '3years': 1095
+            };
+            const value = localStorage.getItem(LOOKBACK_KEY) || 'month';
+            if (value === 'all') return null;
+            const days = daysByKey[value] || daysByKey.month;
+            return Math.floor(Date.now() / 1000) - days * 24 * 60 * 60;
+        }
+
+        withLookback(filter, since) {
+            // Add a since bound only when the visitor did not choose "all" posts.
+            return since ? { ...filter, since } : filter;
+        }
+
         countEventHashtags(event) {
             // Count both explicit Nostr hashtag tags and visible hashtags inside note content.
             const tagCount = (event.tags || []).filter(tag => tag[0] === 't' && tag[1]).length;
@@ -597,8 +776,10 @@
             const noteTags = (event.tags || [])
                 .filter(tag => tag[0] === 't')
                 .map(tag => this.normalizeText(tag[1] || ''));
-            return terms.some(term => this.normalizedTermMatches(content, contentTokens, term))
-                || tags.some(tag => noteTags.includes(tag) || contentHashtags.includes(tag));
+            const searchableTags = [...noteTags, ...contentHashtags];
+            return terms.some(term => this.normalizedTermMatches(content, contentTokens, term)
+                    || searchableTags.some(tag => this.normalizedTagMatches(tag, term)))
+                || tags.some(tag => searchableTags.some(noteTag => this.normalizedTagMatches(noteTag, tag)));
         }
 
         normalizedTermMatches(content, contentTokens, term) {
@@ -607,6 +788,13 @@
             if (!term.includes(' ')) return contentTokens.includes(term);
             const escaped = this.escapeRegex(term).replace(/\\ /g, '\\s+');
             return new RegExp(`(^|\\s)${escaped}(?=\\s|$)`, 'u').test(content);
+        }
+
+        normalizedTagMatches(tag, term) {
+            // Match hashtags exactly, and also match multi-word bird names written as one hashtag.
+            if (!tag || !term) return false;
+            const joinedTerm = term.replace(/\s+/g, '');
+            return tag === term || tag === joinedTerm;
         }
 
         getNormalizedTokens(text) {
@@ -668,6 +856,8 @@
             const name = this.getProfileName(profile, event.pubkey);
             const npub = this.formatNpub(event.pubkey);
             const score = this.calculateWotScore(event);
+            const media = this.extractMediaAttachments(event);
+            const visibleContent = this.removeDisplayedMediaUrls(event.content || '', media);
             if (isHidden) {
                 return `
                     <article class="featheration-note hidden-author" data-event-id="${this.escapeHtml(event.id)}" data-pubkey="${this.escapeHtml(event.pubkey)}">
@@ -692,16 +882,15 @@
                         </div>
                         ${this.renderNoteMenu(event, isHidden)}
                     </header>
-                    <div class="featheration-note-content">${this.highlightText(event.content || '')}</div>
-                    ${this.renderMediaAttachments(event)}
+                    <div class="featheration-note-content">${this.highlightText(visibleContent)}</div>
+                    ${this.renderMediaAttachments(media)}
                     ${this.renderNoteActions(event)}
                 </article>
             `;
         }
 
-        renderMediaAttachments(event) {
+        renderMediaAttachments(media) {
             // Render safe media URLs found in note content or media tags without executing third-party scripts.
-            const media = this.extractMediaAttachments(event);
             if (!media.length) return '';
             return `
                 <div class="featheration-media-grid">
@@ -720,9 +909,32 @@
             });
             this.extractUrls(event.content || '').forEach(url => urls.add(url));
             return [...urls]
-                .map(url => this.classifyMediaUrl(url))
+                .map(url => {
+                    const media = this.classifyMediaUrl(url);
+                    return media ? { ...media, originalUrl: url } : null;
+                })
                 .filter(Boolean)
                 .slice(0, 8);
+        }
+
+        removeDisplayedMediaUrls(content, media) {
+            // Hide raw source URLs from note text when the same URLs are rendered as media attachments.
+            const sourceUrls = new Set();
+            (media || []).forEach(item => {
+                [item.originalUrl, item.source, item.type !== 'iframe' ? item.url : '']
+                    .filter(Boolean)
+                    .forEach(url => sourceUrls.add(String(url)));
+            });
+            let visible = String(content || '');
+            sourceUrls.forEach(url => {
+                const pattern = new RegExp(`(^|\\s)${this.escapeRegex(url)}(?=\\s|$|[.,!?;:)\\]])`, 'g');
+                visible = visible.replace(pattern, '$1');
+            });
+            return visible
+                .replace(/[ \t]{2,}/g, ' ')
+                .replace(/[ \t]+\n/g, '\n')
+                .replace(/\n{3,}/g, '\n\n')
+                .trim();
         }
 
         extractUrls(text) {
@@ -821,15 +1033,26 @@
         renderNoteActions(event) {
             // Show Nostr interactions only when this browser has a saved Nostr identity.
             const publicHex = localStorage.getItem('birdNostrPublicKeyHex');
+            const likePubkeys = this.reactionSummary.get(event.id) || new Set();
+            const likedByUser = Boolean(publicHex && likePubkeys.has(publicHex));
+            const likeCount = likePubkeys.size;
             if (!publicHex) {
-                return `<div class="featheration-note-actions"><span class="featheration-note-time">${this.escapeHtml(this.t('featheration.loginForActions'))}</span></div>`;
+                return `
+                    <div class="featheration-note-actions">
+                        <button class="featheration-note-action featheration-reaction-button" type="button" disabled aria-label="${this.escapeHtml(this.t('featheration.like'))}" title="${this.escapeHtml(this.t('featheration.loginForActions'))}">
+                            <i class="fa-solid fa-feather-pointed" aria-hidden="true"></i>
+                            <span class="featheration-like-count">${this.escapeHtml(this.formatNumber(likeCount))}</span>
+                        </button>
+                        <span class="featheration-note-time">${this.escapeHtml(this.t('featheration.loginForActions'))}</span>
+                    </div>
+                `;
             }
-            const reactions = ['💚', '🐦', '📷', '🔥', '👍']
-                .map(emoji => `<button class="featheration-note-action featheration-reaction-button" type="button" data-react="${this.escapeHtml(emoji)}">${this.escapeHtml(emoji)}</button>`)
-                .join('');
             return `
                 <div class="featheration-note-actions">
-                    ${reactions}
+                    <button class="featheration-note-action featheration-reaction-button ${likedByUser ? 'liked' : ''}" type="button" data-react="+" aria-pressed="${likedByUser}" aria-label="${this.escapeHtml(this.t('featheration.like'))}" title="${this.escapeHtml(this.t('featheration.like'))}">
+                        <i class="fa-solid fa-feather-pointed" aria-hidden="true"></i>
+                        <span class="featheration-like-count">${this.escapeHtml(this.formatNumber(likeCount))}</span>
+                    </button>
                     <button class="featheration-note-action" type="button" data-repost>${this.escapeHtml(this.t('featheration.repost'))}</button>
                     <button class="featheration-note-action" type="button" data-reply>${this.escapeHtml(this.t('featheration.reply'))}</button>
                 </div>
@@ -838,6 +1061,28 @@
 
         async handleFeedClick(event) {
             // Route feed button clicks to copy, hide, reaction, repost, and reply handlers.
+            const groupedSpeciesButton = event.target.closest('[data-bird-group-species]');
+            if (groupedSpeciesButton) {
+                event.preventDefault();
+                event.stopPropagation();
+                this.closeBirdGroupCloud();
+                await this.openBirdDetailsModal(groupedSpeciesButton.dataset.birdGroupSpecies);
+                return;
+            }
+            const birdGroupButton = event.target.closest('[data-bird-group-term]');
+            if (birdGroupButton) {
+                event.preventDefault();
+                event.stopPropagation();
+                this.showBirdGroupCloud(birdGroupButton, birdGroupButton.dataset.birdGroupTerm);
+                return;
+            }
+            const birdButton = event.target.closest('[data-bird-scientific-name]');
+            if (birdButton) {
+                event.preventDefault();
+                event.stopPropagation();
+                await this.openBirdDetailsModal(birdButton.dataset.birdScientificName);
+                return;
+            }
             const note = event.target.closest('.featheration-note');
             if (!note) return;
             const originalEvent = this.lastEvents.find(item => item.id === note.dataset.eventId);
@@ -865,6 +1110,153 @@
             if (event.target.closest('[data-reply]')) return this.publishReply(originalEvent, event.target.closest('[data-reply]'));
         }
 
+        async openBirdDetailsModal(scientificName) {
+            // Open the real encyclopedia bird details modal in-place through an iframe bridge.
+            const cleanScientificName = String(scientificName || '').trim();
+            if (!cleanScientificName || !this.birdModal || !this.birdDetailsFrame) return;
+            const record = this.birdLookupByScientificName.get(cleanScientificName.toLowerCase()) || { scientificName: cleanScientificName };
+            this.birdModal.hidden = false;
+            document.body.classList.add('featheration-modal-open');
+            if (this.birdModalTitle) this.birdModalTitle.textContent = record.localName || record.commonName || record.scientificName;
+            this.birdDetailsFrame.src = `index.html?embed=bird&bird=${encodeURIComponent(record.scientificName)}`;
+        }
+
+        closeBirdDetailsModal() {
+            // Close the bird details modal and keep the user on the Featheration page.
+            if (!this.birdModal) return;
+            this.birdModal.hidden = true;
+            if (this.birdDetailsFrame) this.birdDetailsFrame.removeAttribute('src');
+            document.body.classList.remove('featheration-modal-open');
+        }
+
+        handleBirdDetailsMessage(event) {
+            // Let the embedded encyclopedia modal ask Featheration to close the outer iframe modal.
+            if (event.origin !== window.location.origin) return;
+            if (event.source !== this.birdDetailsFrame?.contentWindow) return;
+            if (event.data?.type === 'birds-name-bird-modal-closed') this.closeBirdDetailsModal();
+        }
+
+        showBirdGroupCloud(anchor, groupTerm) {
+            // Spread matching species into non-overlapping viewport cells near the clicked blue group keyword.
+            const records = this.birdGroupLookup.get(this.normalizeText(groupTerm)) || [];
+            if (!records.length) return;
+            this.closeBirdGroupCloud();
+            const anchorBox = anchor.getBoundingClientRect();
+            const centerX = anchorBox.left + anchorBox.width / 2;
+            const centerY = anchorBox.top + anchorBox.height / 2;
+            const layout = this.createBirdGroupCloudLayout(records.length, centerX, centerY);
+            const cloud = document.createElement('div');
+            cloud.className = 'bird-group-cloud';
+            cloud.setAttribute('role', 'dialog');
+            cloud.setAttribute('aria-label', this.t('featheration.chooseBirdGroup'));
+            cloud.style.setProperty('--bird-group-bubble-size', `${layout.bubbleSize}px`);
+            cloud.style.setProperty('--bird-group-scroll-height', `${layout.scrollHeight}px`);
+            cloud.innerHTML = `
+                <div class="bird-group-cloud-title">
+                    <strong>${this.escapeHtml(groupTerm)}</strong>
+                    <small>${this.escapeHtml(this.t('featheration.groupSpeciesCount', { count: records.length }))}</small>
+                    <button type="button" class="bird-group-cloud-close" aria-label="${this.escapeHtml(this.t('action.cancel'))}">&times;</button>
+                </div>
+                <div class="bird-group-cloud-items"></div>
+            `;
+            document.body.appendChild(cloud);
+            const items = cloud.querySelector('.bird-group-cloud-items');
+            records.forEach((record, index) => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'bird-group-species';
+                button.dataset.birdGroupSpecies = record.scientificName;
+                button.innerHTML = `
+                    <img class="bird-group-species-image" src="${this.escapeHtml(this.getLocalBirdImageUrl(record, 0))}" alt="" loading="lazy" data-bird-image-key="${this.escapeHtml(this.localBirdImageKey(record.scientificName))}" data-bird-image-index="0">
+                    <span>${this.escapeHtml(record.commonName || record.localName || record.scientificName)}</span>
+                `;
+                const position = layout.positions[index];
+                button.style.left = `${position.x}px`;
+                button.style.top = `${position.y}px`;
+                items.appendChild(button);
+            });
+            cloud.addEventListener('click', event => this.handleBirdGroupCloudClick(event));
+            cloud.addEventListener('error', event => this.handleLocalBirdImageError(event), true);
+            cloud.querySelector('.bird-group-cloud-close')?.addEventListener('click', () => this.closeBirdGroupCloud());
+            this.birdGroupOverlay = cloud;
+        }
+
+        async handleBirdGroupCloudClick(event) {
+            // Open a selected species from the temporary blue group cloud.
+            const speciesButton = event.target.closest('[data-bird-group-species]');
+            if (!speciesButton) return;
+            event.preventDefault();
+            event.stopPropagation();
+            this.closeBirdGroupCloud();
+            await this.openBirdDetailsModal(speciesButton.dataset.birdGroupSpecies);
+        }
+
+        createBirdGroupCloudLayout(count, centerX, centerY) {
+            // Calculate a non-overlapping grid with a minimum bubble size; extra rows continue below the viewport.
+            const viewportWidth = window.innerWidth || document.documentElement.clientWidth || 360;
+            const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 640;
+            const margin = viewportWidth < 620 ? 8 : 14;
+            const topOffset = viewportWidth < 620 ? 88 : 76;
+            const minBubbleSize = viewportWidth < 620 ? 58 : 72;
+            const maxBubbleSize = viewportWidth < 620 ? 86 : 104;
+            const gap = viewportWidth < 620 ? 10 : 14;
+            const availableWidth = Math.max(240, viewportWidth - margin * 2);
+            const idealColumns = Math.ceil(Math.sqrt(count * (availableWidth / Math.max(240, viewportHeight - topOffset))));
+            const maxColumnsAtMinSize = Math.max(1, Math.floor((availableWidth + gap) / (minBubbleSize + gap)));
+            const columns = Math.max(1, Math.min(maxColumnsAtMinSize, idealColumns));
+            const rows = Math.max(1, Math.ceil(count / columns));
+            const cellWidth = availableWidth / columns;
+            const bubbleSize = Math.floor(Math.max(minBubbleSize, Math.min(maxBubbleSize, cellWidth - gap)));
+            const rowHeight = bubbleSize + gap;
+            const cells = [];
+            for (let row = 0; row < rows; row += 1) {
+                for (let column = 0; column < columns; column += 1) {
+                    const x = margin + column * cellWidth + (cellWidth - bubbleSize) / 2;
+                    const y = topOffset + row * rowHeight;
+                    const distance = Math.hypot(x - centerX, y - centerY);
+                    cells.push({ x, y, distance });
+                }
+            }
+            return {
+                bubbleSize,
+                scrollHeight: topOffset + rows * rowHeight + margin,
+                positions: cells
+                    .sort((a, b) => a.distance - b.distance)
+                    .slice(0, count)
+            };
+        }
+
+        handleLocalBirdImageError(event) {
+            // Fall back to the origami bird when a generated local thumbnail is unavailable.
+            const image = event.target.closest?.('.bird-group-species-image');
+            if (!image) return;
+            image.removeAttribute('data-bird-image-key');
+            image.src = 'img/origami_bird_B.png';
+        }
+
+        getLocalBirdImageUrl(record) {
+            // Resolve generated thumbnail images into a stable browser path for species bubbles.
+            const key = this.localBirdImageKey(record?.scientificName || record);
+            if (!key) return 'img/origami_bird_B.png';
+            return `data/bird-images/thumbnails/${encodeURIComponent(key)}.webp`;
+        }
+
+        localBirdImageKey(scientificName) {
+            // Normalize scientific names into filesystem-friendly lowercase image names.
+            return String(scientificName || '')
+                .toLowerCase()
+                .normalize('NFKD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-+|-+$/g, '');
+        }
+
+        closeBirdGroupCloud() {
+            // Remove the temporary broad-group chooser without affecting the feed or bird details modal.
+            this.birdGroupOverlay?.remove();
+            this.birdGroupOverlay = null;
+        }
+
         toggleNoteMenu(menu) {
             // Open one three-dot menu at a time to avoid overlapping panels on small screens.
             const panel = menu?.querySelector('.featheration-menu-panel');
@@ -882,13 +1274,20 @@
         }
 
         async publishReaction(event, emoji, button) {
-            // Publish a standard kind-7 reaction with the selected emoji as content.
+            // Publish a standard kind-7 like reaction while the UI presents it as a feather.
+            const publicHex = localStorage.getItem('birdNostrPublicKeyHex');
+            if (publicHex && this.reactionSummary.get(event.id)?.has(publicHex)) return;
             const unsigned = this.baseEvent(7, emoji, [
                 ['e', event.id],
                 ['p', event.pubkey],
                 ['k', String(event.kind || 1)]
             ]);
-            await this.signAndPublish(unsigned, button, this.t('featheration.reactionSent'));
+            const signed = await this.signAndPublish(unsigned, button, this.t('featheration.likeSent'));
+            if (signed?.pubkey) {
+                if (!this.reactionSummary.has(event.id)) this.reactionSummary.set(event.id, new Set());
+                this.reactionSummary.get(event.id).add(signed.pubkey);
+                this.renderFeed(this.lastEvents);
+            }
         }
 
         async publishRepost(event, button) {
@@ -930,9 +1329,11 @@
                 const relays = await this.getReadRelays();
                 const result = await this.publishToRelays(signed, relays);
                 this.setStatus(`${successMessage} ${this.t('featheration.publishedToRelays', { count: this.formatNumber(result) })}`);
+                return signed;
             } catch (error) {
                 console.warn('Could not publish Nostr action:', error);
                 this.setStatus(error?.message || this.t('featheration.publishFailed'), true);
+                return null;
             } finally {
                 button.disabled = false;
             }
@@ -1166,16 +1567,144 @@
         }
 
         highlightText(text) {
-            // Escape the note first, then mark hashtags and known search/bird terms.
-            let escaped = this.escapeHtml(text);
-            escaped = escaped.replace(/(^|\s)(#[\p{L}\p{N}_-]+)/gu, '$1<span class="hashtag-match">$2</span>');
+            // Highlight bird names first in purple, then hashtags and normal search terms without nested spans.
+            const source = String(text || '');
+            const matches = [
+                ...this.collectBirdHighlightMatches(source),
+                ...this.collectBirdGroupMatches(source),
+                ...this.collectHashtagMatches(source),
+                ...this.collectFocusMatches(source)
+            ].sort((a, b) => a.start - b.start || b.priority - a.priority || (b.end - b.start) - (a.end - a.start));
+            const accepted = [];
+            let cursor = 0;
+            matches.forEach(match => {
+                if (match.start < cursor || match.end <= match.start) return;
+                accepted.push(match);
+                cursor = match.end;
+            });
+            if (!accepted.length) return this.escapeHtml(source);
+            let html = '';
+            cursor = 0;
+            accepted.forEach(match => {
+                html += this.escapeHtml(source.slice(cursor, match.start));
+                html += this.renderHighlightedMatch(match, source.slice(match.start, match.end));
+                cursor = match.end;
+            });
+            return html + this.escapeHtml(source.slice(cursor));
+        }
+
+        renderHighlightedMatch(match, text) {
+            // Make bird-name matches clickable while keeping normal focus and hashtag highlights passive.
+            const safeText = this.escapeHtml(text);
+            if (match.className === 'bird-group-match' && match.groupTerm) {
+                return `<button class="bird-group-match bird-group-trigger" type="button" data-bird-group-term="${this.escapeHtml(match.groupTerm)}" title="${this.escapeHtml(this.t('featheration.chooseBirdGroup'))}">${safeText}</button>`;
+            }
+            if (match.className !== 'bird-name-match' || !match.scientificName) {
+                return `<span class="${match.className}">${safeText}</span>`;
+            }
+            return `<button class="bird-name-match" type="button" data-bird-scientific-name="${this.escapeHtml(match.scientificName)}" title="${this.escapeHtml(this.t('featheration.openBirdDetails'))}">${safeText}</button>`;
+        }
+
+        collectBirdHighlightMatches(source) {
+            // Find scientific and local bird names, including multi-word names joined into hashtags.
+            const matches = [];
+            const sourceNormalized = this.normalizeText(source);
+            const sourceJoined = sourceNormalized.replace(/\s+/g, '');
+            const seen = new Set();
+            const terms = (this.birdHighlightRecords || [])
+                .filter(record => String(record.term || '').trim().length >= 4)
+                .filter(record => {
+                    const normalizedTerm = this.normalizeText(record.term);
+                    return sourceNormalized.includes(normalizedTerm)
+                        || sourceJoined.includes(normalizedTerm.replace(/\s+/g, ''));
+                })
+                .filter(record => {
+                    const key = `${record.scientificName}|${this.normalizeText(record.term)}`;
+                    if (seen.has(key)) return false;
+                    seen.add(key);
+                    return true;
+                })
+                .slice(0, 240);
+            terms.forEach(record => {
+                const pattern = this.buildDisplayTermPattern(record.term);
+                if (!pattern) return;
+                const regex = new RegExp(`(?<![\\p{L}\\p{N}])(${pattern})(?![\\p{L}\\p{N}])`, 'giu');
+                for (const match of source.matchAll(regex)) {
+                    matches.push({
+                        start: match.index,
+                        end: match.index + match[0].length,
+                        className: 'bird-name-match',
+                        scientificName: record.scientificName,
+                        priority: 3
+                    });
+                }
+            });
+            return matches;
+        }
+
+        collectBirdGroupMatches(source) {
+            // Turn broad group words such as woodpecker into blue chooser links.
+            const matches = [];
+            if (!this.birdGroupLookup?.size) return matches;
+            const sourceNormalized = this.normalizeText(source);
+            const sourceTokens = sourceNormalized.split(/\s+/).map(token => token.replace(/^#+/, ''));
+            [...this.birdGroupLookup.keys()]
+                .filter(term => sourceTokens.includes(term))
+                .forEach(term => {
+                    const regex = new RegExp(`(?<![\\p{L}\\p{N}])(#?${this.escapeRegex(term)})(?![\\p{L}\\p{N}])`, 'giu');
+                    for (const match of source.matchAll(regex)) {
+                        matches.push({
+                            start: match.index,
+                            end: match.index + match[0].length,
+                            className: 'bird-group-match',
+                            groupTerm: term,
+                            priority: 2.5
+                        });
+                    }
+                });
+            return matches;
+        }
+
+        buildDisplayTermPattern(term) {
+            // Allow spaces, hyphens, and underscores between name parts, plus joined hashtag forms.
+            const parts = String(term || '').trim().split(/[\s_-]+/).filter(Boolean);
+            if (!parts.length) return '';
+            const separated = parts.map(part => this.escapeRegex(part)).join('[\\s_-]+');
+            const joined = this.escapeRegex(parts.join(''));
+            return parts.length > 1 ? `${separated}|${joined}` : joined;
+        }
+
+        collectHashtagMatches(source) {
+            // Mark hashtags as focused terms unless a bird-name match already takes precedence.
+            const matches = [];
+            const regex = /(^|\s)(#[\p{L}\p{N}_-]+)/gu;
+            for (const match of source.matchAll(regex)) {
+                const prefixLength = match[1]?.length || 0;
+                matches.push({
+                    start: match.index + prefixLength,
+                    end: match.index + prefixLength + match[2].length,
+                    className: 'hashtag-match',
+                    priority: 2
+                });
+            }
+            return matches;
+        }
+
+        collectFocusMatches(source) {
+            // Highlight the active query and default bird-topic words in the theme color.
             const terms = [...new Set([...(this.lastSearchTerms || []), 'bird', 'birds', 'birding'])]
-                .map(term => this.escapeRegex(term.replace(/^#+/, '')))
+                .map(term => String(term || '').replace(/^#+/, '').trim())
                 .filter(term => term.length >= 3)
                 .slice(0, 30);
-            if (!terms.length) return escaped;
-            const regex = new RegExp(`\\b(${terms.join('|')})\\b`, 'gi');
-            return escaped.replace(regex, '<span class="focus-match">$1</span>');
+            if (!terms.length) return [];
+            const pattern = terms.map(term => this.escapeRegex(term)).join('|');
+            const regex = new RegExp(`(?<![\\p{L}\\p{N}])(${pattern})(?![\\p{L}\\p{N}])`, 'giu');
+            return [...source.matchAll(regex)].map(match => ({
+                start: match.index,
+                end: match.index + match[0].length,
+                className: 'focus-match',
+                priority: 1
+            }));
         }
 
         normalizeText(text) {
