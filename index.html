@@ -494,10 +494,6 @@
             </div>
             <h2 id="nostr-title" data-i18n="nostr.title">Featheration sign in</h2>
             <p data-i18n="nostr.intro">Nostr lets you use one identity across compatible apps. Birds.name will use it later for optional federation features around your bird observations.</p>
-            <div class="nostr-warning">
-                <strong data-i18n="nostr.privateWarningTitle">Your private key is your account.</strong>
-                <p data-i18n="nostr.privateWarningText">Anyone who gets your private key can post, edit, or delete as you in Nostr apps. Birds.name generates the key in this browser and does not upload it. To write events safely, put the private key in a signer extension or app and let Birds.name ask that signer for signatures.</p>
-            </div>
             <div class="nostr-step-guide">
                 <h3 data-i18n="nostr.stepGuideTitle">Recommended setup</h3>
                 <ol>
@@ -578,7 +574,10 @@
                         <span><strong>Amber</strong><small data-i18n="nostr.amberText">Android signer app.</small></span>
                     </a>
                 </div>
-                <p class="nostr-platform-note" data-i18n="nostr.appleNote">Apple/iOS is not supported by this website.</p>
+            </div>
+            <div class="nostr-warning">
+                <strong data-i18n="nostr.privateWarningTitle">Your private key is your account.</strong>
+                <p data-i18n="nostr.privateWarningText">Anyone who gets your private key can post, edit, or delete as you in Nostr apps. Birds.name generates the key in this browser and does not upload it. To write events safely, put the private key in a signer extension or app and let Birds.name ask that signer for signatures.</p>
             </div>
             <div class="nostr-current-public nostr-profile-panel" id="nostr-current-public" hidden>
                 <img class="nostr-profile-avatar" id="nostr-profile-avatar" src="img/origami_bird_B-ICO.png" alt="">
@@ -902,6 +901,10 @@
 <!-- Leaflet is loaded after the page markup so the diary map picker can initialize on demand. -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
+    // Public Cloudinary unsigned-upload settings for browser-side diary image uploads.
+    const CLOUDINARY_CLOUD_NAME = 'dxlvcnmub';
+    const CLOUDINARY_UNSIGNED_UPLOAD_PRESET = 'birds_name_featheration_unsigned';
+
     // Production-ready Birds.name application.
     class BirdEncyclopedia {
         constructor() {
@@ -1278,6 +1281,7 @@
             if (this.myDiaryMenu) {
                 this.myDiaryMenu.addEventListener('click', () => {
                     this.hideDropdown();
+                    this.clearCrossLanguageResults();
                     this.showDiaryOverview();
                 });
             }
@@ -1518,6 +1522,8 @@
             console.log('Hiding search...');
             this.searchContainer.classList.remove('visible');
             this.searchToggle.classList.remove('hidden');
+            this.searchToggle.hidden = false;
+            this.searchToggle.setAttribute('aria-expanded', 'false');
             clearTimeout(this.searchTimeout); // Clear any pending auto-hide
         }
 
@@ -1539,10 +1545,14 @@
             if (this.searchContainer.classList.contains('visible')) {
                 console.log('Search is now visible, focusing input');
                 this.searchToggle.classList.add('hidden');
+                this.searchToggle.hidden = true;
+                this.searchToggle.setAttribute('aria-expanded', 'true');
                 this.searchInput.focus();
             } else {
                 console.log('Search is now hidden');
                 this.searchToggle.classList.remove('hidden');
+                this.searchToggle.hidden = false;
+                this.searchToggle.setAttribute('aria-expanded', 'false');
             }
         }
 
@@ -2397,6 +2407,7 @@
 
         handleCategoryFilter(filter) {
             console.log('Filtering by category:', filter);
+            this.clearCrossLanguageResults();
             this.leaveDiaryOverviewMode();
             this.destroyDiaryOverviewMap();
             this.activeIucnFilter = null;
@@ -2415,6 +2426,7 @@
 
         handleIucnFilter(code) {
             // Filter only official records present in the generated local IUCN status file.
+            this.clearCrossLanguageResults();
             this.leaveDiaryOverviewMode();
             this.destroyDiaryOverviewMap();
             this.activeIucnFilter = code;
@@ -2436,6 +2448,15 @@
                 this.displayedCount = this.displayBirds(0, this.batchSize);
             }
             this.updateLoadMoreButton();
+        }
+
+        clearCrossLanguageResults() {
+            // Remove background cross-language search results when the visitor changes context.
+            this.crossLanguageSearchResults = [];
+            const crossLangContainer = document.getElementById('cross-language-container');
+            if (!crossLangContainer) return;
+            crossLangContainer.innerHTML = '';
+            crossLangContainer.hidden = false;
         }
 
         isBackupCredentialKey(key) {
@@ -6885,6 +6906,7 @@
                         <div>
                             <p class="diary-overview-eyebrow">${this.escapeHtml(this.t('nav.myDiary'))}</p>
                             <h2>${this.escapeHtml(this.t('diary.overviewTitle'))}</h2>
+                            <p class="diary-overview-help">${this.escapeHtml(this.t('diary.writeFromBirdHelp'))}</p>
                         </div>
                         <div class="diary-overview-count">
                             ${this.escapeHtml(this.t('diary.noteCount', { count: this.formatInterfaceNumber(entries.length) }))}
@@ -6927,14 +6949,7 @@
                     <div class="diary-overview-map" id="diary-overview-map">
                         ${mapEntries.length ? '' : `<p>${this.escapeHtml(this.t('diary.noMappedNotes'))}</p>`}
                     </div>
-                    <section class="diary-observed-section">
-                        <h3>${this.escapeHtml(this.t('diary.observedSpeciesTitle'))}</h3>
-                        <div class="diary-observed-list">
-                            ${observedSpecies.length ? observedSpecies.map(item => this.renderDiaryObservedSpecies(item)).join('') : `
-                                <p class="diary-overview-empty">${this.escapeHtml(this.t('diary.noObservedSpecies'))}</p>
-                            `}
-                        </div>
-                    </section>
+                    ${this.renderDiaryObservedSection(observedSpecies)}
                     <div class="diary-overview-list">
                         ${entries.length ? entries.map(item => this.renderDiaryOverviewCard(item)).join('') : `
                             <p class="diary-overview-empty">${this.escapeHtml(this.t('diary.noNotes'))}</p>
@@ -6982,6 +6997,40 @@
                 const date = new Date(normalized);
                 return Number.isFinite(date.getTime()) && date.getTime() >= cutoff;
             });
+        }
+
+        renderDiaryObservedSection(observedSpecies) {
+            // Collapse long observed-species lists so My Diary stays usable with large personal datasets.
+            const speciesMarkup = observedSpecies.length
+                ? observedSpecies.map(item => this.renderDiaryObservedSpecies(item)).join('')
+                : `<p class="diary-overview-empty">${this.escapeHtml(this.t('diary.noObservedSpecies'))}</p>`;
+            const title = this.t('diary.observedSpeciesTitle');
+            const count = this.formatInterfaceNumber(observedSpecies.length);
+            if (observedSpecies.length <= 5) {
+                return `
+                    <section class="diary-observed-section">
+                        <h3>${this.escapeHtml(title)} <span>${this.escapeHtml(count)}</span></h3>
+                        <div class="diary-observed-list">
+                            ${speciesMarkup}
+                        </div>
+                    </section>
+                `;
+            }
+
+            return `
+                <details class="diary-observed-section diary-observed-section-collapsible">
+                    <summary class="diary-observed-summary">
+                        <span>
+                            <i class="fa-solid fa-chevron-right diary-observed-chevron" aria-hidden="true"></i>
+                            <strong>${this.escapeHtml(title)}</strong>
+                            <small>${this.escapeHtml(this.t('diary.observedSpeciesCount', { count }))}</small>
+                        </span>
+                    </summary>
+                    <div class="diary-observed-list">
+                        ${speciesMarkup}
+                    </div>
+                </details>
+            `;
         }
 
         renderDiaryObservedSpecies(item) {
@@ -7908,7 +7957,10 @@
             }
 
             const apiKey = await this.requestPollinationsApiKey();
-            if (!apiKey) return;
+            if (!apiKey) {
+                this.showDiarySummaryAiRequired(result);
+                return;
+            }
 
             const selectedModel = this.getAiTextModel();
             const targetLanguage = this.languageMap[this.currentLanguage]?.name || this.currentLanguage;
@@ -7955,6 +8007,20 @@
                 if (result) result.textContent = this.t('diary.summaryFailed');
             } finally {
                 button.disabled = false;
+            }
+        }
+
+        showDiarySummaryAiRequired(result) {
+            // Explain why the diary summary did not run and reopen AI settings after an explicit no-AI choice.
+            if (result) {
+                result.hidden = false;
+                result.textContent = this.t('diary.summaryNeedsAi');
+            }
+            if (localStorage.getItem('birdAiTranslationPreference') === 'disabled') {
+                this.openAiTranslationConsent({
+                    settingsOnly: true,
+                    messageKey: 'diary.summaryNeedsAi'
+                });
             }
         }
 
@@ -8095,6 +8161,18 @@
                                 ${this.renderMarkdownToolButton('strike', 'fa-strikethrough', this.t('diary.strike'))}
                                 ${this.renderMarkdownToolButton('link', 'fa-link', this.t('diary.link'))}
                             </div>
+                            <div class="observation-image-upload-row">
+                                <input class="observation-image-upload-input" type="file" accept="image/*"
+                                    data-observation-image-file="${this.escapeHtml(entry.id)}"
+                                    data-scientific-name="${this.escapeHtml(scientificName)}">
+                                <button class="observation-location-button observation-image-upload-button" type="button"
+                                    data-observation-image-upload="${this.escapeHtml(entry.id)}"
+                                    data-scientific-name="${this.escapeHtml(scientificName)}">
+                                    <i class="fa-solid fa-cloud-arrow-up" aria-hidden="true"></i>
+                                    ${this.escapeHtml(this.t('diary.uploadImage'))}
+                                </button>
+                            </div>
+                            <p class="observation-image-upload-status" data-observation-image-status="${this.escapeHtml(entry.id)}" role="status" aria-live="polite"></p>
                             <textarea class="observation-note-input"
                                 data-observation-note="${this.escapeHtml(entry.id)}"
                                 data-scientific-name="${this.escapeHtml(scientificName)}"
@@ -8209,6 +8287,14 @@
                 return;
             }
 
+            const imageUploadButton = event.target.closest('[data-observation-image-upload]');
+            if (imageUploadButton) {
+                event.preventDefault();
+                event.stopPropagation();
+                this.uploadObservationImage(imageUploadButton);
+                return;
+            }
+
             const editButton = event.target.closest('[data-observation-edit]');
             if (editButton) {
                 event.preventDefault();
@@ -8309,6 +8395,81 @@
             this.refreshObservationUi(scientificName);
         }
 
+        async uploadObservationImage(button) {
+            // Upload one diary image through the shared Cloudinary unsigned browser-upload endpoint.
+            const entry = button.closest('[data-observation-entry]');
+            const entryId = button.dataset.observationImageUpload;
+            const fileInput = entry?.querySelector(`[data-observation-image-file="${CSS.escape(entryId)}"]`);
+            const textarea = entry?.querySelector(`[data-observation-note="${CSS.escape(entryId)}"]`);
+            const status = entry?.querySelector(`[data-observation-image-status="${CSS.escape(entryId)}"]`);
+            const file = fileInput?.files?.[0];
+            const cloudName = this.normalizeCloudinaryCloudName(CLOUDINARY_CLOUD_NAME);
+            const uploadPreset = String(CLOUDINARY_UNSIGNED_UPLOAD_PRESET || '').trim();
+            const setStatus = (message, isError = false) => {
+                if (!status) return;
+                status.textContent = message || '';
+                status.classList.toggle('error', Boolean(isError));
+            };
+
+            if (!textarea) return;
+            if (!cloudName || !uploadPreset) {
+                setStatus(this.t('diary.imageUploadNotConfigured'), true);
+                return;
+            }
+            if (!file) {
+                setStatus(this.t('diary.imageMissingFile'), true);
+                return;
+            }
+            if (!file.type.startsWith('image/')) {
+                setStatus(this.t('diary.imageInvalidFile'), true);
+                return;
+            }
+
+            button.disabled = true;
+            setStatus(this.t('diary.imageUploading'));
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('upload_preset', uploadPreset);
+                const response = await fetch(`https://api.cloudinary.com/v1_1/${encodeURIComponent(cloudName)}/image/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const payload = await response.json().catch(() => ({}));
+                if (!response.ok || !payload.secure_url) {
+                    throw new Error(payload.error?.message || this.t('diary.imageUploadFailed'));
+                }
+                this.appendObservationImageMarkdown(textarea, payload.secure_url);
+                if (fileInput) fileInput.value = '';
+                setStatus(this.t('diary.imageUploaded'));
+            } catch (error) {
+                console.warn('Diary image upload failed:', error);
+                setStatus(error?.message || this.t('diary.imageUploadFailed'), true);
+            } finally {
+                button.disabled = false;
+            }
+        }
+
+        appendObservationImageMarkdown(textarea, imageUrl) {
+            // Insert the uploaded image URL as Markdown so the diary preview can render it immediately.
+            const imageMarkdown = `![${this.t('diary.uploadedImageAlt')}](${imageUrl})`;
+            const currentText = textarea.value.trimEnd();
+            textarea.value = currentText ? `${currentText}\n\n${imageMarkdown}` : imageMarkdown;
+            textarea.dispatchEvent(new Event('input', { bubbles: true }));
+            textarea.focus();
+            textarea.selectionStart = textarea.selectionEnd = textarea.value.length;
+        }
+
+        normalizeCloudinaryCloudName(value) {
+            // Accept either a raw Cloudinary cloud name or a pasted res.cloudinary.com URL.
+            const rawValue = String(value || '').trim();
+            const match = rawValue.match(/res\.cloudinary\.com\/([^/?#]+)/i);
+            return (match ? match[1] : rawValue)
+                .replace(/^https?:\/\//i, '')
+                .replace(/\/.*$/, '')
+                .trim();
+        }
+
         applyMarkdownFormat(button) {
             // Wrap the selected diary text with the requested Markdown or HTML-compatible marker.
             const entry = button.closest('[data-observation-entry]');
@@ -8386,6 +8547,7 @@
             // Apply inline Markdown after the text has already been HTML-escaped.
             return String(text || '')
                 .replace(/`([^`]+)`/g, '<code>$1</code>')
+                .replace(/!\[([^\]]*)\]\((https?:\/\/[^)\s]+)\)/g, '<img class="diary-note-image" src="$2" alt="$1" loading="lazy">')
                 .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
                 .replace(/&lt;u&gt;([\s\S]+?)&lt;\/u&gt;/g, '<u>$1</u>')
                 .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
@@ -9370,10 +9532,20 @@
 
                 <div class="results-separator"></div>
 
-                <h3>${this.escapeHtml(this.t('modal.otherLanguages'))}</h3>
-                <p>${this.escapeHtml(this.t('search.otherLanguageMatches', {
-                    count: this.formatInterfaceNumber(this.crossLanguageSearchResults.length)
-                }))}</p>
+                <div class="cross-language-header">
+                    <div>
+                        <h3>${this.escapeHtml(this.t('modal.otherLanguages'))}</h3>
+                        <p>${this.escapeHtml(this.t('search.otherLanguageMatches', {
+                            count: this.formatInterfaceNumber(this.crossLanguageSearchResults.length)
+                        }))}</p>
+                    </div>
+                    <button class="cross-language-close" type="button"
+                        aria-label="${this.escapeHtml(this.t('action.close'))}"
+                        title="${this.escapeHtml(this.t('action.close'))}"
+                        data-cross-language-close>
+                        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                    </button>
+                </div>
                 <div class="cross-language-summary">
                     ${languageSummary.map(item => `
                         <button class="cross-language-summary-pill" type="button"
@@ -9424,6 +9596,10 @@
 
             // Append to container
             container.appendChild(resultsSection);
+
+            resultsSection.querySelector('[data-cross-language-close]')?.addEventListener('click', () => {
+                this.clearCrossLanguageResults();
+            });
 
             // this.birdGrid.appendChild(resultsSection);
 

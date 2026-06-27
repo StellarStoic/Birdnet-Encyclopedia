@@ -846,6 +846,46 @@ body[data-theme="paper"] {
     font-size: 0.78rem;
 }
 
+.observation-image-upload-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+    align-items: center;
+    min-width: 0;
+    padding: 0 14px 8px;
+}
+
+.observation-image-upload-input {
+    min-width: 0;
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--background);
+    color: var(--text);
+    padding: 8px 10px;
+    font: inherit;
+    font-size: 0.78rem;
+}
+
+.observation-image-upload-button:disabled {
+    cursor: progress;
+    opacity: 0.65;
+}
+
+.observation-image-upload-status {
+    min-height: 1.2em;
+    margin: 0;
+    padding: 0 14px 8px;
+    color: var(--primary);
+    font-size: 0.8rem;
+    font-weight: 800;
+    overflow-wrap: anywhere;
+}
+
+.observation-image-upload-status.error {
+    color: #c83232;
+}
+
 .markdown-tool-button:hover,
 .markdown-tool-button:focus-visible,
 .observation-add-button:hover,
@@ -938,6 +978,16 @@ body[data-theme="paper"] {
 .observation-note-preview a {
     color: var(--primary);
     font-weight: 800;
+}
+
+.diary-note-image {
+    display: block;
+    max-width: 100%;
+    max-height: 420px;
+    margin: 8px 0;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    object-fit: contain;
 }
 
 .observation-location-preview {
@@ -1105,6 +1155,14 @@ body[data-theme="paper"] {
     margin: 0;
 }
 
+.diary-overview-help {
+    max-width: 760px;
+    margin: 8px 0 0;
+    color: var(--muted);
+    font-size: 0.92rem;
+    line-height: 1.5;
+}
+
 .diary-overview-count {
     flex: 0 0 auto;
     border: 1px solid var(--border);
@@ -1242,6 +1300,60 @@ body[data-theme="paper"] {
 
 .diary-observed-section h3 {
     margin: 0;
+}
+
+.diary-observed-section h3 span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.8em;
+    margin-left: 6px;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--primary) 12%, var(--surface-solid));
+    color: var(--primary);
+    font-size: 0.78rem;
+}
+
+.diary-observed-section-collapsible {
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    background: color-mix(in srgb, var(--surface-solid) 74%, transparent);
+    padding: 10px;
+}
+
+.diary-observed-summary {
+    cursor: pointer;
+    list-style: none;
+}
+
+.diary-observed-summary::-webkit-details-marker {
+    display: none;
+}
+
+.diary-observed-summary > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.diary-observed-summary small {
+    color: var(--muted);
+    font-weight: 800;
+}
+
+.diary-observed-chevron {
+    color: var(--primary);
+    transition: transform 0.18s ease;
+}
+
+.diary-observed-section-collapsible[open] .diary-observed-chevron {
+    transform: rotate(90deg);
+}
+
+.diary-observed-section-collapsible .diary-observed-list {
+    padding-top: 10px;
 }
 
 .diary-observed-list {
@@ -3041,12 +3153,16 @@ body[data-theme="midnight"] .site-title-logo {
     .observation-date-editor,
     .observation-location-row,
     .markdown-toolbar,
+    .observation-image-upload-row,
+    .observation-image-upload-status,
     .observation-save-row {
         padding-inline: 8px;
     }
 
     .observation-location-row,
+    .observation-image-upload-row,
     .observation-save-row {
+        grid-template-columns: 1fr;
         align-items: stretch;
         flex-direction: column;
     }
@@ -3399,12 +3515,6 @@ body[data-theme="midnight"] .site-title-logo {
     display: flex;
     flex-direction: column;
     min-width: 0;
-}
-
-.nostr-platform-note {
-    margin: 12px 0 0;
-    color: #b42318;
-    font-weight: 700;
 }
 
 .achievements-card {
@@ -4711,6 +4821,39 @@ body[data-theme="midnight"] .site-title-logo {
     border-radius: 8px;
 }
 
+.cross-language-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.cross-language-header p {
+    margin: 0;
+}
+
+.cross-language-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 34px;
+    height: 34px;
+    border: 1px solid rgba(73, 80, 87, 0.18);
+    border-radius: 50%;
+    background: #ffffff;
+    color: #495057;
+    cursor: pointer;
+    transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+
+.cross-language-close:hover,
+.cross-language-close:focus-visible {
+    background: #e9ecef;
+    color: #212529;
+    transform: translateY(-1px);
+}
+
 .cross-language-results h3 {
     margin-top: 0;
     color: #495057;
@@ -5357,4 +5500,64 @@ body .translation-header h3 {
 body .translation-header .translation-stats,
 body .translation-header .translation-status {
     color: var(--muted) !important;
+}
+
+/* Keep the floating magnifier out of the way while the bottom search panel is open. */
+body .search-toggle.hidden {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+body .search-container.visible {
+    z-index: 220;
+}
+
+body .search-container.visible .search-box {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    max-width: min(680px, 100%);
+}
+
+body .search-container.visible #searchInput {
+    min-width: 0;
+    width: 100%;
+}
+
+body .search-container.visible #searchButton {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    min-width: max-content;
+    white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+    body .search-container.visible {
+        padding: 12px;
+    }
+
+    body .search-container.visible .search-box {
+        max-width: 100%;
+    }
+
+    body .search-container.visible #searchButton {
+        padding: 12px 14px;
+        font-size: 0.92rem;
+    }
+}
+
+@media (max-width: 380px) {
+    body .search-container.visible #searchButton {
+        padding: 12px;
+        font-size: 0;
+    }
+
+    body .search-container.visible #searchButton::before {
+        content: "\f002";
+        font-family: "Font Awesome 6 Free";
+        font-size: 1rem;
+        font-weight: 900;
+    }
 }
