@@ -869,5 +869,14 @@
   "diary.summaryNeedsAi": "Povzetki dnevnika potrebujejo umetno inteligenco. V tem oknu omogočite Pollinations AI in nato znova poskusite s povzetkom.",
   "diary.writeFromBirdHelp": "Za pisanje zapiska najprej izberite ptico v enciklopediji, odprite njene podrobnosti in nato dodajte zapisek v dnevniku te ptice.",
   "diary.observedSpeciesCount": "{count} opaženih vrst",
-  "action.close": "Zapri"
+  "action.close": "Zapri",
+  "achievements.attachedToNostr": "Ta značka je že pripeta vaši Nostr identiteti. Čestitke.",
+  "achievements.readyToPublish": "Lokalno odklenjeno. Značko lahko zdaj objavite na Nostr ali pa bo izdana ob naslednji objavi dnevnika na Nostr.",
+  "achievements.publishButton": "Objavi značko na Nostr",
+  "achievements.loginRequired": "Pred objavo značke se prijavite z Nostr.",
+  "achievements.notUnlocked": "Ta značka še ni odklenjena.",
+  "achievements.publishing": "Objavljanje značke na Nostr...",
+  "achievements.published": "Značka je objavljena na {relays} relej(ih) in pripeta vaši Nostr identiteti.",
+  "achievements.publishFailed": "Objava značke ni uspela. Preverite podpisovalnik in releje ter poskusite znova.",
+  "achievements.alreadyPublished": "Ta značka je že pripeta vaši Nostr identiteti."
 }

@@ -57,6 +57,9 @@ class MyBirdNETDashboard {
         this.floatingDataRange = document.getElementById('floating-data-range');
         this.weatherMapModal = document.getElementById('weather-map-modal');
         this.weatherStationMapElement = document.getElementById('weather-station-map');
+        this.birdDetailsModal = document.getElementById('bird-details-modal');
+        this.birdDetailsFrame = document.getElementById('bird-details-frame');
+        this.closeBirdDetailsButton = document.getElementById('close-bird-details');
         this.observations = [];
         this.filteredObservations = [];
         this.savedFileDataset = null;
@@ -193,8 +196,14 @@ class MyBirdNETDashboard {
         this.weatherMapModal.addEventListener('click', event => {
             if (event.target === this.weatherMapModal) this.closeWeatherStationMap();
         });
+        this.closeBirdDetailsButton.addEventListener('click', () => this.closeBirdDetailsModal());
+        this.birdDetailsModal.addEventListener('click', event => {
+            if (event.target === this.birdDetailsModal) this.closeBirdDetailsModal();
+        });
+        window.addEventListener('message', event => this.handleBirdDetailsMessage(event));
         document.addEventListener('keydown', event => {
             if (event.key === 'Escape' && !this.weatherMapModal.hidden) this.closeWeatherStationMap();
+            if (event.key === 'Escape' && !this.birdDetailsModal.hidden) this.closeBirdDetailsModal();
         });
 
         // Allow keyboard users to activate the drop zone.
@@ -243,6 +252,16 @@ class MyBirdNETDashboard {
         });
 
         this.speciesFilter.addEventListener('input', () => this.renderSpeciesTable());
+        this.speciesTableBody.addEventListener('click', event => {
+            const thumbnail = event.target.closest('[data-open-bird-details]');
+            if (thumbnail) this.openBirdDetailsModal(thumbnail.dataset.openBirdDetails, thumbnail.dataset.commonName);
+        });
+        this.speciesTableBody.addEventListener('keydown', event => {
+            const thumbnail = event.target.closest('[data-open-bird-details]');
+            if (!thumbnail || !['Enter', ' '].includes(event.key)) return;
+            event.preventDefault();
+            this.openBirdDetailsModal(thumbnail.dataset.openBirdDetails, thumbnail.dataset.commonName);
+        });
         this.activitySpeciesSelect.addEventListener('change', () => {
             // Rebuild both explorer charts for the newly selected species.
             this.selectedActivitySpeciesKey = this.activitySpeciesSelect.value;
@@ -4004,6 +4023,36 @@ class MyBirdNETDashboard {
         }
     }
 
+    openBirdDetailsModal(scientificName, commonName = '') {
+        // Open the full encyclopedia bird card in-place for a species thumbnail from the observation table.
+        const cleanScientificName = String(scientificName || '').trim();
+        if (!cleanScientificName || !this.birdDetailsModal || !this.birdDetailsFrame) return;
+        const title = String(commonName || cleanScientificName).trim();
+        const titleElement = document.getElementById('bird-details-title');
+        if (titleElement) titleElement.textContent = title;
+        this.birdDetailsFrame.src = `index.html?embed=bird&bird=${encodeURIComponent(cleanScientificName)}`;
+        this.birdDetailsModal.hidden = false;
+        document.body.classList.add('modal-open');
+        this.closeBirdDetailsButton?.focus();
+    }
+
+    closeBirdDetailsModal() {
+        // Close the embedded encyclopedia bird card and clear the iframe to stop background work.
+        if (!this.birdDetailsModal) return;
+        this.birdDetailsModal.hidden = true;
+        if (this.birdDetailsFrame) this.birdDetailsFrame.removeAttribute('src');
+        if (this.stationMapModal.hidden && this.weatherMapModal.hidden && this.fetchProgressModal.hidden) {
+            document.body.classList.remove('modal-open');
+        }
+    }
+
+    handleBirdDetailsMessage(event) {
+        // Let the embedded encyclopedia modal close this dashboard wrapper when its own close button is used.
+        if (event.origin !== window.location.origin) return;
+        if (event.source !== this.birdDetailsFrame?.contentWindow) return;
+        if (event.data?.type === 'birds-name-bird-modal-closed') this.closeBirdDetailsModal();
+    }
+
     showImportPanel({ focusStations = false } = {}) {
         // Return to source selection without clearing either the saved file or current station controls.
         this.destroyCharts();
@@ -5011,6 +5060,10 @@ class MyBirdNETDashboard {
                         src="${this.placeholderImage()}"
                         data-scientific-name="${this.escapeHTML(item.scientificName || '')}"
                         data-common-name="${this.escapeHTML(item.commonName || '')}"
+                        data-open-bird-details="${this.escapeHTML(item.scientificName || '')}"
+                        role="button"
+                        tabindex="0"
+                        title="${this.escapeHTML(this.t('featheration.birdDetails'))}"
                         alt="${this.escapeHTML(item.commonName || 'Bird')}">
                 </td>
                 <td data-label="Species">${this.escapeHTML(item.commonName || 'Unknown')}</td>

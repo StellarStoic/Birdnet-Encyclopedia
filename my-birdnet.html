@@ -515,6 +515,22 @@
         </section>
     </div>
 
+    <!-- Reuse the encyclopedia bird-card modal from index.html for species clicked in the observation table. -->
+    <div class="modal-overlay bird-details-overlay" id="bird-details-modal" hidden>
+        <section class="bird-details-modal" role="dialog" aria-modal="true" aria-labelledby="bird-details-title">
+            <div class="modal-heading">
+                <div>
+                    <p class="eyebrow" data-i18n="table.speciesDetails">Species details</p>
+                    <h2 id="bird-details-title" data-i18n="featheration.birdDetails">Bird details</h2>
+                </div>
+                <button class="icon-button" id="close-bird-details" type="button" aria-label="Close bird details" data-i18n-aria-label="action.close">
+                    <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                </button>
+            </div>
+            <iframe class="bird-details-frame" id="bird-details-frame" title="Bird details" loading="lazy"></iframe>
+        </section>
+    </div>
+
     <!-- Long BirdWeather imports report pagination progress and can be cancelled safely. -->
     <div class="modal-overlay progress-overlay" id="fetch-progress-modal" hidden>
         <section class="progress-modal" role="dialog" aria-modal="true" aria-labelledby="fetch-progress-title">

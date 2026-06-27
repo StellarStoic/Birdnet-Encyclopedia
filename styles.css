@@ -3527,6 +3527,10 @@ body[data-theme="midnight"] .site-title-logo {
     font-weight: 800;
 }
 
+.achievements-status.error {
+    color: var(--danger);
+}
+
 .achievements-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -3585,8 +3589,39 @@ body[data-theme="midnight"] .site-title-logo {
 }
 
 .achievement-copy small {
+    display: block;
     color: var(--muted);
     font-weight: 800;
+}
+
+.achievement-publish-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    margin-top: 10px;
+    padding: 9px 12px;
+    border: 1px solid color-mix(in srgb, var(--primary) 55%, var(--border));
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--primary) 12%, var(--surface-solid));
+    color: var(--primary);
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.achievement-publish-button:hover,
+.achievement-publish-button:focus-visible {
+    background: var(--primary);
+    color: var(--on-primary);
+    outline: none;
+}
+
+.achievement-publish-button:disabled {
+    cursor: wait;
+    opacity: 0.64;
 }
 
 .nostr-new-user {

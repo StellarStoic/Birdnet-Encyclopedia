@@ -869,5 +869,14 @@
   "diary.summaryNeedsAi": "Diary summaries need AI. Enable Pollinations AI from this dialog, then try summarizing again.",
   "diary.writeFromBirdHelp": "To write a diary note, first choose a bird from the encyclopedia, open its details, then add the note from that bird diary section.",
   "diary.observedSpeciesCount": "{count} observed species",
-  "action.close": "Close"
+  "action.close": "Close",
+  "achievements.attachedToNostr": "This badge is already attached to your Nostr ID. Congrats.",
+  "achievements.readyToPublish": "Unlocked locally. Publish it to Nostr now, or it will still be issued on your next Nostr diary publish.",
+  "achievements.publishButton": "Publish badge to Nostr",
+  "achievements.loginRequired": "Log in with Nostr before publishing this badge.",
+  "achievements.notUnlocked": "This badge is not unlocked yet.",
+  "achievements.publishing": "Publishing badge to Nostr...",
+  "achievements.published": "Badge published to {relays} relay(s) and attached to your Nostr ID.",
+  "achievements.publishFailed": "Badge publishing failed. Check your signer and relays, then try again.",
+  "achievements.alreadyPublished": "This badge is already attached to your Nostr ID."
 }

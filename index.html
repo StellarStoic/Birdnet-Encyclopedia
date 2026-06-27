@@ -2752,6 +2752,8 @@
             this.achievementsClose?.addEventListener('click', () => this.closeAchievementsModal());
             this.achievementsModal?.addEventListener('click', event => {
                 if (event.target === this.achievementsModal) this.closeAchievementsModal();
+                const publishButton = event.target.closest('[data-achievement-publish]');
+                if (publishButton) this.publishSingleAchievementBadge(publishButton.dataset.achievementPublish, publishButton);
             });
             this.nostrClose?.addEventListener('click', () => this.closeNostrKeyModal());
             this.nostrModal?.addEventListener('click', event => {
@@ -3175,8 +3177,8 @@
         }
 
         getNostrConnectPermissions() {
-            // Request only event kinds Birds.name currently signs: feed replies/reactions/reposts, diary data, deletion, and badges.
-            return ['sign_event:1', 'sign_event:6', 'sign_event:7', 'sign_event:30078', 'sign_event:5', 'sign_event:30009', 'sign_event:8'].join(',');
+            // Request only event kinds Birds.name currently signs: feed replies/reactions/reposts, diary data, deletion, and NIP-58 badges.
+            return ['sign_event:1', 'sign_event:6', 'sign_event:7', 'sign_event:30078', 'sign_event:5', 'sign_event:30009', 'sign_event:8', 'sign_event:10008'].join(',');
         }
 
         async startNostrConnectLogin() {
@@ -3537,6 +3539,7 @@
                     unlocked: this.formatInterfaceNumber(unlockedCount),
                     total: this.formatInterfaceNumber(catalog.length)
                 });
+                this.achievementsStatus.classList.remove('error');
             }
             this.achievementsGrid.innerHTML = catalog.map(badge => this.renderAchievementCard(badge, awarded[badge.id], progress)).join('');
         }
@@ -3550,6 +3553,17 @@
                 current: this.formatInterfaceNumber(current),
                 target: this.formatInterfaceNumber(badge.threshold)
             });
+            const statusText = issued
+                ? this.t('achievements.attachedToNostr')
+                : achieved
+                    ? this.t('achievements.readyToPublish')
+                    : progressText;
+            const publishButton = achieved && !issued
+                ? `<button class="achievement-publish-button" type="button" data-achievement-publish="${this.escapeHtml(badge.id)}">
+                        <i class="fa-solid fa-feather" aria-hidden="true"></i>
+                        ${this.escapeHtml(this.t('achievements.publishButton'))}
+                    </button>`
+                : '';
             return `
                 <article class="achievement-card ${achieved || issued ? 'achievement-card-unlocked' : 'achievement-card-locked'}">
                     <div class="achievement-image-wrap">
@@ -3560,7 +3574,8 @@
                     <div class="achievement-copy">
                         <h3>${this.escapeHtml(badge.name)}</h3>
                         <p>${this.escapeHtml(badge.description)}</p>
-                        <small>${this.escapeHtml(issued ? this.t('achievements.unlocked') : achieved ? this.t('achievements.readyToIssue') : progressText)}</small>
+                        <small>${this.escapeHtml(statusText)}</small>
+                        ${publishButton}
                     </div>
                 </article>
             `;
@@ -4432,7 +4447,7 @@
                         socket.addEventListener('open', () => {
                             openedRelays += 1;
                             socket.send(JSON.stringify(['REQ', requestId, {
-                                kinds: [30078, 30009, 8, 5],
+                                kinds: [30078, 30009, 8, 10008, 5],
                                 authors: [publicHex],
                                 limit: 1000
                             }]));
@@ -4525,6 +4540,7 @@
                         threshold: badge.threshold,
                         track: badge.track,
                         awardEventId: event.id,
+                        badgeDefinitionRef: badgeRef,
                         awardedAt: new Date(Number(event.created_at || 0) * 1000).toISOString(),
                         restoredFromRelay: true
                     };
@@ -7555,6 +7571,50 @@
             localStorage.setItem('birdNostrAwardedBadges', JSON.stringify(badges || {}));
         }
 
+        async publishSingleAchievementBadge(badgeId, button) {
+            // Publish one unlocked achievement directly from its card instead of waiting for a diary publish.
+            const badge = this.getNostrBadgeCatalog().find(item => item.id === badgeId);
+            const publicHex = localStorage.getItem('birdNostrPublicKeyHex');
+            if (!publicHex) {
+                this.showAchievementsStatus(this.t('achievements.loginRequired'), true);
+                this.openNostrKeyModal();
+                return;
+            }
+            if (!badge || this.getBadgeCurrentProgress(badge) < badge.threshold) {
+                this.showAchievementsStatus(this.t('achievements.notUnlocked'), true);
+                return;
+            }
+            if (this.getStoredNostrAwardedBadges()[badge.id]) {
+                this.showAchievementsStatus(this.t('achievements.alreadyPublished'));
+                this.renderAchievements();
+                return;
+            }
+
+            try {
+                if (button) button.disabled = true;
+                this.showAchievementsStatus(this.t('achievements.publishing'));
+                const result = await this.publishNostrBadgeBatch([badge], { storeEvents: true });
+                this.showAchievementsStatus(
+                    result.awarded
+                        ? this.t('achievements.published', { relays: this.formatInterfaceNumber(result.successRelays) })
+                        : this.t('achievements.publishFailed'),
+                    result.successRelays < 1
+                );
+            } catch (error) {
+                console.warn('Single badge publish failed:', error);
+                this.showAchievementsStatus(error?.message || this.t('achievements.publishFailed'), true);
+            } finally {
+                if (button) button.disabled = false;
+            }
+        }
+
+        showAchievementsStatus(message, isError = false) {
+            // Reuse the achievements status line for direct badge-publish feedback.
+            if (!this.achievementsStatus) return;
+            this.achievementsStatus.textContent = message || '';
+            this.achievementsStatus.classList.toggle('error', Boolean(isError));
+        }
+
         async publishEarnedNostrObservationBadges() {
             // Publish self-attested NIP-58 badges for newly reached Birds.name collector milestones.
             try {
@@ -7565,35 +7625,53 @@
                     .filter(badge => !awarded[badge.id]);
                 if (!earnedBadges.length) return { awarded: 0, events: [], successRelays: 0 };
 
-                const signedEvents = [];
-                for (const badge of earnedBadges) {
-                    const definitionEvent = await this.signNostrEvent(this.buildNostrBadgeDefinitionEvent(badge));
-                    const awardEvent = await this.signNostrEvent(this.buildNostrBadgeAwardEvent(badge, definitionEvent.pubkey));
-                    signedEvents.push(definitionEvent, awardEvent);
-                    awarded[badge.id] = {
-                        id: badge.id,
-                        threshold: badge.threshold,
-                        track: badge.track,
-                        definitionEventId: definitionEvent.id,
-                        awardEventId: awardEvent.id,
-                        awardedAt: new Date().toISOString()
-                    };
-                }
-
-                const result = await this.publishNostrEvents(signedEvents);
-                if (result.successRelays > 0) {
-                    this.saveStoredNostrAwardedBadges(awarded);
-                    if (!this.achievementsModal?.hidden) this.renderAchievements();
-                }
-                return {
-                    awarded: result.successRelays > 0 ? earnedBadges.length : 0,
-                    events: result.successRelays > 0 ? signedEvents : [],
-                    successRelays: result.successRelays
-                };
+                return await this.publishNostrBadgeBatch(earnedBadges);
             } catch (error) {
                 console.warn('Nostr badge publishing failed:', error);
                 return { awarded: 0, events: [], successRelays: 0 };
             }
+        }
+
+        async publishNostrBadgeBatch(badges, options = {}) {
+            // Sign badge definitions, badge awards, and the NIP-58 profile-badges event as one publish batch.
+            const publicHex = localStorage.getItem('birdNostrPublicKeyHex');
+            if (!publicHex) return { awarded: 0, events: [], successRelays: 0 };
+            const awarded = this.getStoredNostrAwardedBadges();
+            const signedEvents = [];
+            const newlyAwarded = [];
+            const nextAwarded = { ...awarded };
+
+            for (const badge of badges) {
+                if (!badge || nextAwarded[badge.id]) continue;
+                const definitionEvent = await this.signNostrEvent(this.buildNostrBadgeDefinitionEvent(badge));
+                const badgeDefinitionRef = `30009:${definitionEvent.pubkey}:${badge.id}`;
+                const awardEvent = await this.signNostrEvent(this.buildNostrBadgeAwardEvent(badge, definitionEvent.pubkey));
+                signedEvents.push(definitionEvent, awardEvent);
+                nextAwarded[badge.id] = {
+                    id: badge.id,
+                    threshold: badge.threshold,
+                    track: badge.track,
+                    definitionEventId: definitionEvent.id,
+                    awardEventId: awardEvent.id,
+                    badgeDefinitionRef,
+                    awardedAt: new Date().toISOString()
+                };
+                newlyAwarded.push(badge);
+            }
+
+            if (!newlyAwarded.length) return { awarded: 0, events: [], successRelays: 0 };
+            signedEvents.push(await this.signNostrEvent(this.buildNostrProfileBadgesEvent(nextAwarded)));
+            const result = await this.publishNostrEvents(signedEvents);
+            if (result.successRelays > 0) {
+                this.saveStoredNostrAwardedBadges(nextAwarded);
+                if (options.storeEvents) this.storePublishedNostrEvents(signedEvents);
+                if (!this.achievementsModal?.hidden) this.renderAchievements();
+            }
+            return {
+                awarded: result.successRelays > 0 ? newlyAwarded.length : 0,
+                events: result.successRelays > 0 ? signedEvents : [],
+                successRelays: result.successRelays
+            };
         }
 
         getEarnedNostrBadgeDefinitions() {
@@ -7763,6 +7841,26 @@
                     ['badge_code', badge.code]
                 ],
                 content: `Awarded for ${badge.description}`
+            };
+        }
+
+        buildNostrProfileBadgesEvent(awardedBadges) {
+            // Publish the NIP-58 profile-badges list so badge-aware clients can show the user's selected achievements.
+            const publicHex = localStorage.getItem('birdNostrPublicKeyHex');
+            const tags = [['client', 'Birds.name']];
+            Object.values(awardedBadges || {})
+                .filter(award => award?.badgeDefinitionRef && award?.awardEventId)
+                .sort((left, right) => String(left.awardedAt || '').localeCompare(String(right.awardedAt || '')))
+                .forEach(award => {
+                    tags.push(['a', award.badgeDefinitionRef]);
+                    tags.push(['e', award.awardEventId]);
+                });
+            return {
+                kind: 10008,
+                pubkey: publicHex,
+                created_at: Math.floor(Date.now() / 1000),
+                tags,
+                content: ''
             };
         }
 
