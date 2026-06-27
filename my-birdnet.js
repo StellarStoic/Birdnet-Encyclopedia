@@ -42,6 +42,9 @@ class MyBirdNETDashboard {
         this.mapPlaceInput = document.getElementById('map-place-input');
         this.mapPlaceRecommendations = document.getElementById('map-place-recommendations');
         this.activitySpeciesSelect = document.getElementById('activity-species-select');
+        this.activitySpeciesDisplay = document.getElementById('activity-species-display');
+        this.activitySpeciesDisplayText = document.getElementById('activity-species-display-text');
+        this.activitySpeciesCount = document.getElementById('activity-species-count');
         this.dateRangeStartInput = document.getElementById('date-range-start');
         this.dateRangeEndInput = document.getElementById('date-range-end');
         this.weatherToggle = document.getElementById('weather-toggle');
@@ -265,6 +268,8 @@ class MyBirdNETDashboard {
         this.activitySpeciesSelect.addEventListener('change', () => {
             // Rebuild both explorer charts for the newly selected species.
             this.selectedActivitySpeciesKey = this.activitySpeciesSelect.value;
+            this.updateActivitySpeciesCount();
+            this.updateActivitySpeciesDisplay();
             if (this.stats) this.renderCharts();
         });
         [this.dateRangeStartInput, this.dateRangeEndInput].forEach(input => {
@@ -283,6 +288,7 @@ class MyBirdNETDashboard {
         window.addEventListener('resize', () => {
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(() => {
+                this.updateActivitySpeciesDisplay();
                 if (this.stats) this.renderCharts();
             }, 180);
         });
@@ -327,6 +333,7 @@ class MyBirdNETDashboard {
             this.renderInsights();
             this.renderCharts();
             this.renderSpeciesTable();
+            this.updateActivitySpeciesDisplay();
         }
         if (this.weatherStationsButton && !this.weatherStationsButton.hidden) {
             this.weatherStationsButton.title = this.t('weather.showStationsMap');
@@ -1228,6 +1235,8 @@ class MyBirdNETDashboard {
         this.speciesTableBody.innerHTML = '';
         this.speciesFilter.value = '';
         this.activitySpeciesSelect.innerHTML = '';
+        this.updateActivitySpeciesDisplay('');
+        this.activitySpeciesCount.textContent = '';
 
         // Reset the date controls and all labels so hidden dashboard content cannot retain old values.
         [this.dateRangeStartInput, this.dateRangeEndInput].forEach(input => {
@@ -4257,17 +4266,18 @@ class MyBirdNETDashboard {
         const peakMonth = this.indexOfMax(this.stats.month);
         const category = this.sortedMap(this.stats.categories)[0];
         const rareSpecies = this.stats.speciesList.filter(item => item.count === 1).length;
+        const monthCount = this.stats.month.filter(count => count > 0).length;
 
         const insights = [
             ['fa-crown', this.t('insight.mostObserved'), topSpecies?.commonName || this.t('common.notAvailable'), topSpecies ? this.t('common.detectionCount', { count: this.formatNumber(topSpecies.count) }) : '', true],
             ['fa-clock', this.t('insight.peakActivity'), `${String(peakHour).padStart(2, '0')}:00–${String((peakHour + 1) % 24).padStart(2, '0')}:00`, this.t('common.detectionCount', { count: this.formatNumber(this.stats.hour[peakHour]) })],
-            ['fa-calendar-days', this.t('insight.busiestMonth'), this.monthNames()[peakMonth], this.t('common.detectionCount', { count: this.formatNumber(this.stats.month[peakMonth]) })],
+            monthCount >= 2 ? ['fa-calendar-days', this.t('insight.busiestMonth'), this.monthNames()[peakMonth], this.t('common.detectionCount', { count: this.formatNumber(this.stats.month[peakMonth]) })] : null,
             ['fa-chart-pie', this.t('insight.largestCategory'), category?.[0] || this.t('common.unknown'), category ? this.t('common.percentOfDetections', { percent: this.percent(category[1] / this.stats.totalDetections) }) : ''],
             ['fa-binoculars', this.t('insight.singleAppearances'), this.formatNumber(rareSpecies), this.t('chart.detectedOnce')],
             ['fa-seedling', this.t('insight.taxonomyMatched'), this.formatNumber(this.stats.speciesList.filter(item => item.category !== 'Unknown').length), this.t('insight.speciesAssignedCategory')],
             ['fa-sun', this.t('insight.daytimeShare'), this.percent(this.sum(this.stats.hour.slice(6, 18)) / this.stats.totalDetections), '06:00-17:59'],
             ['fa-moon', this.t('insight.nightShare'), this.percent((this.sum(this.stats.hour.slice(18)) + this.sum(this.stats.hour.slice(0, 6))) / this.stats.totalDetections), '18:00-05:59']
-        ];
+        ].filter(Boolean);
 
         this.insightGrid.innerHTML = insights.map(([icon, label, value, detail, hasThumbnail]) => `
             <article class="insight ${hasThumbnail ? 'insight-with-thumbnail' : ''}">
@@ -4362,7 +4372,10 @@ class MyBirdNETDashboard {
             data: {
                 labels: timelineLabels,
                 datasets: [
-                    this.dataset(this.t('common.detections'), timelineDetections, colors[0], style !== 'bars'),
+                    {
+                        ...this.dataset(this.t('common.detections'), timelineDetections, colors[0], style !== 'bars'),
+                        lockVisibility: true
+                    },
                     ...timelineWeatherDatasets
                 ]
             },
@@ -4430,12 +4443,15 @@ class MyBirdNETDashboard {
             data: {
                 labels: selectedSpeciesLabels,
                 datasets: [
-                    this.dataset(
-                        selectedSpeciesActivity.species?.commonName || this.t('common.detections'),
-                        selectedSpeciesDetections,
-                        colors[4],
-                        style !== 'bars'
-                    ),
+                    {
+                        ...this.dataset(
+                            selectedSpeciesActivity.species?.commonName || this.t('common.detections'),
+                            selectedSpeciesDetections,
+                            colors[4],
+                            style !== 'bars'
+                        ),
+                        lockVisibility: true
+                    },
                     ...speciesWeatherDatasets
                 ]
             },
@@ -4519,7 +4535,10 @@ class MyBirdNETDashboard {
             data: {
                 labels: weeks.map(([week]) => week),
                 datasets: [
-                    this.dataset(this.t('common.detections'), weeks.map(([, value]) => value.detections), colors[0], style !== 'bars'),
+                    {
+                        ...this.dataset(this.t('common.detections'), weeks.map(([, value]) => value.detections), colors[0], style !== 'bars'),
+                        lockVisibility: true
+                    },
                     {
                         ...this.dataset(this.t('chart.uniqueSpecies'), weeks.map(([, value]) => value.species.size), colors[5], true),
                         yAxisID: 'species'
@@ -4548,6 +4567,7 @@ class MyBirdNETDashboard {
         if (!availableKeys.has(this.selectedActivitySpeciesKey)) {
             this.selectedActivitySpeciesKey = this.getSpeciesKey(this.stats.speciesList[0]);
         }
+        const detectionCounts = this.getActivitySpeciesDetectionCounts();
         // Sort translated display names with the visitor's current locale for a predictable A-Z selector.
         const sortedSpecies = [...this.stats.speciesList].sort((speciesA, speciesB) =>
             speciesA.commonName.localeCompare(speciesB.commonName, undefined, {
@@ -4558,12 +4578,51 @@ class MyBirdNETDashboard {
         this.activitySpeciesSelect.innerHTML = sortedSpecies.map(species => {
             const key = this.getSpeciesKey(species);
             const scientificName = species.scientificName ? ` (${species.scientificName})` : '';
+            const count = detectionCounts.get(key) || 0;
             return `
                 <option value="${this.escapeHTML(key)}" ${key === this.selectedActivitySpeciesKey ? 'selected' : ''}>
-                    ${this.escapeHTML(`${species.commonName}${scientificName}`)}
+                    ${this.escapeHTML(`${species.commonName}${scientificName} · ${this.formatNumber(count)}`)}
                 </option>
             `;
         }).join('');
+        this.updateActivitySpeciesCount(detectionCounts);
+        this.updateActivitySpeciesDisplay();
+    }
+
+    getActivitySpeciesDetectionCounts() {
+        // Count detections for each species inside the currently selected date window.
+        const counts = new Map();
+        this.filteredObservations.forEach(observation => {
+            const key = this.getSpeciesKey(observation);
+            if (!key) return;
+            counts.set(key, (counts.get(key) || 0) + observation.count);
+        });
+        return counts;
+    }
+
+    updateActivitySpeciesCount(counts = this.getActivitySpeciesDetectionCounts()) {
+        // Show the selected species count as smaller helper text because native option text cannot be partially styled.
+        if (!this.activitySpeciesCount) return;
+        const count = counts.get(this.selectedActivitySpeciesKey) || 0;
+        this.activitySpeciesCount.textContent = this.t('common.detectionCount', {
+            count: this.formatNumber(count)
+        });
+    }
+
+    updateActivitySpeciesDisplay(text = null) {
+        // Mirror the selected native option in a stylable overlay and animate it only when clipped.
+        if (!this.activitySpeciesDisplay || !this.activitySpeciesDisplayText) return;
+        const label = text ?? this.activitySpeciesSelect?.selectedOptions?.[0]?.textContent.trim() ?? '';
+        this.activitySpeciesDisplayText.textContent = label;
+        this.activitySpeciesDisplay.classList.remove('is-overflowing');
+        this.activitySpeciesDisplay.style.setProperty('--activity-species-overflow', '0px');
+        requestAnimationFrame(() => {
+            const overflow = this.activitySpeciesDisplayText.scrollWidth - this.activitySpeciesDisplay.clientWidth + 12;
+            if (overflow > 4) {
+                this.activitySpeciesDisplay.style.setProperty('--activity-species-overflow', `${overflow}px`);
+                this.activitySpeciesDisplay.classList.add('is-overflowing');
+            }
+        });
     }
 
     getSelectedSpeciesActivity() {
@@ -4974,12 +5033,20 @@ class MyBirdNETDashboard {
         // Add only the independent unit axes required by weather series which contain visible data.
         const activeAxes = new Set(weatherDatasets.map(dataset => dataset.yAxisID));
         if (!this.weatherEnabled || !activeAxes.size) return {};
+        const displayedWeatherAxes = ['temperature', 'precipitation', 'humidity', 'pressure', 'windSpeed']
+            .filter(axisId => activeAxes.has(axisId));
+        const axisDisplay = axisId => displayedWeatherAxes.includes(axisId);
+        const axisOffset = axisId => displayedWeatherAxes.indexOf(axisId) > 1;
+        const axisWeight = axisId => displayedWeatherAxes.indexOf(axisId) + 1;
         const scales = {
             temperature: {
                 type: 'linear',
                 position: 'right',
+                display: axisDisplay('temperature'),
+                weight: axisWeight('temperature'),
                 ticks: {
                     color: '#d65a31',
+                    maxTicksLimit: 5,
                     callback: value => `${value}°C`
                 },
                 grid: { drawOnChartArea: false },
@@ -4988,10 +5055,13 @@ class MyBirdNETDashboard {
             precipitation: {
                 type: 'linear',
                 position: 'right',
+                display: axisDisplay('precipitation'),
                 beginAtZero: true,
                 offset: true,
+                weight: axisWeight('precipitation'),
                 ticks: {
                     color: '#378bc4',
+                    maxTicksLimit: 5,
                     callback: value => `${value} mm`
                 },
                 grid: { drawOnChartArea: false },
@@ -5000,15 +5070,31 @@ class MyBirdNETDashboard {
             pressure: {
                 type: 'linear',
                 position: 'right',
-                display: false,
-                grid: { drawOnChartArea: false }
+                display: axisDisplay('pressure'),
+                offset: axisOffset('pressure'),
+                weight: axisWeight('pressure'),
+                ticks: {
+                    color: '#7d57a5',
+                    maxTicksLimit: 4,
+                    callback: value => `${value} hPa`
+                },
+                grid: { drawOnChartArea: false },
+                title: { display: true, text: 'hPa', color: axisColor }
             },
             windSpeed: {
                 type: 'linear',
                 position: 'right',
-                display: false,
+                display: axisDisplay('windSpeed'),
+                offset: axisOffset('windSpeed'),
+                weight: axisWeight('windSpeed'),
                 beginAtZero: true,
-                grid: { drawOnChartArea: false }
+                ticks: {
+                    color: '#3f8f68',
+                    maxTicksLimit: 4,
+                    callback: value => `${value} km/h`
+                },
+                grid: { drawOnChartArea: false },
+                title: { display: true, text: 'km/h', color: axisColor }
             },
             windDirectionBand: {
                 type: 'linear',
@@ -5021,10 +5107,18 @@ class MyBirdNETDashboard {
             humidity: {
                 type: 'linear',
                 position: 'right',
-                display: false,
+                display: axisDisplay('humidity'),
+                offset: axisOffset('humidity'),
+                weight: axisWeight('humidity'),
                 min: 0,
                 max: 100,
-                grid: { drawOnChartArea: false }
+                ticks: {
+                    color: '#29a3a3',
+                    maxTicksLimit: 4,
+                    callback: value => `${value}%`
+                },
+                grid: { drawOnChartArea: false },
+                title: { display: true, text: '% RH', color: axisColor }
             },
             condition: {
                 type: 'linear',
@@ -5047,9 +5141,9 @@ class MyBirdNETDashboard {
 
     renderSpeciesTable() {
         if (!this.stats) return;
-        const filter = this.speciesFilter.value.trim().toLowerCase();
+        const filter = this.normalizeSearchText(this.speciesFilter.value);
         const rows = this.stats.speciesList.filter(item =>
-            `${item.commonName} ${item.scientificName} ${item.category}`.toLowerCase().includes(filter)
+            this.normalizeSearchText(`${item.commonName} ${item.scientificName} ${item.category}`).includes(filter)
         );
 
         this.speciesTableBody.innerHTML = rows.map(item => `
@@ -5232,8 +5326,36 @@ class MyBirdNETDashboard {
     }
 
     createChart(id, config) {
+        // Prepare timeline-style charts for horizontal scrolling before Chart.js measures its parent.
         const canvas = document.getElementById(id);
+        this.prepareScrollableChart(canvas, config);
         this.charts.set(id, new Chart(canvas, config));
+    }
+
+    prepareScrollableChart(canvas, config) {
+        // Wrap dense chart canvases so mobile users can pan across labels instead of reading a squeezed chart.
+        const chartWrap = canvas?.closest('.chart-scrollable');
+        if (!chartWrap) return;
+        let scrollInner = canvas.parentElement?.classList.contains('chart-scroll-inner')
+            ? canvas.parentElement
+            : null;
+        if (!scrollInner) {
+            scrollInner = document.createElement('div');
+            scrollInner.className = 'chart-scroll-inner';
+            chartWrap.insertBefore(scrollInner, canvas);
+            scrollInner.appendChild(canvas);
+        }
+        const scrollWidth = this.getScrollableChartWidth(config);
+        scrollInner.style.setProperty('--chart-scroll-width', `${scrollWidth}px`);
+    }
+
+    getScrollableChartWidth(config) {
+        // Estimate readable horizontal chart width from label count and the active viewport.
+        const labelCount = Array.isArray(config?.data?.labels) ? config.data.labels.length : 0;
+        const mobile = window.matchMedia('(max-width: 760px)').matches;
+        if (!mobile) return 0;
+        const perLabel = labelCount > 96 ? 18 : labelCount > 48 ? 24 : 34;
+        return Math.min(2600, Math.max(720, labelCount * perLabel));
     }
 
     destroyCharts() {
@@ -5264,7 +5386,10 @@ class MyBirdNETDashboard {
             maintainAspectRatio: false,
             interaction: { mode: 'index', intersect: false },
             plugins: {
-                legend: { labels: { color: axisColor } },
+                legend: {
+                    labels: { color: axisColor },
+                    onClick: (event, legendItem, legend) => this.handleChartLegendClick(event, legendItem, legend)
+                },
                 tooltip: { displayColors: true }
             },
             scales: {
@@ -5291,6 +5416,27 @@ class MyBirdNETDashboard {
         };
 
         return this.deepMerge(base, overrides);
+    }
+
+    handleChartLegendClick(event, legendItem, legend) {
+        // Keep the primary detections series fixed while allowing weather overlays to be hidden.
+        const chart = legend.chart;
+        const dataset = chart.data.datasets[legendItem.datasetIndex];
+        if (dataset?.lockVisibility) return;
+        Chart.defaults.plugins.legend.onClick.call(this, event, legendItem, legend);
+        this.updateWeatherAxisVisibility(chart);
+    }
+
+    updateWeatherAxisVisibility(chart) {
+        // Redraw only axes used by currently visible weather series so hidden overlays free chart space.
+        Object.keys(chart.options.scales || {}).forEach(axisId => {
+            if (['x', 'y', 'species'].includes(axisId)) return;
+            const hasVisibleDataset = chart.data.datasets.some((dataset, index) =>
+                dataset.yAxisID === axisId && chart.isDatasetVisible(index)
+            );
+            chart.options.scales[axisId].display = hasVisibleDataset && !['windDirectionBand', 'condition'].includes(axisId);
+        });
+        chart.update();
     }
 
     getBirdCategory(taxonomy) {
@@ -5367,6 +5513,16 @@ class MyBirdNETDashboard {
             .trim()
             .toLowerCase()
             .replace(/[^a-z0-9]/g, '');
+    }
+
+    normalizeSearchText(value = '') {
+        // Treat spaces, hyphens, underscores, and spaced separators as equivalent in species searches.
+        return String(value || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[\s_-]+/g, ' ')
+            .trim()
+            .toLowerCase();
     }
 
     pick(row, keys) {

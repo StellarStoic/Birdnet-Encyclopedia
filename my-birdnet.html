@@ -331,7 +331,7 @@
                             <p id="timeline-chart-description" data-i18n="chart.timelineDescription">Detection activity by day</p>
                         </div>
                     </div>
-                    <div class="chart-wrap chart-wrap-wide"><canvas id="timeline-chart"></canvas></div>
+                    <div class="chart-wrap chart-wrap-wide chart-scrollable"><canvas id="timeline-chart"></canvas></div>
                 </article>
 
                 <article class="chart-card">
@@ -376,13 +376,19 @@
                             <p data-i18n="chart.speciesExplorerDescription">Choose a species to compare detections over time and its most active hours</p>
                         </div>
                         <label for="activity-species-select"><span data-i18n="common.species">Species</span>
-                            <select id="activity-species-select"></select>
+                            <span class="activity-species-select-shell">
+                                <select id="activity-species-select"></select>
+                                <span class="activity-species-display" id="activity-species-display" aria-hidden="true">
+                                    <span id="activity-species-display-text"></span>
+                                </span>
+                            </span>
+                            <small class="activity-species-count" id="activity-species-count"></small>
                         </label>
                     </div>
                     <div class="species-explorer-grid">
                         <div>
                             <h4 id="species-timeline-description" data-i18n="chart.speciesDailyDescription">Daily detections over the selected window</h4>
-                            <div class="chart-wrap"><canvas id="selected-species-timeline-chart"></canvas></div>
+                            <div class="chart-wrap chart-scrollable"><canvas id="selected-species-timeline-chart"></canvas></div>
                         </div>
                         <div>
                             <h4 data-i18n="chart.mostActiveHours">Most active hours</h4>
@@ -418,7 +424,7 @@
                             <p data-i18n="chart.weeklyRichnessDescription">Unique species and detections per ISO week</p>
                         </div>
                     </div>
-                    <div class="chart-wrap chart-wrap-wide"><canvas id="week-chart"></canvas></div>
+                    <div class="chart-wrap chart-wrap-wide chart-scrollable"><canvas id="week-chart"></canvas></div>
                 </article>
             </div>
 

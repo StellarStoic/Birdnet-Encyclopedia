@@ -9398,7 +9398,8 @@
         async handleSearch() {
             console.log("🔎 handleSearch called!");
             const requestId = ++this.searchRequestId;
-            const searchTerm = this.searchInput.value.toLowerCase().trim(); // normalize input - Convert to lowercase
+            const rawSearchTerm = this.searchInput.value.trim();
+            const searchTerm = this.normalizeSearchText(rawSearchTerm);
             this.leaveDiaryOverviewMode();
             this.destroyDiaryOverviewMap();
 
@@ -9414,14 +9415,15 @@
 
             // step 2. Get birds for current language (only properly translated ones)
             const languageBirds = this.getTranslatedBirdsForCurrentLanguage();
+            const isLatinNameSearch = searchTerm !== '' && this.isLatinSearchTerm(searchTerm);
 
             if (searchTerm === '') {
                 // If nothing typed, show all birds in current language
                 this.filteredBirds = languageBirds;
             } else {
                 // Filter current language only
-                this.filteredBirds = languageBirds.filter(bird => 
-                    bird.searchText.includes(searchTerm)
+                this.filteredBirds = languageBirds.filter(bird =>
+                    this.normalizeSearchText(bird.searchText).includes(searchTerm)
                 );
             }
 
@@ -9449,9 +9451,9 @@
             }
 
             // --- Step 4: run cross-language search in BACKGROUND ---
-            if (searchTerm !== '') {
+            if (searchTerm !== '' && !isLatinNameSearch) {
                 // Don’t block local results → continue async
-                this.searchAcrossAllLanguages(searchTerm, this.filteredBirds).then(results => {
+                this.searchAcrossAllLanguages(rawSearchTerm, this.filteredBirds).then(results => {
                     if (requestId !== this.searchRequestId) return;
                     this.crossLanguageSearchResults = results;
 
@@ -9473,7 +9475,19 @@
                         this.showNoResults('final', searchTerm);
                     }
                 });
+            } else if (searchTerm !== '' && this.filteredBirds.length === 0) {
+                this.showNoResults('final', searchTerm);
             }
+        }
+
+        isLatinSearchTerm(normalizedSearchTerm) {
+            // Latin/scientific names are language-independent, so they should not create "other languages" results.
+            const term = this.normalizeSearchText(normalizedSearchTerm);
+            if (!term) return false;
+            return this.birds.some(bird => {
+                const latin = this.normalizeSearchText(bird.latin);
+                return latin === term || latin.includes(term);
+            });
         }
 
         disableLoadMoreButtonTemporarily() {
@@ -9560,8 +9574,7 @@
                             // console.log(`🔍 Checking: "${translatedName}" (${latin})`);
 
                             //  word matching
-                            if (wordRegex.test(normalizedTranslatedName) ||
-                                wordRegex.test(latin)) {
+                            if (wordRegex.test(normalizedTranslatedName)) {
 
                                 console.log(`✅ Match found in ${langCode}: "${translatedName}"`);
 
@@ -9605,9 +9618,10 @@
 
         // Normalize names consistently for matching and fallback detection.
         normalizeSearchText(value = '') {
-            return value
+            return String(value || '')
                 .normalize('NFD')
                 .replace(/[\u0300-\u036f]/g, '')
+                .replace(/[\s_-]+/g, ' ')
                 .trim()
                 .toLowerCase();
         }

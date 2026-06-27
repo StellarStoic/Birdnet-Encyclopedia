@@ -1516,6 +1516,63 @@ button:disabled {
 
 #activity-species-select {
     width: 100%;
+    min-height: 42px;
+    color: transparent;
+    font-size: 0.84rem;
+}
+
+#activity-species-select option {
+    color: var(--text);
+    background: var(--surface-solid);
+    font-size: 0.84rem;
+}
+
+.activity-species-select-shell {
+    position: relative;
+    display: block;
+    min-width: 0;
+}
+
+.activity-species-display {
+    position: absolute;
+    inset: 1px 38px 1px 1px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    border-radius: 10px;
+    color: var(--text);
+    font-size: 0.8rem;
+    font-weight: 800;
+    line-height: 1.2;
+    pointer-events: none;
+}
+
+.activity-species-display span {
+    display: inline-block;
+    max-width: 100%;
+    padding-left: 10px;
+    white-space: nowrap;
+}
+
+.activity-species-display.is-overflowing span {
+    max-width: none;
+    animation: activity-species-marquee 12s ease-in-out infinite alternate;
+}
+
+@keyframes activity-species-marquee {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(calc(-1 * var(--activity-species-overflow, 0px)));
+    }
+}
+
+.activity-species-count {
+    color: var(--muted);
+    font-size: 0.76rem;
+    font-weight: 800;
+    line-height: 1.2;
 }
 
 .species-explorer-grid {
@@ -1557,6 +1614,11 @@ button:disabled {
     height: 330px;
     margin-top: 14px;
     overflow: hidden;
+}
+
+.chart-scroll-inner {
+    width: 100%;
+    height: 100%;
 }
 
 .chart-snapshot-button {
@@ -1904,6 +1966,22 @@ tbody tr:hover {
     .chart-wrap,
     .chart-wrap-wide {
         height: 280px;
+    }
+
+    .chart-scrollable {
+        overflow-x: auto;
+        overflow-y: hidden;
+        overscroll-behavior-x: contain;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .chart-scrollable .chart-scroll-inner {
+        width: max(100%, var(--chart-scroll-width, 720px));
+        min-width: max(100%, var(--chart-scroll-width, 720px));
+    }
+
+    .chart-scrollable canvas {
+        max-width: none;
     }
 
     .chart-wrap-single {

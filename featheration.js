@@ -430,8 +430,9 @@
 
         buildSearchTerms(query) {
             // Combine reliable hashtag/recent-note filters with optional relay text search.
-            const words = query
-                ? query.split(/\s+/).map(value => value.trim()).filter(Boolean)
+            const normalizedQuery = this.normalizeText(String(query || '').replace(/^#+/, ''));
+            const words = normalizedQuery
+                ? normalizedQuery.split(/\s+/).map(value => value.trim()).filter(Boolean)
                 : ['bird', 'birds', 'birding'];
             const tags = words
                 .filter(word => word.startsWith('#'))
