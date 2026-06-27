@@ -932,6 +932,11 @@
             this.observationDiary = this.loadObservationDiary(); // Local seen-state and diary entries keyed by scientific name
             this.localizedNameCache = new Map(); // Caches language-file names used to guide AI description translations
             this.wikipediaSitelinkCache = new Map(); // Caches Wikidata language links so localized Wikipedia pages are resolved exactly once per species/language.
+            this.birdImageProviderCache = new Map(); // Caches multi-source carousel images per scientific name during the browser session.
+            this.localBirdThumbnailExistsCache = new Map(); // Avoids repeated local thumbnail existence checks for modal carousel images.
+            this.catalogueOfLifeLinkCache = new Map(); // Caches Catalogue of Life taxon links resolved through ChecklistBank.
+            this.gbifSpeciesLinkCache = new Map(); // Caches resolved GBIF species pages so modal links do not repeatedly query GBIF.
+            this.eolSpeciesLinkCache = new Map(); // Caches resolved Encyclopedia of Life pages separately from EOL carousel media.
             this.openDiaryEntryId = null; // Keeps only the newly started diary note expanded after adding it
             this.editingDiaryEntryId = null; // Shows the diary editor only for the entry being actively edited
             this.openDiarySpeciesKey = null; // Scopes expanded diary entries to the species modal that owns them
@@ -6508,6 +6513,15 @@
             return String(scientificName || '').trim().toLowerCase();
         }
 
+        localBirdImageKey(scientificName) {
+            // Match generated thumbnail filenames such as "aix-sponsa.webp" from scientific names.
+            return this.observationKey(scientificName)
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-+|-+$/g, '');
+        }
+
         getObservationRecord(scientificName) {
             // Read one diary record without creating it.
             const record = this.observationDiary[this.observationKey(scientificName)] || null;
@@ -9012,6 +9026,347 @@
             return `https://ebird.org/search?search=${encodeURIComponent(latinName)}`;
         }
 
+        async getCatalogueOfLifeSpeciesUrl(latinName) {
+            // Resolve Catalogue of Life through the ChecklistBank API and link only exact Aves species matches.
+            const cacheKey = this.observationKey(latinName);
+            if (this.catalogueOfLifeLinkCache.has(cacheKey)) {
+                return this.catalogueOfLifeLinkCache.get(cacheKey);
+            }
+
+            let resolvedUrl = '';
+            try {
+                const response = await this.fetchWithTimeout(
+                    `https://api.checklistbank.org/dataset/3LR/nameusage/search?q=${encodeURIComponent(latinName)}&rank=species&limit=5`,
+                    {},
+                    3500
+                );
+                if (response.ok) {
+                    const data = await response.json();
+                    const targetName = this.normalizeSearchText(latinName);
+                    const exactResult = (data.result || []).find(result => {
+                        const usage = result.usage || {};
+                        const scientificName = usage.name?.scientificName || usage.label || '';
+                        const isBird = (result.classification || []).some(item =>
+                            this.normalizeSearchText(item.name) === 'aves'
+                        );
+                        const rank = this.normalizeSearchText(usage.name?.rank || usage.rank || result.rank || '');
+                        const status = this.normalizeSearchText(usage.status || result.status || '');
+
+                        return isBird
+                            && rank === 'species'
+                            && ['accepted', 'provisionally accepted', ''].includes(status)
+                            && this.normalizeSearchText(scientificName) === targetName;
+                    });
+
+                    if (exactResult?.id) {
+                        resolvedUrl = `https://www.catalogueoflife.org/data/taxon/${encodeURIComponent(exactResult.id)}`;
+                    }
+                }
+            } catch (error) {
+                console.warn(`Catalogue of Life link lookup failed for ${latinName}:`, error);
+            }
+
+            this.catalogueOfLifeLinkCache.set(cacheKey, resolvedUrl);
+            return resolvedUrl;
+        }
+
+        async getGbifSpeciesUrl(latinName) {
+            // Resolve a direct GBIF species page only when GBIF returns a confident species-level match.
+            const cacheKey = this.observationKey(latinName);
+            if (this.gbifSpeciesLinkCache.has(cacheKey)) {
+                return this.gbifSpeciesLinkCache.get(cacheKey);
+            }
+
+            let resolvedUrl = '';
+            try {
+                const response = await this.fetchWithTimeout(
+                    `https://api.gbif.org/v1/species/match?name=${encodeURIComponent(latinName)}&rank=SPECIES`,
+                    {},
+                    3500
+                );
+                if (response.ok) {
+                    const match = await response.json();
+                    const taxonKey = match.usageKey || match.speciesKey;
+                    const matchedName = this.normalizeSearchText(match.scientificName || match.canonicalName || '');
+                    const targetName = this.normalizeSearchText(latinName);
+                    const isSpeciesMatch = match.rank === 'SPECIES' || match.rank === 'SUBSPECIES';
+                    const isAcceptedEnough = !match.status || ['ACCEPTED', 'DOUBTFUL'].includes(String(match.status).toUpperCase());
+
+                    if (taxonKey && isSpeciesMatch && isAcceptedEnough && matchedName.includes(targetName)) {
+                        resolvedUrl = `https://www.gbif.org/species/${taxonKey}`;
+                    }
+                }
+            } catch (error) {
+                console.warn(`GBIF species link lookup failed for ${latinName}:`, error);
+            }
+
+            this.gbifSpeciesLinkCache.set(cacheKey, resolvedUrl);
+            return resolvedUrl;
+        }
+
+        async getEolSpeciesUrl(latinName) {
+            // Resolve a direct Encyclopedia of Life page when EOL has an exact species search result.
+            const cacheKey = this.observationKey(latinName);
+            if (this.eolSpeciesLinkCache.has(cacheKey)) {
+                return this.eolSpeciesLinkCache.get(cacheKey);
+            }
+
+            let resolvedUrl = '';
+            try {
+                const response = await this.fetchWithTimeout(
+                    `https://eol.org/api/search/1.0.json?q=${encodeURIComponent(latinName)}&page=1&exact=true`,
+                    {},
+                    3500
+                );
+                if (response.ok) {
+                    const data = await response.json();
+                    const exactResult = (data.results || []).find(result =>
+                        this.normalizeSearchText(result.title || result.content || '').includes(this.normalizeSearchText(latinName))
+                    );
+                    if (exactResult?.id) {
+                        resolvedUrl = `https://eol.org/pages/${exactResult.id}`;
+                    }
+                }
+            } catch (error) {
+                console.warn(`EOL species link lookup failed for ${latinName}:`, error);
+            }
+
+            this.eolSpeciesLinkCache.set(cacheKey, resolvedUrl);
+            return resolvedUrl;
+        }
+
+        async getBirdCarouselImages(bird, details = {}) {
+            // Build the bird-modal carousel from local and public media providers without letting one failed provider block the modal.
+            const cacheKey = this.observationKey(details.scientific_name || bird.latin);
+            if (this.birdImageProviderCache.has(cacheKey)) {
+                return this.birdImageProviderCache.get(cacheKey);
+            }
+
+            const providerTasks = [
+                this.getLocalBirdCarouselImage(bird),
+                this.getWikipediaCarouselImages(bird),
+                this.getWikimediaCommonsCarouselImages(bird),
+                this.getINaturalistCarouselImages(details),
+                this.getEolCarouselImages(bird)
+            ];
+
+            const settledProviders = await Promise.allSettled(providerTasks);
+            const providerImages = settledProviders.flatMap(result =>
+                result.status === 'fulfilled' ? result.value : []
+            );
+
+            const thumbnailFallback = details.thumbnail
+                ? [{
+                    url: this.normalizeINaturalistImageUrl(details.thumbnail),
+                    source: 'iNaturalist',
+                    pageUrl: details.id ? `https://www.inaturalist.org/taxa/${details.id}` : ''
+                }]
+                : [];
+
+            const images = this.deduplicateCarouselImages([...thumbnailFallback, ...providerImages]).slice(0, 36);
+            this.birdImageProviderCache.set(cacheKey, images);
+            return images;
+        }
+
+        async getLocalBirdCarouselImage(bird) {
+            // Use the generated local thumbnail first when it exists, so the modal has a fast same-origin image.
+            const imageUrl = `data/bird-images/thumbnails/${encodeURIComponent(this.localBirdImageKey(bird.latin))}.webp`;
+            const exists = await this.localBirdThumbnailExists(imageUrl);
+            return exists
+                ? [{ url: imageUrl, source: 'Birds.name local thumbnail', pageUrl: '' }]
+                : [];
+        }
+
+        async localBirdThumbnailExists(imageUrl) {
+            // Cache HEAD checks so reopening the same species does not repeat same-origin thumbnail probes.
+            if (this.localBirdThumbnailExistsCache.has(imageUrl)) {
+                return this.localBirdThumbnailExistsCache.get(imageUrl);
+            }
+
+            const existsPromise = this.fetchWithTimeout(imageUrl, { method: 'HEAD' }, 1800)
+                .then(response => response.ok)
+                .catch(() => false);
+            this.localBirdThumbnailExistsCache.set(imageUrl, existsPromise);
+            return existsPromise;
+        }
+
+        async fetchWithTimeout(url, options = {}, timeoutMs = 4500) {
+            // Keep optional image-provider requests from holding the bird modal open too long.
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), timeoutMs);
+            try {
+                return await fetch(url, { ...options, signal: controller.signal });
+            } finally {
+                clearTimeout(timer);
+            }
+        }
+
+        async getWikipediaCarouselImages(bird) {
+            // Request the resolved Wikipedia page image from the selected language first, then English/scientific-name fallbacks.
+            const images = [];
+            const candidates = [
+                [this.currentLanguage, bird.name],
+                ['en', bird.name],
+                ['en', bird.latin]
+            ];
+
+            for (const [languageCode, commonName] of candidates) {
+                const wikipediaLanguage = this.getWikipediaLanguageCode(languageCode);
+                const linkedTitle = languageCode !== 'en'
+                    ? await this.getLinkedWikipediaTitle(bird.latin, languageCode, commonName)
+                    : '';
+                const title = linkedTitle || commonName || bird.latin;
+                if (!title) continue;
+
+                try {
+                    const response = await this.fetchWithTimeout(
+                        `https://${wikipediaLanguage}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`
+                    );
+                    if (!response.ok) continue;
+                    const data = await response.json();
+                    const imageUrl = data.originalimage?.source || data.thumbnail?.source || '';
+                    if (imageUrl) {
+                        images.push({
+                            url: imageUrl,
+                            source: `Wikipedia (${wikipediaLanguage})`,
+                            pageUrl: data.content_urls?.desktop?.page || `https://${wikipediaLanguage}.wikipedia.org/wiki/${encodeURIComponent(data.title || title)}`
+                        });
+                        break;
+                    }
+                } catch (error) {
+                    console.warn(`Wikipedia image fetch failed for ${bird.latin}:`, error);
+                }
+            }
+
+            return images;
+        }
+
+        async getWikimediaCommonsCarouselImages(bird) {
+            // Search Wikimedia Commons file pages for species photos and request direct thumbnail URLs.
+            try {
+                const searchTerms = [`"${bird.latin}"`, `"${bird.name}" bird`].filter(Boolean).join(' OR ');
+                const response = await this.fetchWithTimeout(
+                    `https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=6&gsrlimit=12&gsrsearch=${encodeURIComponent(searchTerms)}&prop=imageinfo&iiprop=url|mime|extmetadata&iiurlwidth=1400`
+                );
+                if (!response.ok) return [];
+
+                const data = await response.json();
+                return Object.values(data.query?.pages || {})
+                    .filter(page => page.imageinfo?.[0]?.mime?.startsWith('image/'))
+                    .map(page => {
+                        const imageInfo = page.imageinfo[0];
+                        return {
+                            url: imageInfo.thumburl || imageInfo.url,
+                            source: 'Wikimedia Commons',
+                            pageUrl: imageInfo.descriptionurl || `https://commons.wikimedia.org/wiki/${encodeURIComponent(page.title)}`
+                        };
+                    });
+            } catch (error) {
+                console.warn(`Wikimedia Commons image fetch failed for ${bird.latin}:`, error);
+                return [];
+            }
+        }
+
+        async getINaturalistCarouselImages(details = {}) {
+            // Extend the carousel with iNaturalist taxon photos beyond the default thumbnail.
+            if (!details.id) return [];
+
+            try {
+                const detailsRes = await this.fetchWithTimeout(`https://api.inaturalist.org/v1/taxa/${details.id}`);
+                if (!detailsRes.ok) return [];
+
+                const detailsData = await detailsRes.json();
+                const taxonDetails = detailsData.results?.[0];
+                return (taxonDetails?.taxon_photos || [])
+                    .map(taxonPhoto => taxonPhoto.photo)
+                    .filter(Boolean)
+                    .map(photo => ({
+                        url: this.normalizeINaturalistImageUrl(photo.medium_url || photo.url || photo.large_url || photo.original_url),
+                        source: 'iNaturalist',
+                        pageUrl: photo.attribution ? `https://www.inaturalist.org/taxa/${details.id}` : `https://www.inaturalist.org/taxa/${details.id}`
+                    }));
+            } catch (error) {
+                console.warn(`iNaturalist image fetch failed for ${details.scientific_name || details.id}:`, error);
+                return [];
+            }
+        }
+
+        async getEolCarouselImages(bird) {
+            // Resolve the species page on EOL and take image data objects from that page.
+            try {
+                const searchResponse = await this.fetchWithTimeout(
+                    `https://eol.org/api/search/1.0.json?q=${encodeURIComponent(bird.latin)}&page=1&exact=true`
+                );
+                if (!searchResponse.ok) return [];
+
+                const searchData = await searchResponse.json();
+                const pageId = searchData.results?.[0]?.id;
+                if (!pageId) return [];
+
+                const pageResponse = await this.fetchWithTimeout(
+                    `https://eol.org/api/pages/1.0/${encodeURIComponent(pageId)}.json?images_per_page=20&videos_per_page=0&sounds_per_page=0&text_per_page=0&details=true`
+                );
+                if (!pageResponse.ok) return [];
+
+                const pageData = await pageResponse.json();
+                return (pageData.dataObjects || [])
+                    .filter(item => item.eolMediaURL || item.mediaURL)
+                    .map(item => ({
+                        url: item.eolMediaURL || item.mediaURL,
+                        source: 'EOL',
+                        pageUrl: item.source || pageData.source || `https://eol.org/pages/${pageId}`
+                    }))
+                    .filter(image => this.isProbablyImageUrl(image.url));
+            } catch (error) {
+                console.warn(`EOL image fetch failed for ${bird.latin}:`, error);
+                return [];
+            }
+        }
+
+        deduplicateCarouselImages(images) {
+            // Collapse repeated provider results by normalized URL while preserving provider order.
+            const seen = new Set();
+            return images
+                .map(image => ({
+                    url: String(image.url || '').trim(),
+                    source: String(image.source || 'Image source').trim(),
+                    pageUrl: String(image.pageUrl || '').trim()
+                }))
+                .filter(image => image.url && this.isProbablyImageUrl(image.url))
+                .filter(image => {
+                    const key = image.url
+                        .replace(/^http:/i, 'https:')
+                        .replace(/\/(square|small|medium|large)\./i, '/.')
+                        .split('?')[0]
+                        .toLowerCase();
+                    if (seen.has(key)) return false;
+                    seen.add(key);
+                    return true;
+                });
+        }
+
+        normalizeINaturalistImageUrl(url = '') {
+            // Prefer medium-sized iNaturalist images in the modal to balance detail and bandwidth.
+            return String(url || '').replace(/\/square\./, '/medium.').replace(/\/small\./, '/medium.');
+        }
+
+        isProbablyImageUrl(url = '') {
+            // Keep obvious image URLs and API-provided media paths, while dropping pages that cannot render as images.
+            const text = String(url || '').trim();
+            if (!text) return false;
+            if (text.startsWith('data:image/')) return true;
+            try {
+                const parsed = new URL(text, window.location.origin);
+                return /\.(avif|gif|jpe?g|png|svg|webp)(?:$|\?)/i.test(parsed.pathname)
+                    || /\/photos\//i.test(parsed.pathname)
+                    || (/eol\.org$/i.test(parsed.hostname) && /\/(?:content|media)\//i.test(parsed.pathname))
+                    || /inaturalist-open-data\.s3/i.test(parsed.hostname)
+                    || /static\.inaturalist\.org/i.test(parsed.hostname);
+            } catch {
+                return false;
+            }
+        }
+
         async showBirdDetails(bird) {
 
             // Set current bird and clear previous modal content
@@ -9056,6 +9411,11 @@
                     (details.scientific_name || bird.latin).toLowerCase()
                 );
                 const iucnSourceUrl = iucnAssessment?.url || details.conservation_status?.url || '';
+                const [catalogueOfLifeUrl, gbifSpeciesUrl, eolSpeciesUrl] = await Promise.all([
+                    this.getCatalogueOfLifeSpeciesUrl(details.scientific_name || bird.latin),
+                    this.getGbifSpeciesUrl(details.scientific_name || bird.latin),
+                    this.getEolSpeciesUrl(details.scientific_name || bird.latin)
+                ]);
 
                 // Fetch located recent observations for the modal navigator.
                 let recentObservations = [];
@@ -9063,42 +9423,21 @@
                     recentObservations = await this.fetchRecentINatObservations(details.id);
                 }
 
-                // Get additional images for the modal
-                let images = [];
-                if (details.id) {
-                    try {
-                        const detailsRes = await fetch(
-                            `https://api.inaturalist.org/v1/taxa/${details.id}`
-                        );
-                        if (detailsRes.ok) {
-                            const detailsData = await detailsRes.json();
-                            if (detailsData.results && detailsData.results.length > 0) {
-                                const taxonDetails = detailsData.results[0];
-                                if (taxonDetails.taxon_photos) {
-                                    images = taxonDetails.taxon_photos.map(tp =>
-                                        tp.photo.url.replace('square', 'medium')
-                                    ).slice(0, 21); // Limit to 21 images
-                                }
-                            }
-                        }
-                    } catch (err) {
-                        console.warn("Failed to fetch additional images:", err);
-                    }
-                }
-
-                // Add thumbnail as first image if available
-                if (details.thumbnail && !images.includes(details.thumbnail)) {
-                    images.unshift(details.thumbnail);
-                }
+                const images = await this.getBirdCarouselImages(bird, details);
 
                 let carouselHTML = '';
                 if (images.length > 0) {
                     carouselHTML = `
                         <div class="carousel">
                             <div class="carousel-inner">
-                                ${images.map((src, idx) => `
+                                ${images.map((image, idx) => `
                                     <div class="carousel-item ${idx === 0 ? 'active' : ''}">
-                                        <img src="${src}" alt="${bird.name}" class="carousel-image" loading="lazy">
+                                        <img src="${this.escapeHtml(image.url)}" alt="${this.escapeHtml(bird.name)}" class="carousel-image" loading="lazy">
+                                        <div class="carousel-source">
+                                            ${image.pageUrl
+                                                ? `<a href="${this.escapeHtml(image.pageUrl)}" target="_blank" rel="noopener noreferrer">${this.escapeHtml(image.source)}</a>`
+                                                : this.escapeHtml(image.source)}
+                                        </div>
                                     </div>
                                 `).join('')}
                             </div>
@@ -9227,6 +9566,24 @@
                                 alt="eBird Logo" class="link-icon">
                             View on eBird
                         </a>
+                        ${catalogueOfLifeUrl ? `
+                            <a href="${this.escapeHtml(catalogueOfLifeUrl)}" target="_blank" rel="noopener noreferrer" class="external-link">
+                                <i class="fa-solid fa-list-check link-icon-fallback" aria-hidden="true"></i>
+                                View on Catalogue of Life
+                            </a>
+                        ` : ''}
+                        ${gbifSpeciesUrl ? `
+                            <a href="${this.escapeHtml(gbifSpeciesUrl)}" target="_blank" rel="noopener noreferrer" class="external-link">
+                                <i class="fa-solid fa-database link-icon-fallback" aria-hidden="true"></i>
+                                View on GBIF
+                            </a>
+                        ` : ''}
+                        ${eolSpeciesUrl ? `
+                            <a href="${this.escapeHtml(eolSpeciesUrl)}" target="_blank" rel="noopener noreferrer" class="external-link">
+                                <i class="fa-solid fa-leaf link-icon-fallback" aria-hidden="true"></i>
+                                View on Encyclopedia of Life
+                            </a>
+                        ` : ''}
                     </div>
                 `;
 
