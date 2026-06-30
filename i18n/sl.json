@@ -639,7 +639,7 @@
   "nostr.albyText": "Podpisovalna razširitev za brskalnik.",
   "nostr.nos2xText": "Preprosta podpisovalna razširitev za brskalnik.",
   "nostr.amberText": "Podpisovalna aplikacija za Android.",
-  "nostr.signInMenu": "Prijava / vpis",
+  "nostr.signInMenu": "Ustvari ali se prijavi",
   "nostr.noPublicKeyTitle": "Nostr identiteta še ni shranjena.",
   "nostr.noPublicKeyText": "Ste novi v Nostru? Ustvarite nov ID. Ga že imate? Prijavite se s podpisovalnikom, Amberjem ali zasebnim ključem.",
   "nostr.signInButton": "Prijava z obstoječim ID-jem",
@@ -878,5 +878,10 @@
   "achievements.publishing": "Objavljanje značke na Nostr...",
   "achievements.published": "Značka je objavljena na {relays} relej(ih) in pripeta vaši Nostr identiteti.",
   "achievements.publishFailed": "Objava značke ni uspela. Preverite podpisovalnik in releje ter poskusite znova.",
-  "achievements.alreadyPublished": "Ta značka je že pripeta vaši Nostr identiteti."
+  "achievements.alreadyPublished": "Ta značka je že pripeta vaši Nostr identiteti.",
+  "detail.otherNames": "Druga imena",
+  "nostr.loggedInAsMenu": "Prijavljen kot {name}",
+  "detail.moreOtherNames": "Prikaži še {count} imen",
+  "detail.scientificSynonym": "Znanstvena sopomenka",
+  "search.matchedOtherName": "Ujemanje z drugim imenom: {name} ({language})"
 }

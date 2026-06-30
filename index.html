@@ -204,13 +204,17 @@
                                     <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
                                 </a>
                                 <button class="menu-page-link menu-action-button" id="nostr-key-settings" type="button">
-                                    <span><i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i> <span data-i18n="nostr.signInMenu">Sign in / log in</span></span>
+                                    <span><i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i> <span id="nostr-menu-login-label" data-i18n="nostr.signInMenu">Sign or log in</span></span>
                                     <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
                                 </button>
                                 <button class="menu-page-link menu-action-button" id="nostr-achievements-settings" type="button">
                                     <span><i class="fa-solid fa-award" aria-hidden="true"></i> <span data-i18n="achievements.menu">Achievements</span></span>
                                     <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
                                 </button>
+                                <a class="menu-page-link" href="featheration.html#check-others">
+                                    <span><i class="fa-solid fa-user-group" aria-hidden="true"></i> <span data-i18n="featheration.checkOthers">Check others</span></span>
+                                    <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -934,6 +938,9 @@
             this.wikipediaSitelinkCache = new Map(); // Caches Wikidata language links so localized Wikipedia pages are resolved exactly once per species/language.
             this.birdImageProviderCache = new Map(); // Caches multi-source carousel images per scientific name during the browser session.
             this.localBirdThumbnailExistsCache = new Map(); // Avoids repeated local thumbnail existence checks for modal carousel images.
+            this.otherNamesBySciName = new Map(); // Optional alternate names loaded from data/otherNames.txt for search and modal synonyms.
+            this.otherNamesSearchIndex = []; // Flattened alternate-name records used after normal language search.
+            this.otherNamesLoadPromise = null; // Shares the optional alternate-name file request.
             this.catalogueOfLifeLinkCache = new Map(); // Caches Catalogue of Life taxon links resolved through ChecklistBank.
             this.gbifSpeciesLinkCache = new Map(); // Caches resolved GBIF species pages so modal links do not repeatedly query GBIF.
             this.eolSpeciesLinkCache = new Map(); // Caches resolved Encyclopedia of Life pages separately from EOL carousel media.
@@ -1036,6 +1043,7 @@
             this.nostrStatus = document.getElementById('nostr-status');
             this.nostrCurrentPublic = document.getElementById('nostr-current-public');
             this.nostrSavedPublicKey = document.getElementById('nostr-saved-public-key');
+            this.nostrMenuLoginLabel = document.getElementById('nostr-menu-login-label');
             this.nostrProfileAvatar = document.getElementById('nostr-profile-avatar');
             this.nostrProfileName = document.getElementById('nostr-profile-name');
             this.nostrProfileNip05 = document.getElementById('nostr-profile-nip05');
@@ -1431,6 +1439,7 @@
 
                 // Load English first so untranslated fallbacks can be identified reliably.
                 await this.loadBirdData('en'); // Pass language parameter
+                await this.loadOtherNamesData();
 
                 // Load available languages (after main content is loaded)
                 await this.loadAvailableLanguages();
@@ -2870,6 +2879,17 @@
             if (this.nostrProfileNip05) {
                 this.nostrProfileNip05.hidden = !isLoggedIn || !nip05;
                 this.nostrProfileNip05.textContent = isLoggedIn ? nip05 : '';
+            }
+            if (this.nostrMenuLoginLabel) {
+                if (isLoggedIn) {
+                    this.nostrMenuLoginLabel.removeAttribute('data-i18n');
+                    this.nostrMenuLoginLabel.textContent = this.t('nostr.loggedInAsMenu', {
+                        name: displayName || this.shortenNostrKey(savedPublicKey)
+                    });
+                } else {
+                    this.nostrMenuLoginLabel.setAttribute('data-i18n', 'nostr.signInMenu');
+                    this.nostrMenuLoginLabel.textContent = this.t('nostr.signInMenu');
+                }
             }
             if (this.nostrNewUser) this.nostrNewUser.hidden = isLoggedIn;
             if (isLoggedIn) {
@@ -4952,7 +4972,9 @@
 
                             bird.apiData = {
                                 id: taxon.id,
-                                scientific_name: taxon.name,
+                                // Keep the Birds.name/BirdNET scientific name canonical; iNaturalist may return accepted synonyms.
+                                scientific_name: bird.latin,
+                                provider_scientific_name: taxon.name,
                                 rank: taxon.rank,
                                 common_name: taxon.preferred_common_name,
                                 description: taxon.wikipedia_summary || "",
@@ -6451,6 +6473,12 @@
 
             // Include both Latin and translated name in search text
             const searchText = `${bird.latin} ${bird.name}`.toLowerCase();
+            const otherNameMatchHtml = bird.otherNameMatch
+                ? `<p class="bird-other-name-match">${this.escapeHtml(this.t('search.matchedOtherName', {
+                    name: bird.otherNameMatch.name,
+                    language: bird.otherNameMatch.languageLabel || bird.otherNameMatch.code || this.t('common.unknown')
+                }))}</p>`
+                : '';
             
             card.innerHTML = `
                 <div class="bird-image-container">
@@ -6467,6 +6495,7 @@
                 <div class="bird-info">
                     <h2 class="bird-name">${this.escapeHtml(bird.name)}</h2>
                     <p class="bird-latin">${this.escapeHtml(bird.latin)}</p>
+                    ${otherNameMatchHtml}
                 </div>
             `;
 
@@ -9137,7 +9166,7 @@
 
         async getBirdCarouselImages(bird, details = {}) {
             // Build the bird-modal carousel from local and public media providers without letting one failed provider block the modal.
-            const cacheKey = this.observationKey(details.scientific_name || bird.latin);
+            const cacheKey = this.observationKey(bird.latin);
             if (this.birdImageProviderCache.has(cacheKey)) {
                 return this.birdImageProviderCache.get(cacheKey);
             }
@@ -9170,7 +9199,9 @@
 
         async getLocalBirdCarouselImage(bird) {
             // Use the generated local thumbnail first when it exists, so the modal has a fast same-origin image.
-            const imageUrl = `data/bird-images/thumbnails/${encodeURIComponent(this.localBirdImageKey(bird.latin))}.webp`;
+            const imageKey = this.localBirdImageKey(bird.latin);
+            if (!imageKey) return [];
+            const imageUrl = `data/bird-images/thumbnails/${encodeURIComponent(imageKey)}.webp`;
             const exists = await this.localBirdThumbnailExists(imageUrl);
             return exists
                 ? [{ url: imageUrl, source: 'Birds.name local thumbnail', pageUrl: '' }]
@@ -9405,16 +9436,18 @@
                 }
 
                 const details = bird.apiData;
+                const canonicalScientificName = bird.latin;
+                const otherNamesDetailHtml = this.renderOtherNamesDetailGroup(canonicalScientificName, details);
                 // Load the small alphabetical IUCN detail file only when this bird is opened.
-                await this.loadLocalIucnDetail(details.scientific_name || bird.latin);
+                await this.loadLocalIucnDetail(canonicalScientificName);
                 const iucnAssessment = this.localIucnDetails.get(
-                    (details.scientific_name || bird.latin).toLowerCase()
+                    canonicalScientificName.toLowerCase()
                 );
                 const iucnSourceUrl = iucnAssessment?.url || details.conservation_status?.url || '';
                 const [catalogueOfLifeUrl, gbifSpeciesUrl, eolSpeciesUrl] = await Promise.all([
-                    this.getCatalogueOfLifeSpeciesUrl(details.scientific_name || bird.latin),
-                    this.getGbifSpeciesUrl(details.scientific_name || bird.latin),
-                    this.getEolSpeciesUrl(details.scientific_name || bird.latin)
+                    this.getCatalogueOfLifeSpeciesUrl(canonicalScientificName),
+                    this.getGbifSpeciesUrl(canonicalScientificName),
+                    this.getEolSpeciesUrl(canonicalScientificName)
                 ]);
 
                 // Fetch located recent observations for the modal navigator.
@@ -9476,7 +9509,7 @@
                     <div class="modal-details">
                         <div class="detail-group">
                             <div class="detail-label">${this.escapeHtml(this.t('detail.latinName'))}</div>
-                            <div class="detail-value">${details.scientific_name || bird.latin}</div>
+                            <div class="detail-value">${canonicalScientificName}</div>
                         </div>
                         <div class="detail-group">
                             <div class="detail-label">${this.escapeHtml(this.t('detail.commonName'))}</div>
@@ -9488,6 +9521,7 @@
                             </div>
                             <div class="detail-value">${bird.name}</div>
                         </div>
+                        ${otherNamesDetailHtml}
                     ${eBirdDetails ?
                         `<div class="ebird-details">
                             <div class="detail-group">
@@ -9499,7 +9533,7 @@
 
                         ${this.renderConservationDetails(
                             details.conservation_status,
-                            details.scientific_name || bird.latin
+                            canonicalScientificName
                         )}
                     </div>
 
@@ -9507,7 +9541,7 @@
                         ${this.renderBirdDescriptionSection(birdDescription, bird)}
                     </div>
                     ${this.renderIucnAssessmentDetails(
-                        details.scientific_name || bird.latin,
+                        canonicalScientificName,
                         iucnAssessment
                     )}
 
@@ -9601,6 +9635,70 @@
                     </div>
                 `;
             }
+        }
+
+        getOtherScientificNames(canonicalScientificName, details = {}) {
+            // Collect provider-returned scientific synonyms without changing the canonical BirdNET/lang-file species name.
+            const canonical = this.observationKey(canonicalScientificName);
+            return [...new Set([
+                details.provider_scientific_name,
+                details.accepted_scientific_name
+            ]
+                .map(name => String(name || '').trim())
+                .filter(name => name && this.observationKey(name) !== canonical))];
+        }
+
+        renderOtherNamesDetailGroup(canonicalScientificName, details = {}) {
+            // Render alternate scientific and common names as a standalone collapsible detail group.
+            const entries = [
+                ...this.getOtherScientificNames(canonicalScientificName, details).map(name => ({
+                    name,
+                    meta: this.t('detail.scientificSynonym')
+                })),
+                ...(this.otherNamesBySciName.get(this.observationKey(canonicalScientificName)) || []).map(entry => ({
+                    name: entry.name,
+                    meta: this.getOtherNameLanguageLabel(entry.code)
+                }))
+            ];
+            const uniqueEntries = [];
+            const seen = new Set();
+            entries.forEach(entry => {
+                const key = `${this.normalizeSearchText(entry.name)}|${entry.meta}`;
+                if (!entry.name || seen.has(key)) return;
+                seen.add(key);
+                uniqueEntries.push(entry);
+            });
+            if (!uniqueEntries.length) return '';
+
+            const visibleEntries = uniqueEntries.slice(0, 3);
+            const hiddenEntries = uniqueEntries.slice(3);
+            const renderEntry = entry => `
+                <li>
+                    <span class="detail-other-name-text">${this.escapeHtml(entry.name)}</span>
+                    <small>${this.escapeHtml(entry.meta)}</small>
+                </li>
+            `;
+
+            return `
+                <div class="detail-group detail-other-names-group">
+                    <div class="detail-label">${this.escapeHtml(this.t('detail.otherNames'))}</div>
+                    <div class="detail-value detail-other-names">
+                        <ul class="detail-other-names-list detail-other-names-list-visible">
+                            ${visibleEntries.map(renderEntry).join('')}
+                        </ul>
+                        ${hiddenEntries.length ? `
+                            <details class="detail-other-names-more">
+                                <summary>${this.escapeHtml(this.t('detail.moreOtherNames', {
+                                    count: this.formatInterfaceNumber(hiddenEntries.length)
+                                }))}</summary>
+                                <ul class="detail-other-names-list">
+                                    ${hiddenEntries.map(renderEntry).join('')}
+                                </ul>
+                            </details>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
         }
 
         escapeHtml(text) {
@@ -9782,6 +9880,10 @@
                 this.filteredBirds = languageBirds.filter(bird =>
                     this.normalizeSearchText(bird.searchText).includes(searchTerm)
                 );
+                const otherNameMatches = this.searchOtherNames(searchTerm, this.filteredBirds, languageBirds);
+                if (otherNameMatches.length) {
+                    this.filteredBirds = [...this.filteredBirds, ...otherNameMatches];
+                }
             }
 
             // --- Step 3: show current-language results immediately ---
@@ -9845,6 +9947,33 @@
                 const latin = this.normalizeSearchText(bird.latin);
                 return latin === term || latin.includes(term);
             });
+        }
+
+        searchOtherNames(searchTerm, currentResults = [], languageBirds = []) {
+            // Add optional alternate-name matches after the normal selected-language search has run.
+            const term = this.normalizeSearchText(searchTerm);
+            if (!term || this.otherNamesSearchIndex.length === 0) return [];
+            const currentKeys = new Set(currentResults.map(bird => this.observationKey(bird.latin)));
+            const languageBirdsByKey = new Map(languageBirds.map(bird => [this.observationKey(bird.latin), bird]));
+            const matches = [];
+            const seen = new Set(currentKeys);
+            this.otherNamesSearchIndex.forEach(entry => {
+                if (!entry.normalizedName.includes(term)) return;
+                const key = this.observationKey(entry.scientificName);
+                if (seen.has(key)) return;
+                const bird = languageBirdsByKey.get(key) || this.allBirdsBySciName.get(key);
+                if (!bird) return;
+                seen.add(key);
+                matches.push({
+                    ...bird,
+                    otherNameMatch: {
+                        name: entry.name,
+                        code: entry.code,
+                        languageLabel: entry.languageLabel
+                    }
+                });
+            });
+            return matches;
         }
 
         disableLoadMoreButtonTemporarily() {
@@ -10132,13 +10261,6 @@
             });
         }
 
-        // Add this helper method to get alternative names for a bird
-        getAlternativeNames(latinName) {
-            // This would need to be implemented to fetch names from other language files
-            // For now, return empty string - you'll need to implement this properly
-            return "";
-        }
-
         // Change language immediately and repeat the user's existing search.
         async switchToLanguage(langCode, searchTerm = '') {
             const preservedSearchTerm = searchTerm || this.searchInput.value;
@@ -10245,6 +10367,146 @@
                 console.warn(`Failed to load ${langCode} data, using demo data:`, error);
                 await this.loadDemoData();
             }
+        }
+
+        async loadOtherNamesData() {
+            // Load optional alternate species names without requiring the file to exist in every deployment.
+            if (this.otherNamesLoadPromise) return this.otherNamesLoadPromise;
+            this.otherNamesLoadPromise = fetch('data/otherNames.txt', { cache: 'no-cache' })
+                .then(async response => {
+                    if (!response.ok) return;
+                    this.parseOtherNamesData(await response.text());
+                })
+                .catch(error => {
+                    console.info('Optional data/otherNames.txt was not loaded:', error);
+                });
+            return this.otherNamesLoadPromise;
+        }
+
+        parseOtherNamesData(text) {
+            // Convert rows like Latin_English-Alias(code) or Latin_English-Alias (Language) into lookup maps.
+            const bySciName = new Map();
+            const searchIndex = [];
+            String(text || '').split(/\r?\n/).forEach(line => {
+                const trimmed = line.trim();
+                if (!trimmed || !trimmed.includes('_')) return;
+                const separatorIndex = trimmed.indexOf('_');
+                const scientificName = trimmed.slice(0, separatorIndex).trim();
+                const aliasText = trimmed.slice(separatorIndex + 1).trim();
+                const speciesKey = this.observationKey(scientificName);
+                const bird = this.allBirdsBySciName.get(speciesKey);
+                if (!scientificName || !bird || !aliasText) return;
+
+                const entries = this.parseOtherNameEntries(aliasText);
+                const uniqueEntries = [];
+                const seen = new Set();
+                entries.forEach(entry => {
+                    const normalizedName = this.normalizeSearchText(entry.name);
+                    if (!normalizedName || seen.has(`${normalizedName}|${entry.code}`)) return;
+                    seen.add(`${normalizedName}|${entry.code}`);
+                    uniqueEntries.push(entry);
+                    searchIndex.push({
+                        scientificName,
+                        name: entry.name,
+                        code: entry.code,
+                        languageLabel: this.getOtherNameLanguageLabel(entry.code),
+                        normalizedName
+                    });
+                });
+                if (uniqueEntries.length) bySciName.set(speciesKey, uniqueEntries);
+            });
+            this.otherNamesBySciName = bySciName;
+            this.otherNamesSearchIndex = searchIndex;
+        }
+
+        parseOtherNameEntries(aliasText) {
+            // Parse aliases by their trailing language marker so hyphens inside names stay intact.
+            const entries = [];
+            let cursor = 0;
+            for (let index = 0; index < aliasText.length; index += 1) {
+                if (aliasText[index] !== ')') continue;
+                const nextCharacter = aliasText[index + 1] || '';
+                if (nextCharacter && nextCharacter !== '-') continue;
+
+                let depth = 0;
+                let openIndex = -1;
+                for (let probe = index; probe >= cursor; probe -= 1) {
+                    if (aliasText[probe] === ')') depth += 1;
+                    if (aliasText[probe] === '(') {
+                        depth -= 1;
+                        if (depth === 0) {
+                            openIndex = probe;
+                            break;
+                        }
+                    }
+                }
+                if (openIndex < cursor) continue;
+
+                let name = aliasText.slice(cursor, openIndex).trim();
+                if (name.startsWith('-')) name = name.slice(1).trim();
+                if (cursor === 0 && name.includes('-')) {
+                    name = name.slice(name.lastIndexOf('-') + 1).trim();
+                }
+                const code = aliasText.slice(openIndex + 1, index).trim();
+                if (name) entries.push({ name, code });
+                cursor = index + 1;
+                if (aliasText[cursor] === '-') cursor += 1;
+                index = cursor - 1;
+            }
+            return entries;
+        }
+
+        getOtherNameLanguageLabel(code) {
+            // Map compact codes and full language names from otherNames.txt to readable labels with country context.
+            const normalizedCode = this.normalizeSearchText(code).replace(/[()]/g, '').replace(/\s+/g, ' ').trim();
+            if (!normalizedCode || normalizedCode === 'unknown') return this.t('common.unknown');
+            const languageAliases = {
+                catalan: 'ca',
+                ces: 'cs',
+                czech: 'cs',
+                cze: 'cs',
+                danish: 'da',
+                deu: 'de',
+                dutch: 'nl',
+                english: 'en',
+                ger: 'de',
+                german: 'de',
+                eng: 'en',
+                esperanto: 'eo',
+                fra: 'fr',
+                french: 'fr',
+                fre: 'fr',
+                indonesian: 'id',
+                ind: 'id',
+                ita: 'it',
+                italian: 'it',
+                latvian: 'lv',
+                lav: 'lv',
+                msa: 'ms',
+                'malay macrolanguage': 'ms',
+                malay: 'ms',
+                nld: 'nl',
+                dut: 'nl',
+                epo: 'eo',
+                spa: 'es',
+                spanish: 'es',
+                srp: 'sr',
+                serbian: 'sr',
+                tur: 'tr',
+                turkish: 'tr',
+                vie: 'vi',
+                vietnamese: 'vi',
+                zho: 'zh_CN'
+            };
+            const fallbackLanguages = {
+                eo: { name: 'Esperanto', flag: '🌐', country: 'International' },
+                ms: { name: 'Malay', flag: '🇲🇾', country: 'Malaysia' }
+            };
+            const languageCode = languageAliases[normalizedCode] || normalizedCode;
+            const languageInfo = this.languageMap?.[languageCode] || this.availableLanguages?.[languageCode] || fallbackLanguages[languageCode];
+            if (languageInfo?.country) return `${languageInfo.flag || ''} ${languageInfo.name} (${languageInfo.country})`.trim();
+            if (languageInfo?.name) return `${languageInfo.flag || ''} ${languageInfo.name}`.trim();
+            return normalizedCode ? normalizedCode.toUpperCase() : this.t('common.unknown');
         }
 
         initCarousel() {

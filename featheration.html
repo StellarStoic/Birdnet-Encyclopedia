@@ -87,11 +87,15 @@
                                     <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
                                 </a>
                                 <button class="menu-page-link menu-action-button" type="button" data-index-target="#nostr-login">
-                                    <span><i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i> <span data-i18n="nostr.signInMenu">Sign in / log in</span></span>
+                                    <span><i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i> <span id="nostr-menu-login-label" data-i18n="nostr.signInMenu">Sign or log in</span></span>
                                     <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
                                 </button>
                                 <button class="menu-page-link menu-action-button" type="button" data-index-target="#nostr-achievements">
                                     <span><i class="fa-solid fa-award" aria-hidden="true"></i> <span data-i18n="achievements.menu">Achievements</span></span>
+                                    <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                                </button>
+                                <button class="menu-page-link menu-action-button" id="featheration-check-others-menu" type="button">
+                                    <span><i class="fa-solid fa-user-group" aria-hidden="true"></i> <span data-i18n="featheration.checkOthers">Check others</span></span>
                                     <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
                                 </button>
                             </div>
@@ -254,6 +258,29 @@
                     <span data-i18n="featheration.composePublish">Publish note</span>
                 </button>
             </div>
+        </div>
+    </div>
+
+    <!-- Check another Nostr user without importing their diary: only public species totals and badge awards are read. -->
+    <div class="featheration-check-modal" id="featheration-check-modal" hidden role="dialog" aria-modal="true" aria-labelledby="featheration-check-title">
+        <div class="featheration-check-card" role="document">
+            <button class="featheration-compose-close" id="featheration-check-close" type="button" aria-label="Close lookup" data-i18n-aria-label="action.close">
+                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
+            <h2 id="featheration-check-title" data-i18n="featheration.checkOthersTitle">Check another birder</h2>
+            <p class="featheration-check-intro" data-i18n="featheration.checkOthersIntro">Enter an npub, hex public key, or NIP-05 address. Birds.name will read public observed-species totals and badges from your configured relays.</p>
+            <form class="featheration-check-form" id="featheration-check-form">
+                <label for="featheration-check-identity" data-i18n="featheration.checkIdentityLabel">Nostr identity</label>
+                <div class="featheration-check-row">
+                    <input id="featheration-check-identity" type="text" autocomplete="off" spellcheck="false" placeholder="npub1... or name@example.com" data-i18n-placeholder="featheration.checkIdentityPlaceholder">
+                    <button class="featheration-primary-button" id="featheration-check-submit" type="submit">
+                        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                        <span data-i18n="featheration.checkButton">Check</span>
+                    </button>
+                </div>
+            </form>
+            <p class="featheration-check-status" id="featheration-check-status" role="status" aria-live="polite"></p>
+            <div class="featheration-check-results" id="featheration-check-results"></div>
         </div>
     </div>
 

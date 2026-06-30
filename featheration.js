@@ -25,6 +25,7 @@
             this.submenuToggles = [...document.querySelectorAll('.submenu-toggle')];
             this.themeOptions = [...document.querySelectorAll('[data-theme-value]')];
             this.menuNostrAvatar = document.getElementById('menu-nostr-avatar');
+            this.nostrMenuLoginLabel = document.getElementById('nostr-menu-login-label');
             this.status = document.getElementById('featheration-status');
             this.feed = document.getElementById('featheration-feed');
             this.feedMeta = document.getElementById('featheration-feed-meta');
@@ -61,11 +62,21 @@
             this.cloudinaryFile = document.getElementById('featheration-cloudinary-file');
             this.cloudinaryUpload = document.getElementById('featheration-cloudinary-upload');
             this.cloudinaryStatus = document.getElementById('featheration-cloudinary-status');
+            this.checkOthersMenu = document.getElementById('featheration-check-others-menu');
+            this.checkModal = document.getElementById('featheration-check-modal');
+            this.checkClose = document.getElementById('featheration-check-close');
+            this.checkForm = document.getElementById('featheration-check-form');
+            this.checkInput = document.getElementById('featheration-check-identity');
+            this.checkSubmit = document.getElementById('featheration-check-submit');
+            this.checkStatus = document.getElementById('featheration-check-status');
+            this.checkResults = document.getElementById('featheration-check-results');
             this.birdGroupOverlay = null;
             this.currentQueryLabel = 'bird topics';
             this.localFilterTerms = [];
             this.localFilterTags = [];
             this.nostrTools = null;
+            this.taxonomyByScientificName = new Map();
+            this.taxonomyPromise = null;
         }
 
         async init() {
@@ -79,6 +90,7 @@
             await this.loadLoggedInContacts();
             await this.loadBirdTerms();
             this.search('');
+            if (window.location.hash === '#check-others') this.openCheckOthersModal();
         }
 
         applyStoredTheme() {
@@ -121,12 +133,24 @@
             this.composeCancel?.addEventListener('click', () => this.closeComposeModal());
             this.composePublish?.addEventListener('click', () => this.publishComposeNote());
             this.cloudinaryUpload?.addEventListener('click', () => this.uploadComposeImageToCloudinary());
+            this.checkOthersMenu?.addEventListener('click', () => this.openCheckOthersModal());
+            this.checkClose?.addEventListener('click', () => this.closeCheckOthersModal());
+            this.checkForm?.addEventListener('submit', event => {
+                event.preventDefault();
+                this.lookupOtherBirder();
+            });
+            this.checkResults?.addEventListener('click', event => this.handleCheckResultsClick(event));
+            this.checkResults?.addEventListener('error', event => this.handleLocalBirdImageError(event), true);
+            this.checkModal?.addEventListener('click', event => {
+                if (event.target === this.checkModal) this.closeCheckOthersModal();
+            });
             this.composeModal?.addEventListener('click', event => {
                 if (event.target === this.composeModal) this.closeComposeModal();
             });
             document.addEventListener('keydown', event => {
                 if (event.key === 'Escape' && this.birdModal && !this.birdModal.hidden) this.closeBirdDetailsModal();
                 if (event.key === 'Escape' && this.composeModal && !this.composeModal.hidden) this.closeComposeModal();
+                if (event.key === 'Escape' && this.checkModal && !this.checkModal.hidden) this.closeCheckOthersModal();
             });
             window.addEventListener('message', event => this.handleBirdDetailsMessage(event));
             window.addEventListener('storage', event => {
@@ -211,21 +235,32 @@
         async updateMenuIdentity() {
             // Show the same logged-in Nostr avatar used by the encyclopedia burger menu.
             const publicHex = localStorage.getItem('birdNostrPublicKeyHex') || '';
-            if (!this.menuNostrAvatar || !this.menuToggle) return;
+            if (!this.menuToggle) return;
             if (!publicHex) {
-                this.menuNostrAvatar.hidden = true;
+                if (this.menuNostrAvatar) this.menuNostrAvatar.hidden = true;
+                if (this.nostrMenuLoginLabel) {
+                    this.nostrMenuLoginLabel.setAttribute('data-i18n', 'nostr.signInMenu');
+                    this.nostrMenuLoginLabel.textContent = this.t('nostr.signInMenu');
+                }
                 this.menuToggle.classList.remove('nostr-logged-in');
                 return;
             }
 
             const profile = this.getCachedNostrProfile(publicHex) || await this.loadAndCacheOwnProfile(publicHex);
+            const displayName = profile?.display_name || profile?.displayName || profile?.name || this.formatNpub(publicHex);
             const imageUrl = profile?.picture || profile?.image || 'img/origami_bird_B-ICO.png';
-            this.menuNostrAvatar.src = imageUrl;
-            this.menuNostrAvatar.hidden = false;
+            if (this.menuNostrAvatar) {
+                this.menuNostrAvatar.src = imageUrl;
+                this.menuNostrAvatar.hidden = false;
+                this.menuNostrAvatar.onerror = () => {
+                    this.menuNostrAvatar.src = 'img/origami_bird_B-ICO.png';
+                };
+            }
+            if (this.nostrMenuLoginLabel) {
+                this.nostrMenuLoginLabel.removeAttribute('data-i18n');
+                this.nostrMenuLoginLabel.textContent = this.t('nostr.loggedInAsMenu', { name: displayName });
+            }
             this.menuToggle.classList.add('nostr-logged-in');
-            this.menuNostrAvatar.onerror = () => {
-                this.menuNostrAvatar.src = 'img/origami_bird_B-ICO.png';
-            };
         }
 
         updateComposeAvailability() {
@@ -1292,6 +1327,406 @@
             if (event.target.closest('[data-reply]')) return this.publishReply(originalEvent, event.target.closest('[data-reply]'));
         }
 
+        openCheckOthersModal() {
+            // Open the read-only public-observations lookup without requiring the visitor to log in.
+            if (!this.checkModal) return;
+            this.closeMenu();
+            this.checkModal.hidden = false;
+            document.body.classList.add('featheration-modal-open');
+            if (this.checkStatus) this.checkStatus.textContent = '';
+            if (this.checkResults && !this.checkResults.innerHTML.trim()) {
+                this.checkResults.innerHTML = `<p class="featheration-check-empty">${this.escapeHtml(this.t('featheration.checkEmpty'))}</p>`;
+            }
+            window.setTimeout(() => this.checkInput?.focus(), 50);
+        }
+
+        closeCheckOthersModal() {
+            // Close the public-observations lookup modal.
+            if (!this.checkModal) return;
+            this.checkModal.hidden = true;
+            document.body.classList.remove('featheration-modal-open');
+        }
+
+        async lookupOtherBirder() {
+            // Resolve npub, hex, or NIP-05 and render public Birds.name species totals plus badges.
+            const identity = String(this.checkInput?.value || '').trim();
+            if (!identity) {
+                this.setCheckStatus(this.t('featheration.checkIdentityRequired'), true);
+                return;
+            }
+
+            try {
+                this.setCheckBusy(true);
+                this.setCheckStatus(this.t('featheration.checkResolving'));
+                if (this.checkResults) this.checkResults.innerHTML = '';
+                const publicHex = await this.resolveNostrIdentity(identity);
+                await this.loadNostrTools();
+                const profilePromise = this.fetchLatestProfile(publicHex).catch(() => ({}));
+                const relays = await this.getReadRelays();
+                this.setCheckStatus(this.t('featheration.checkFetching', { relays: this.formatNumber(relays.length) }));
+                const events = await this.fetchOtherBirderEvents(publicHex, relays);
+                const profile = await profilePromise;
+                const summary = this.buildOtherBirderSummary(publicHex, profile, events);
+                this.renderOtherBirderSummary(summary);
+                this.setCheckStatus(this.t('featheration.checkLoaded', {
+                    species: this.formatNumber(summary.totalSpecies),
+                    observations: this.formatNumber(summary.totalObservations)
+                }));
+            } catch (error) {
+                console.warn('Could not check Nostr birder:', error);
+                this.setCheckStatus(error?.message || this.t('featheration.checkFailed'), true);
+                if (this.checkResults) this.checkResults.innerHTML = `<p class="featheration-error">${this.escapeHtml(this.t('featheration.checkFailed'))}</p>`;
+            } finally {
+                this.setCheckBusy(false);
+            }
+        }
+
+        setCheckBusy(isBusy) {
+            // Disable the lookup form while relay queries are active.
+            if (this.checkSubmit) this.checkSubmit.disabled = Boolean(isBusy);
+            if (this.checkInput) this.checkInput.disabled = Boolean(isBusy);
+        }
+
+        setCheckStatus(message, isError = false) {
+            // Report check-others progress inside its modal.
+            if (!this.checkStatus) return;
+            this.checkStatus.textContent = message || '';
+            this.checkStatus.classList.toggle('featheration-error-text', Boolean(isError));
+        }
+
+        async resolveNostrIdentity(identity) {
+            // Accept hex public keys, npub bech32 keys, and NIP-05 names such as user@example.com.
+            const value = String(identity || '').trim();
+            if (/^[0-9a-f]{64}$/i.test(value)) return value.toLowerCase();
+            if (/^npub1/i.test(value)) {
+                const tools = await this.loadNostrTools();
+                const decoded = tools.nip19.decode(value);
+                if (decoded?.type === 'npub' && /^[0-9a-f]{64}$/i.test(decoded.data)) return decoded.data.toLowerCase();
+            }
+            if (value.includes('@')) return this.resolveNip05ToPubkey(value);
+            throw new Error(this.t('featheration.checkInvalidIdentity'));
+        }
+
+        async resolveNip05ToPubkey(nip05) {
+            // Resolve a NIP-05 identifier through its well-known nostr.json document.
+            const raw = String(nip05 || '').trim();
+            const [rawNamePart, rawDomainPart] = raw.split('@');
+            const namePart = String(rawNamePart || '').trim();
+            const domainPart = String(rawDomainPart || '').trim().toLowerCase();
+            if (!namePart || !domainPart || !/^[a-z0-9._-]+$/i.test(namePart)) {
+                throw new Error(this.t('featheration.checkInvalidIdentity'));
+            }
+            const response = await fetch(`https://${domainPart}/.well-known/nostr.json?name=${encodeURIComponent(namePart)}`, {
+                headers: { Accept: 'application/json' }
+            });
+            if (!response.ok) throw new Error(this.t('featheration.checkNip05Failed'));
+            const data = await response.json();
+            const names = data.names || {};
+            const lowerName = namePart.toLowerCase();
+            const publicHex = names[namePart] || names[lowerName] || names._ || Object.entries(names)
+                .find(([key]) => String(key).toLowerCase() === lowerName)?.[1];
+            if (!/^[0-9a-f]{64}$/i.test(publicHex || '')) throw new Error(this.t('featheration.checkNip05Failed'));
+            return publicHex.toLowerCase();
+        }
+
+        async fetchOtherBirderEvents(publicHex, relays) {
+            // Fetch only the public Birds.name observed-species summary and self-attested badge events.
+            const filters = [
+                { kinds: [30078], authors: [publicHex], '#d': ['birds.name:observed-species:v1'], limit: 12 },
+                { kinds: [8], authors: [publicHex], limit: 120 },
+                { kinds: [10008], authors: [publicHex], limit: 3 }
+            ];
+            return this.fetchEventsFromRelays(relays, filters, 6500);
+        }
+
+        buildOtherBirderSummary(publicHex, profile = {}, events = []) {
+            // Convert public Nostr app-data events into the read-only friend overview shown in the modal.
+            const latestObservedEvent = events
+                .filter(event => Number(event.kind) === 30078 && this.getEventTag(event, 'd') === 'birds.name:observed-species:v1')
+                .sort((a, b) => Number(b.created_at || 0) - Number(a.created_at || 0))[0];
+            const payload = this.parseJsonContent(latestObservedEvent?.content) || {};
+            const species = Array.isArray(payload.species) ? payload.species : [];
+            const normalizedSpecies = species
+                .map(item => this.normalizeObservedSpeciesItem(item))
+                .filter(item => item.scientificName)
+                .sort((left, right) => right.observationCount - left.observationCount || left.displayName.localeCompare(right.displayName));
+            const badges = this.extractOtherBirderBadges(events);
+            const typeStats = this.calculateOtherBirderTypeStats(normalizedSpecies);
+
+            return {
+                publicHex,
+                profile,
+                observedEvent: latestObservedEvent || null,
+                species: normalizedSpecies,
+                displayNpub: '',
+                totalSpecies: Number(payload.totalSpecies) || normalizedSpecies.length,
+                totalObservations: Number(payload.totalObservations) || normalizedSpecies.reduce((sum, item) => sum + item.observationCount, 0),
+                typeStats,
+                badges
+            };
+        }
+
+        normalizeObservedSpeciesItem(item = {}) {
+            // Merge public summary names with the selected-language local label when this browser has it.
+            const scientificName = String(item.scientificName || '').trim();
+            const record = this.birdLookupByScientificName.get(scientificName.toLowerCase()) || {};
+            const englishName = String(item.englishName || record.commonName || '').trim();
+            const localName = String(record.localName || item.localName || '').trim();
+            return {
+                scientificName,
+                englishName,
+                localName,
+                displayName: localName || englishName || scientificName,
+                observationCount: Math.max(Number(item.observationCount) || 0, 1),
+                record: { ...record, scientificName, commonName: englishName, localName }
+            };
+        }
+
+        extractOtherBirderBadges(events = []) {
+            // Match Birds.name NIP-58 award events to the local badge catalog for names and images.
+            const catalog = this.getBadgeCatalog();
+            const byId = new Map(catalog.map(badge => [badge.id, badge]));
+            const byCode = new Map(catalog.map(badge => [`${badge.track}|${badge.code}`, badge]));
+            const badges = [];
+            const seen = new Set();
+            events
+                .filter(event => Number(event.kind) === 8)
+                .sort((a, b) => Number(b.created_at || 0) - Number(a.created_at || 0))
+                .forEach(event => {
+                    const badgeRef = this.getEventTag(event, 'a') || '';
+                    const badgeId = badgeRef.split(':').slice(2).join(':');
+                    const track = this.getEventTag(event, 'achievement') || '';
+                    const code = this.getEventTag(event, 'badge_code') || '';
+                    const badge = byId.get(badgeId) || byCode.get(`${track}|${code}`);
+                    if (!badge || seen.has(badge.id)) return;
+                    seen.add(badge.id);
+                    badges.push({
+                        ...badge,
+                        eventId: event.id,
+                        awardedAt: new Date(Number(event.created_at || 0) * 1000).toISOString()
+                    });
+                });
+            return badges;
+        }
+
+        calculateOtherBirderTypeStats(species = []) {
+            // Count broad bird types from the same category heuristics used by Birds.name badges.
+            const counters = {
+                water: { key: 'water', label: this.t('nav.waterbirds'), count: 0 },
+                predator: { key: 'predator', label: this.t('nav.birdsOfPrey'), count: 0 },
+                song: { key: 'song', label: this.t('nav.songbirds'), count: 0 },
+                parrot: { key: 'parrot', label: this.t('nav.parrots'), count: 0 },
+                game: { key: 'game', label: this.t('nav.gamebirds'), count: 0 },
+                other: { key: 'other', label: this.t('featheration.checkOtherType'), count: 0 }
+            };
+            species.forEach(item => {
+                const category = this.getBirdCategory(item.record || item) || 'other';
+                counters[category].count += 1;
+            });
+            return Object.values(counters).filter(item => item.count > 0);
+        }
+
+        renderOtherBirderTypePie(typeStats = []) {
+            // Render broad observed-bird categories as a CSS pie chart with an accessible legend.
+            const total = typeStats.reduce((sum, item) => sum + item.count, 0);
+            if (!total) return '';
+            const colors = {
+                water: '#3f88c5',
+                predator: '#b84a3a',
+                song: '#65a765',
+                parrot: '#d9a441',
+                game: '#8b6fc6',
+                other: '#8a9690'
+            };
+            let cursor = 0;
+            const segments = typeStats.map(item => {
+                const start = cursor;
+                cursor += (item.count / total) * 100;
+                return `${colors[item.key] || colors.other} ${start.toFixed(3)}% ${cursor.toFixed(3)}%`;
+            }).join(', ');
+
+            return `
+                <div class="featheration-check-pie-wrap">
+                    <div class="featheration-check-pie"
+                        style="background: conic-gradient(${this.escapeHtml(segments)});"
+                        role="img"
+                        aria-label="${this.escapeHtml(this.t('featheration.checkTypeStats'))}">
+                    </div>
+                    <div class="featheration-check-pie-legend">
+                        ${typeStats.map(item => {
+                            const percent = Math.round((item.count / total) * 100);
+                            return `
+                                <span>
+                                    <i style="background:${this.escapeHtml(colors[item.key] || colors.other)}"></i>
+                                    <strong>${this.escapeHtml(item.label)}</strong>
+                                    <small>${this.escapeHtml(this.formatNumber(item.count))} · ${this.escapeHtml(String(percent))}%</small>
+                                </span>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        getBirdCategory(record = {}) {
+            // Classify observed species into broad Birds.name categories using taxonomy names and common-name fallbacks.
+            const text = this.normalizeText([
+                record.scientificName,
+                record.commonName,
+                record.localName,
+                record.order,
+                record.family,
+                record.familyComName
+            ].filter(Boolean).join(' '));
+            if (/(anseriformes|gaviiformes|podicipediformes|pelecaniformes|suliformes|charadriiformes|ardeidae|anatidae|duck|goose|swan|gull|tern|heron|egret|ibis|stork|pelican|cormorant|grebe|loon|sandpiper|plover|rail|coot)/.test(text)) return 'water';
+            if (/(accipitriformes|falconiformes|strigiformes|accipitridae|falconidae|strigidae|hawk|eagle|falcon|kite|harrier|buzzard|vulture|owl|osprey|raptor)/.test(text)) return 'predator';
+            if (/(psittaciformes|psittacidae|cockatoo|parrot|parakeet|lorikeet|lovebird|macaw|rosella)/.test(text)) return 'parrot';
+            if (/(galliformes|phasianidae|odontophoridae|numididae|megapodiidae|turkey|grouse|quail|pheasant|partridge|guineafowl|chachalaca|curassow)/.test(text)) return 'game';
+            if (/(passeriformes|warbler|sparrow|finch|thrush|flycatcher|wren|swallow|lark|tit|babbler|oriole|starling|vireo|pipit|buntting|bunting)/.test(text)) return 'song';
+            return '';
+        }
+
+        renderOtherBirderSummary(summary) {
+            // Render profile, observation totals, type stats, badges, and clickable observed species.
+            if (!this.checkResults) return;
+            const profileName = this.getProfileName(summary.profile || {}, summary.publicHex);
+            const avatar = this.getProfileImageUrl(summary.profile) || 'img/origami_bird_B-ICO.png';
+            const nip05 = this.getProfileNip05(summary.profile || {});
+            const npub = this.toNpub(summary.publicHex) || this.formatNpub(summary.publicHex);
+            this.checkResults.innerHTML = `
+                <article class="featheration-check-profile">
+                    <img src="${this.escapeHtml(avatar)}" alt="" loading="lazy">
+                    <div>
+                        <strong>${this.escapeHtml(profileName)}</strong>
+                        ${nip05 ? `<small>${this.escapeHtml(nip05)}</small>` : ''}
+                        <code>${this.escapeHtml(npub)}</code>
+                    </div>
+                </article>
+                <div class="featheration-check-metrics">
+                    <span><strong>${this.escapeHtml(this.formatNumber(summary.totalSpecies))}</strong><small>${this.escapeHtml(this.t('featheration.checkSpecies'))}</small></span>
+                    <span><strong>${this.escapeHtml(this.formatNumber(summary.totalObservations))}</strong><small>${this.escapeHtml(this.t('featheration.checkObservations'))}</small></span>
+                </div>
+                ${summary.typeStats.length ? `
+                    <section class="featheration-check-section">
+                        <h3>${this.escapeHtml(this.t('featheration.checkTypeStats'))}</h3>
+                        ${this.renderOtherBirderTypePie(summary.typeStats)}
+                    </section>
+                ` : ''}
+                ${summary.badges.length ? `
+                    <section class="featheration-check-section">
+                        <h3>${this.escapeHtml(this.t('featheration.checkAchievements'))}</h3>
+                        <div class="featheration-check-badges">
+                            ${summary.badges.map(badge => `
+                                <article class="featheration-check-badge">
+                                    <img src="${this.escapeHtml(badge.image)}" alt="${this.escapeHtml(badge.name)}" loading="lazy">
+                                    <span>${this.escapeHtml(badge.name)}</span>
+                                </article>
+                            `).join('')}
+                        </div>
+                    </section>
+                ` : ''}
+                <section class="featheration-check-section">
+                    <h3>${this.escapeHtml(this.t('featheration.checkSpeciesList'))}</h3>
+                    ${summary.species.length ? `
+                        <div class="featheration-check-species-list">
+                            ${summary.species.map(item => this.renderOtherBirderSpeciesRow(item)).join('')}
+                        </div>
+                    ` : `<p class="featheration-check-empty">${this.escapeHtml(this.t('featheration.checkNoPublicSpecies'))}</p>`}
+                </section>
+            `;
+        }
+
+        renderOtherBirderSpeciesRow(item) {
+            // Render one observed species row with a local thumbnail and a bird-modal click target.
+            return `
+                <button class="featheration-check-species" type="button" data-check-bird="${this.escapeHtml(item.scientificName)}">
+                    <img class="featheration-check-species-image bird-group-species-image"
+                        src="${this.escapeHtml(this.getLocalBirdImageUrl(item.record || item))}"
+                        alt="" loading="lazy"
+                        data-bird-image-key="${this.escapeHtml(this.localBirdImageKey(item.scientificName))}">
+                    <span>
+                        <strong>${this.escapeHtml(item.displayName)}</strong>
+                        <small>${this.escapeHtml(item.scientificName)}${item.englishName && item.englishName !== item.displayName ? ` · ${this.escapeHtml(item.englishName)}` : ''}</small>
+                    </span>
+                    <em>${this.escapeHtml(this.formatNumber(item.observationCount))}x</em>
+                </button>
+            `;
+        }
+
+        async handleCheckResultsClick(event) {
+            // Open the full bird details modal from a friend's public species list.
+            const speciesButton = event.target.closest('[data-check-bird]');
+            if (!speciesButton) return;
+            event.preventDefault();
+            await this.openBirdDetailsModal(speciesButton.dataset.checkBird);
+        }
+
+        getEventTag(event, name) {
+            // Read the first matching tag value from a Nostr event.
+            return (event?.tags || []).find(tag => tag[0] === name)?.[1] || '';
+        }
+
+        parseJsonContent(content) {
+            // Parse public app-data JSON defensively because relay content is user-controlled.
+            try {
+                return JSON.parse(content || '{}');
+            } catch (error) {
+                return null;
+            }
+        }
+
+        getBadgeCatalog() {
+            // Mirror the Birds.name badge catalog so public NIP-58 award events can be displayed without fetching definitions.
+            return [
+                ...[
+                    ['B10A', 10],
+                    ['B50A', 50],
+                    ['B100A', 100],
+                    ['B250A', 250],
+                    ['B500A', 500]
+                ].map(([code, threshold]) => ({
+                    id: `birds-name-unique-${code.toLowerCase()}`,
+                    code,
+                    track: 'unique',
+                    threshold,
+                    name: `Birds.name ${threshold} unique birds`,
+                    image: `img/badges/for_unique_bird_speciments/${code}.png`
+                })),
+                ...this.buildBadgeCategoryCatalog('water', 'Waterbirds', 'Waterbirds', [['B3W', 3], ['B7W', 7], ['B15W', 15], ['B21W', 21], ['B42W', 42]]),
+                ...this.buildBadgeCategoryCatalog('predator', 'Birds of Prey', 'Birds_of_Prey', [['B3P', 3], ['B7P', 7], ['B15P', 15], ['B21P', 21], ['B42P', 42]]),
+                ...this.buildBadgeCategoryCatalog('song', 'Songbirds', 'Songbirds', [['B3S', 3], ['B7S', 7], ['B15S', 15], ['B21S', 21], ['B42S', 42]]),
+                ...this.buildBadgeCategoryCatalog('parrot', 'Parrots', 'Parrots', [['B3P', 3], ['B7P', 7], ['B15P', 15], ['B21P', 21], ['B42P', 42]]),
+                ...this.buildBadgeCategoryCatalog('game', 'Gamebirds', 'Gamebirds', [['B3G', 3], ['B7G', 7], ['B15G', 15], ['B21G', 21], ['B42G', 42]]),
+                ...[
+                    ['B7NT', 'nt', 7],
+                    ['B5V', 'vu', 5],
+                    ['B3E', 'en', 3],
+                    ['B1C', 'cr', 1]
+                ].map(([code, status, threshold]) => ({
+                    id: `birds-name-iucn-${code.toLowerCase()}`,
+                    code,
+                    track: 'iucn',
+                    status,
+                    threshold,
+                    name: `Birds.name ${code} conservation badge`,
+                    image: `img/badges/IUCN_statuses_badges_for_seeing_volnurable_bird_species/${code}.png`
+                }))
+            ];
+        }
+
+        buildBadgeCategoryCatalog(category, title, folder, entries) {
+            // Build category badge records from the generated badge image folders.
+            return entries.map(([code, threshold]) => ({
+                id: `birds-name-${category}-${code.toLowerCase()}`,
+                code,
+                track: 'category',
+                category,
+                threshold,
+                name: `Birds.name ${threshold} ${title}`,
+                image: `img/badges/${folder}/${code}.png`
+            }));
+        }
+
         async openBirdDetailsModal(scientificName) {
             // Open the real encyclopedia bird details modal in-place through an iframe bridge.
             const cleanScientificName = String(scientificName || '').trim();
@@ -1851,6 +2286,16 @@
             // Use a compact npub-like display until nostr-tools is loaded for signing.
             if (!pubkey) return 'npub...';
             return `npub…${String(pubkey).slice(-8)}`;
+        }
+
+        toNpub(pubkey) {
+            // Encode a real Nostr bech32 npub when nostr-tools has already been loaded.
+            try {
+                if (!/^[0-9a-f]{64}$/i.test(pubkey || '') || !this.nostrTools?.nip19?.npubEncode) return '';
+                return this.nostrTools.nip19.npubEncode(String(pubkey).toLowerCase());
+            } catch (error) {
+                return '';
+            }
         }
 
         eventDate(event) {

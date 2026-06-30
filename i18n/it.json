@@ -639,7 +639,7 @@
   "nostr.albyText": "Browser signer extension.",
   "nostr.nos2xText": "Simple browser signer extension.",
   "nostr.amberText": "Android signer app.",
-  "nostr.signInMenu": "Sign in / log in",
+  "nostr.signInMenu": "Sign or log in",
   "nostr.noPublicKeyTitle": "No Nostr identity saved yet.",
   "nostr.noPublicKeyText": "New to Nostr? Generate a new ID. Already have one? Log in with a signer, Amber, or your private key.",
   "nostr.signInButton": "Log in with existing ID",
@@ -878,5 +878,10 @@
   "achievements.publishing": "Publishing badge to Nostr...",
   "achievements.published": "Badge published to {relays} relay(s) and attached to your Nostr ID.",
   "achievements.publishFailed": "Badge publishing failed. Check your signer and relays, then try again.",
-  "achievements.alreadyPublished": "This badge is already attached to your Nostr ID."
+  "achievements.alreadyPublished": "This badge is already attached to your Nostr ID.",
+  "detail.otherNames": "Other names",
+  "nostr.loggedInAsMenu": "Logged in as {name}",
+  "detail.moreOtherNames": "Show {count} more names",
+  "detail.scientificSynonym": "Scientific synonym",
+  "search.matchedOtherName": "Matched other name: {name} ({language})"
 }
