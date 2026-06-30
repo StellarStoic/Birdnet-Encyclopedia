@@ -938,6 +938,8 @@
             this.wikipediaSitelinkCache = new Map(); // Caches Wikidata language links so localized Wikipedia pages are resolved exactly once per species/language.
             this.birdImageProviderCache = new Map(); // Caches multi-source carousel images per scientific name during the browser session.
             this.localBirdThumbnailExistsCache = new Map(); // Avoids repeated local thumbnail existence checks for modal carousel images.
+            this.defaultExcludedLabelSpeciesNames = [];
+            this.excludedLabelSpeciesNames = new Set(); // Hidden non-bird labels loaded from lang/labels_to_ignore.txt.
             this.otherNamesBySciName = new Map(); // Optional alternate names loaded from data/otherNames.txt for search and modal synonyms.
             this.otherNamesSearchIndex = []; // Flattened alternate-name records used after normal language search.
             this.otherNamesLoadPromise = null; // Shares the optional alternate-name file request.
@@ -1432,6 +1434,7 @@
 
 
                 // Load taxonomy first so every bird receives automatic order and family metadata.
+                await this.loadExcludedLabelSpeciesNames();
                 await this.loadEBirdTaxonomy();
 
                 // Prefer locally generated official IUCN records over visitor-side API lookups.
@@ -1707,7 +1710,10 @@
             if (langCode === 'en') {
                 validEntries = lines.filter(line => {
                     const parts = line.split('_');
-                    return parts.length >= 2 && parts[0].trim() && parts[1].trim();
+                    return parts.length >= 2
+                        && parts[0].trim()
+                        && parts[1].trim()
+                        && !this.isExcludedLabelSpecies(parts[0].trim(), parts.slice(1).join('_').trim());
                 }).length;
                 
                 console.log(`English file: ${validEntries} valid entries`);
@@ -1725,6 +1731,7 @@
                 if (parts.length >= 2) {
                     const latinName = parts[0].trim();
                     const translatedName = parts.slice(1).join('_').trim();
+                    if (this.isExcludedLabelSpecies(latinName, translatedName)) return;
                     
                     if (!this.isEnglishFallback(translatedName, latinName)) {
                         translatedCount++;
@@ -1842,6 +1849,60 @@
             
             // console.log(`Result: ${isEnglish ? 'ENGLISH' : 'TRANSLATED'}`);
             return isEnglish;
+        }
+
+        normalizeLabelSpeciesName(value = '') {
+            // Normalize label-file names for exact non-bird exclusions across languages and punctuation variants.
+            return String(value || '')
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, ' ')
+                .trim()
+                .replace(/\s+/g, ' ');
+        }
+
+        createExcludedLabelSpeciesSet(names = []) {
+            // Build a normalized ignore set from maintainable label names.
+            return new Set(names.map(name => this.normalizeLabelSpeciesName(name)).filter(Boolean));
+        }
+
+        parseExcludedLabelSpeciesLines(text = '') {
+            // Support plain names and copied label rows such as "Noise_Noise" in labels_to_ignore.txt.
+            return String(text || '')
+                .split(/\r?\n/)
+                .flatMap(line => {
+                    const cleanLine = line.replace(/#.*/, '').trim();
+                    if (!cleanLine) return [];
+                    const separator = cleanLine.indexOf('_');
+                    if (separator < 0) return [cleanLine];
+                    return [
+                        cleanLine.slice(0, separator).trim(),
+                        cleanLine.slice(separator + 1).trim()
+                    ].filter(Boolean);
+                });
+        }
+
+        async loadExcludedLabelSpeciesNames() {
+            // Load ignored non-bird labels from lang/labels_to_ignore.txt.
+            try {
+                const response = await fetch('lang/labels_to_ignore.txt', { cache: 'no-cache' });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const names = this.parseExcludedLabelSpeciesLines(await response.text());
+                this.excludedLabelSpeciesNames = this.createExcludedLabelSpeciesSet([
+                    ...this.defaultExcludedLabelSpeciesNames,
+                    ...names
+                ]);
+            } catch (error) {
+                console.warn('Could not load lang/labels_to_ignore.txt; no label exclusions were applied:', error);
+            }
+        }
+
+        isExcludedLabelSpecies(latinName, commonName = '') {
+            // Treat exact known non-bird label rows as hidden data, without changing upstream language files.
+            const excluded = this.excludedLabelSpeciesNames || this.createExcludedLabelSpeciesSet(this.defaultExcludedLabelSpeciesNames);
+            return excluded.has(this.normalizeLabelSpeciesName(latinName))
+                || excluded.has(this.normalizeLabelSpeciesName(commonName));
         }
         
         containsNonLatinCharacters(text) {
@@ -1995,6 +2056,7 @@
                 if (parts.length >= 2) {
                     const latin = parts[0].trim();
                     const translatedName = parts.slice(1).join('_').trim();
+                    if (this.isExcludedLabelSpecies(latin, translatedName)) return;
                     translationMap.set(latin, translatedName);
                 }
             });
@@ -2041,6 +2103,7 @@
                 if (parts.length >= 2) {
                     const latin = parts[0].trim();
                     const englishName = parts.slice(1).join('_').trim();
+                    if (this.isExcludedLabelSpecies(latin, englishName)) return;
                     
                     // Find the original bird to get complete data
                     const originalBird = this.birds.find(b => b.latin === latin);
@@ -2141,6 +2204,10 @@
                     return latin === normalizedLatin;
                 });
                 const translatedName = line?.split('_').slice(1).join('_').trim() || '';
+                if (this.isExcludedLabelSpecies(latinName, translatedName)) {
+                    this.localizedNameCache.set(cacheKey, '');
+                    return '';
+                }
                 const localName = translatedName && !this.isEnglishFallback(translatedName, latinName)
                     ? translatedName
                     : '';
@@ -3616,18 +3683,12 @@
 
         getDefaultNostrPublishRelays() {
             // Hardcoded publish fallbacks are optional and visible in relay settings.
-            return ['wss://relay.damus.io', 'wss://nos.lol', 'wss://relay.primal.net', 'wss://relay.nostr.band'];
+            return ['wss://relay.damus.io', 'wss://nos.lol', 'wss://relay.primal.net', 'wss://nostr.mom', 'wss://relay.snort.social', 'wss://offchain.pub'];
         }
 
         getDefaultNostrProfileRelays() {
-            // Profile lookup defaults include profile-heavy relays as optional fallbacks.
-            return [
-                'wss://purplepag.es',
-                'wss://relay.damus.io',
-                'wss://nos.lol',
-                'wss://relay.primal.net',
-                'wss://relay.snort.social'
-            ];
+            // Profile metadata and avatars are intentionally looked up through Purple Pages.
+            return ['wss://purplepag.es'];
         }
 
         shouldUseNostrDefaultRelays() {
@@ -4316,19 +4377,8 @@
         }
 
         async getNostrProfileRelays() {
-            // Prefer personal and signer relays, then optional app defaults for profile lookup.
-            const personalRelays = this.getNostrPersonalRelays();
-            const signerRelays = [];
-            try {
-                if (window.nostr?.getRelays) {
-                    const relays = await window.nostr.getRelays();
-                    signerRelays.push(...Object.keys(relays || {}).filter(url => /^wss:\/\//i.test(url)));
-                }
-            } catch (error) {
-                console.warn('Could not read Nostr signer relays:', error);
-            }
-            const defaultRelays = this.shouldUseNostrDefaultRelays() ? this.getDefaultNostrProfileRelays() : [];
-            return [...new Set([...personalRelays, ...signerRelays, ...defaultRelays])].slice(0, 12);
+            // Keep profile metadata separate from note relays by using Purple Pages only.
+            return this.getDefaultNostrProfileRelays();
         }
 
         fetchLatestNostrMetadataEvent(publicHex, relays) {
@@ -6426,6 +6476,7 @@
                 const parts = line.split('_');
                 if (parts.length < 2) {
                     const latin = line.trim();
+                    if (this.isExcludedLabelSpecies(latin)) return null;
                     return {
                         latin,
                         name: latin,
@@ -6437,6 +6488,7 @@
                 
                 const latin = parts[0].trim();
                 const name = parts.slice(1).join('_').trim();
+                if (this.isExcludedLabelSpecies(latin, name)) return null;
                 
                 return {
                     latin,
@@ -6445,7 +6497,7 @@
                     taxonomy: this.taxonomyBySciName.get(latin.toLowerCase()) || null,
                     conservationStatus: this.getLocalIucnStatus(latin)
                 };
-            });
+            }).filter(Boolean);
         }
         
         async loadDemoData() {
@@ -10040,6 +10092,7 @@
                         if (parts.length >= 2) {
                             const latin = parts[0].trim();
                             const translatedName = parts.slice(1).join('_').trim();
+                            if (this.isExcludedLabelSpecies(latin, translatedName)) return;
                             const englishName = this.getEnglishBirdName(latin);
 
                             // Ignore untranslated English fallbacks and names already visible in local results.

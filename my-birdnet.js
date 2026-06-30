@@ -116,6 +116,8 @@ class MyBirdNETDashboard {
         this.meteostatRequestChain = Promise.resolve();
         this.currentLanguage = localStorage.getItem('birdEncyclopediaLanguage') || 'en';
         this.currentTheme = localStorage.getItem('birdEncyclopediaTheme') || 'forest';
+        this.defaultExcludedLabelSpeciesNames = [];
+        this.excludedLabelSpeciesNames = this.createExcludedLabelSpeciesSet(this.defaultExcludedLabelSpeciesNames);
         document.body.dataset.theme = this.currentTheme;
         this.themeSelect.value = this.currentTheme;
         this.loadFavouriteStations();
@@ -124,8 +126,9 @@ class MyBirdNETDashboard {
         this.bindEvents();
         this.initializeChartSnapshots();
         this.initializeWeatherIcons();
+        this.excludedLabelsPromise = this.loadExcludedLabelSpeciesNames();
         this.taxonomyPromise = this.loadTaxonomy();
-        this.languagePromise = this.loadPreferredLanguage();
+        this.languagePromise = this.excludedLabelsPromise.then(() => this.loadPreferredLanguage());
         this.restorePromise = this.restorePersistedFile();
         this.stationCachePromise = this.loadStationCacheMetadata();
         document.addEventListener('bird-i18n-change', () => this.refreshTranslatedInterface());
@@ -525,8 +528,11 @@ class MyBirdNETDashboard {
                 text.split(/\r?\n/)
                     .map(line => {
                         const separator = line.indexOf('_');
+                        const scientificName = separator > 0 ? line.slice(0, separator).trim() : '';
+                        const commonName = separator > 0 ? line.slice(separator + 1).trim() : '';
+                        if (this.isExcludedLabelSpecies(scientificName, commonName)) return null;
                         return separator > 0
-                            ? [line.slice(0, separator).trim().toLowerCase(), line.slice(separator + 1).trim()]
+                            ? [scientificName.toLowerCase(), commonName]
                             : null;
                     })
                     .filter(item => item?.[0] && item?.[1])
@@ -893,6 +899,7 @@ class MyBirdNETDashboard {
                 const commonName = String(row[0] || '').trim();
                 if (!date || !commonName) return null;
                 const taxonomy = this.taxonomyByCommonName.get(commonName.toLowerCase()) || null;
+                if (this.isExcludedLabelSpecies(taxonomy?.sciName || commonName, commonName)) return null;
 
                 return {
                     date,
@@ -922,6 +929,7 @@ class MyBirdNETDashboard {
         const date = this.parseDate(dateValue, timeValue);
 
         if (!date || (!scientificName && !commonName)) return null;
+        if (this.isExcludedLabelSpecies(scientificName || commonName, commonName)) return null;
 
         const taxonomy = scientificName
             ? this.taxonomy.get(scientificName.toLowerCase()) || null
@@ -1113,6 +1121,60 @@ class MyBirdNETDashboard {
                 commonName: translatedName || sourceCommonName || observation.scientificName
             };
         });
+    }
+
+    normalizeLabelSpeciesName(value = '') {
+        // Normalize BirdNET labels so non-bird exclusions work across punctuation variants.
+        return String(value || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, ' ')
+            .trim()
+            .replace(/\s+/g, ' ');
+    }
+
+    createExcludedLabelSpeciesSet(names = []) {
+        // Build a normalized ignore set from maintainable label names.
+        return new Set(names.map(name => this.normalizeLabelSpeciesName(name)).filter(Boolean));
+    }
+
+    parseExcludedLabelSpeciesLines(text = '') {
+        // Support plain names and copied label rows such as "Noise_Noise" in labels_to_ignore.txt.
+        return String(text || '')
+            .split(/\r?\n/)
+            .flatMap(line => {
+                const cleanLine = line.replace(/#.*/, '').trim();
+                if (!cleanLine) return [];
+                const separator = cleanLine.indexOf('_');
+                if (separator < 0) return [cleanLine];
+                return [
+                    cleanLine.slice(0, separator).trim(),
+                    cleanLine.slice(separator + 1).trim()
+                ].filter(Boolean);
+            });
+    }
+
+    async loadExcludedLabelSpeciesNames() {
+        // Load ignored non-bird labels from lang/labels_to_ignore.txt.
+        try {
+            const response = await fetch('lang/labels_to_ignore.txt', { cache: 'no-cache' });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const names = this.parseExcludedLabelSpeciesLines(await response.text());
+            this.excludedLabelSpeciesNames = this.createExcludedLabelSpeciesSet([
+                ...this.defaultExcludedLabelSpeciesNames,
+                ...names
+            ]);
+        } catch (error) {
+            console.warn('Could not load lang/labels_to_ignore.txt; no label exclusions were applied:', error);
+        }
+    }
+
+    isExcludedLabelSpecies(scientificName, commonName = '') {
+        // Treat exact known non-bird rows as hidden data without changing upstream label files.
+        const excluded = this.excludedLabelSpeciesNames || this.createExcludedLabelSpeciesSet(this.defaultExcludedLabelSpeciesNames);
+        return excluded.has(this.normalizeLabelSpeciesName(scientificName))
+            || excluded.has(this.normalizeLabelSpeciesName(commonName));
     }
 
     createDatasetSnapshot() {
@@ -2902,6 +2964,7 @@ class MyBirdNETDashboard {
         const scientificName = String(detection.species?.scientificName || '').trim();
         const commonName = String(detection.species?.commonName || scientificName).trim();
         if (!date || !commonName) return null;
+        if (this.isExcludedLabelSpecies(scientificName || commonName, commonName)) return null;
 
         const taxonomy = scientificName
             ? this.taxonomy.get(scientificName.toLowerCase()) || null
@@ -4075,7 +4138,10 @@ class MyBirdNETDashboard {
     }
 
     calculateStatistics(observations) {
-        const totalDetections = observations.reduce((sum, observation) => sum + observation.count, 0);
+        const birdObservations = observations.filter(observation =>
+            !this.isExcludedLabelSpecies(observation.scientificName || observation.commonName, observation.commonName)
+        );
+        const totalDetections = birdObservations.reduce((sum, observation) => sum + observation.count, 0);
         const species = new Map();
         const daily = new Map();
         const weekly = new Map();
@@ -4089,7 +4155,7 @@ class MyBirdNETDashboard {
         let confidenceTotal = 0;
         let confidenceCount = 0;
 
-        observations.forEach(observation => {
+        birdObservations.forEach(observation => {
             const count = observation.count;
             const speciesKey = (observation.scientificName || observation.commonName).toLowerCase();
             const category = this.getBirdCategory(observation.taxonomy);

@@ -13,6 +13,7 @@
     const CLOUDINARY_UNSIGNED_UPLOAD_PRESET = 'birds_name_featheration_unsigned';
     const NOSTR_TOOLS_URL = 'https://esm.sh/nostr-tools@2.10.4?bundle';
     const RELAY_INFO_CACHE_KEY = 'birdFeatherationRelayInfo';
+    const RELAY_HEALTH_CACHE_KEY = 'birdFeatherationRelayHealth';
 
     class FeatherationClient {
         constructor() {
@@ -43,11 +44,20 @@
             this.engagementSummary = new Map();
             this.renderTimer = null;
             this.activeSearchToken = 0;
+            this.currentRelays = [];
+            this.currentSearchTerms = null;
+            this.oldestLoadedCreatedAt = 0;
+            this.loadingOlderNotes = false;
+            this.noMoreOlderNotes = false;
             this.lastSearchTerms = [...this.defaultTerms];
             this.birdHighlightTerms = [];
             this.birdHighlightRecords = [];
+            this.birdHighlightRecordsByToken = new Map();
+            this.otherNameTermsLoaded = false;
             this.birdLookupByScientificName = new Map();
             this.birdGroupLookup = new Map();
+            this.defaultExcludedLabelSpeciesNames = [];
+            this.excludedLabelSpeciesNames = this.createExcludedLabelSpeciesSet(this.defaultExcludedLabelSpeciesNames);
             this.birdModal = document.getElementById('featheration-bird-modal');
             this.birdModalClose = document.getElementById('featheration-bird-modal-close');
             this.birdModalTitle = document.getElementById('featheration-bird-modal-title');
@@ -88,6 +98,7 @@
             this.updateComposeAvailability();
             localStorage.removeItem('birdFeatherationLastSearch');
             await this.loadLoggedInContacts();
+            await this.loadExcludedLabelSpeciesNames();
             await this.loadBirdTerms();
             this.search('');
             if (window.location.hash === '#check-others') this.openCheckOthersModal();
@@ -147,6 +158,7 @@
             this.composeModal?.addEventListener('click', event => {
                 if (event.target === this.composeModal) this.closeComposeModal();
             });
+            window.addEventListener('scroll', () => this.handleFeedScroll(), { passive: true });
             document.addEventListener('keydown', event => {
                 if (event.key === 'Escape' && this.birdModal && !this.birdModal.hidden) this.closeBirdDetailsModal();
                 if (event.key === 'Escape' && this.composeModal && !this.composeModal.hidden) this.closeComposeModal();
@@ -248,12 +260,12 @@
 
             const profile = this.getCachedNostrProfile(publicHex) || await this.loadAndCacheOwnProfile(publicHex);
             const displayName = profile?.display_name || profile?.displayName || profile?.name || this.formatNpub(publicHex);
-            const imageUrl = profile?.picture || profile?.image || 'img/origami_bird_B-ICO.png';
+            const imageUrl = profile?.picture || profile?.image || 'img/origami_bird_B.png';
             if (this.menuNostrAvatar) {
                 this.menuNostrAvatar.src = imageUrl;
                 this.menuNostrAvatar.hidden = false;
                 this.menuNostrAvatar.onerror = () => {
-                    this.menuNostrAvatar.src = 'img/origami_bird_B-ICO.png';
+                    this.menuNostrAvatar.src = 'img/origami_bird_B.png';
                 };
             }
             if (this.nostrMenuLoginLabel) {
@@ -326,6 +338,12 @@
                     console.warn(`Could not load bird terms from ${file.url}:`, error);
                 }
             }));
+            this.applyBirdTermCollections(termSet, highlightSet, highlightRecords);
+            this.loadOtherNameBirdTermsAfterFirstPaint({ termSet, highlightSet, highlightRecords });
+        }
+
+        applyBirdTermCollections(termSet, highlightSet, highlightRecords) {
+            // Publish the current bird-name collections and rebuild the small token index used by note highlighting.
             this.birdTerms = [...termSet]
                 .filter(term => term.length >= 4)
                 .slice(0, 900);
@@ -335,7 +353,135 @@
             this.birdHighlightTerms = [...highlightSet]
                 .filter(term => term.length >= 4)
                 .sort((a, b) => b.length - a.length);
+            this.birdHighlightRecordsByToken = this.buildBirdHighlightIndex(this.birdHighlightRecords);
             this.buildBirdGroupLookup();
+        }
+
+        loadOtherNameBirdTermsAfterFirstPaint(targets) {
+            // Defer the large alternate-name file so it cannot block initial LCP or the first relay request.
+            if (this.otherNameTermsLoaded) return;
+            const start = () => {
+                this.loadOtherNameBirdTerms(targets).then(didLoad => {
+                    if (!didLoad) return;
+                    this.otherNameTermsLoaded = true;
+                    this.applyBirdTermCollections(targets.termSet, targets.highlightSet, targets.highlightRecords);
+                    if (this.lastEvents.length) this.renderFeed(this.lastEvents);
+                });
+            };
+            if ('requestIdleCallback' in window) {
+                window.requestIdleCallback(start, { timeout: 2500 });
+            } else {
+                window.setTimeout(start, 1200);
+            }
+        }
+
+        buildBirdHighlightIndex(records) {
+            // Index aliases by likely source tokens so each note checks only relevant bird names.
+            const index = new Map();
+            records.forEach(record => {
+                this.getHighlightIndexKeys(record.term).forEach(key => {
+                    if (!index.has(key)) index.set(key, []);
+                    index.get(key).push(record);
+                });
+            });
+            return index;
+        }
+
+        getHighlightIndexKeys(term) {
+            // Use first word and joined name keys; multi-word names still require full phrase matching later.
+            const normalized = this.normalizeText(term);
+            const parts = normalized.split(/\s+/).filter(Boolean);
+            const keys = new Set();
+            if (parts[0]?.length >= 3) keys.add(parts[0]);
+            const joined = parts.join('');
+            if (joined.length >= 4) keys.add(joined);
+            return [...keys];
+        }
+
+        async loadOtherNameBirdTerms(targets) {
+            // Load optional alternate bird names for Featheration highlighting without matching language labels in parentheses.
+            try {
+                const response = await fetch('data/otherNames.txt', { cache: 'no-cache' });
+                if (!response.ok) return false;
+                this.parseOtherNameBirdTerms(await response.text(), targets);
+                return true;
+            } catch (error) {
+                console.info('Optional data/otherNames.txt was not loaded for Featheration highlighting:', error);
+                return false;
+            }
+        }
+
+        parseOtherNameBirdTerms(text, targets) {
+            // Convert rows like "Latin_English-Alias (Language)" into clickable alias highlight records.
+            const { termSet, highlightSet, highlightRecords } = targets;
+            String(text || '').split(/\r?\n/).forEach(line => {
+                const trimmed = line.trim();
+                if (!trimmed || !trimmed.includes('_')) return;
+                const separatorIndex = trimmed.indexOf('_');
+                const scientificName = trimmed.slice(0, separatorIndex).trim();
+                const aliasText = trimmed.slice(separatorIndex + 1).trim();
+                const record = this.birdLookupByScientificName.get(scientificName.toLowerCase());
+                if (!scientificName || !record || !aliasText || this.isExcludedLabelSpecies(scientificName)) return;
+                const seenAliases = new Set();
+                this.parseOtherNameEntries(aliasText).forEach(entry => {
+                    const displayName = String(entry.name || '').trim();
+                    const normalizedName = this.normalizeText(displayName);
+                    if (normalizedName.length < 4 || seenAliases.has(normalizedName)) return;
+                    seenAliases.add(normalizedName);
+                    termSet.add(normalizedName);
+                    highlightSet.add(displayName);
+                    highlightSet.add(displayName.replace(/[\s_-]+/g, ''));
+                    highlightRecords.set(`${scientificName.toLowerCase()}|${normalizedName}`, {
+                        scientificName,
+                        commonName: record.commonName || '',
+                        localName: record.localName || '',
+                        term: displayName,
+                        sourceLanguage: 'otherNames'
+                    });
+                    highlightRecords.set(`${scientificName.toLowerCase()}|${normalizedName.replace(/\s+/g, '')}`, {
+                        scientificName,
+                        commonName: record.commonName || '',
+                        localName: record.localName || '',
+                        term: displayName.replace(/[\s_-]+/g, ''),
+                        sourceLanguage: 'otherNames'
+                    });
+                });
+            });
+        }
+
+        parseOtherNameEntries(aliasText) {
+            // Parse aliases by their trailing language marker so hyphens inside names stay part of the name.
+            const entries = [];
+            let cursor = 0;
+            for (let index = 0; index < aliasText.length; index += 1) {
+                if (aliasText[index] !== ')') continue;
+                const nextCharacter = aliasText[index + 1] || '';
+                if (nextCharacter && nextCharacter !== '-') continue;
+
+                let depth = 0;
+                let openIndex = -1;
+                for (let probe = index; probe >= cursor; probe -= 1) {
+                    if (aliasText[probe] === ')') depth += 1;
+                    if (aliasText[probe] === '(') {
+                        depth -= 1;
+                        if (depth === 0) {
+                            openIndex = probe;
+                            break;
+                        }
+                    }
+                }
+                if (openIndex < cursor) continue;
+
+                let name = aliasText.slice(cursor, openIndex).trim();
+                if (name.startsWith('-')) name = name.slice(1).trim();
+                if (cursor === 0 && name.includes('-')) name = name.slice(name.lastIndexOf('-') + 1).trim();
+                const language = aliasText.slice(openIndex + 1, index).trim();
+                if (name) entries.push({ name, language });
+                cursor = index + 1;
+                if (aliasText[cursor] === '-') cursor += 1;
+                index = cursor - 1;
+            }
+            return entries;
         }
 
         extractBirdTerms(labelsText) {
@@ -346,6 +492,7 @@
             const highlightRecords = [];
             labelsText.split(/\r?\n/).forEach(line => {
                 const [scientificName = '', commonName = ''] = line.split('_');
+                if (this.isExcludedLabelSpecies(scientificName, commonName)) return;
                 const baseRecord = {
                     scientificName: String(scientificName || '').trim(),
                     commonName: String(commonName || '').trim()
@@ -373,6 +520,60 @@
                 highlightTerms: [...highlightTerms],
                 highlightRecords
             };
+        }
+
+        normalizeLabelSpeciesName(value = '') {
+            // Normalize BirdNET label names so non-bird exclusions survive punctuation differences.
+            return String(value || '')
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, ' ')
+                .trim()
+                .replace(/\s+/g, ' ');
+        }
+
+        createExcludedLabelSpeciesSet(names = []) {
+            // Build a normalized ignore set from maintainable label names.
+            return new Set(names.map(name => this.normalizeLabelSpeciesName(name)).filter(Boolean));
+        }
+
+        parseExcludedLabelSpeciesLines(text = '') {
+            // Support plain names and copied label rows such as "Noise_Noise" in labels_to_ignore.txt.
+            return String(text || '')
+                .split(/\r?\n/)
+                .flatMap(line => {
+                    const cleanLine = line.replace(/#.*/, '').trim();
+                    if (!cleanLine) return [];
+                    const separator = cleanLine.indexOf('_');
+                    if (separator < 0) return [cleanLine];
+                    return [
+                        cleanLine.slice(0, separator).trim(),
+                        cleanLine.slice(separator + 1).trim()
+                    ].filter(Boolean);
+                });
+        }
+
+        async loadExcludedLabelSpeciesNames() {
+            // Load ignored non-bird labels from lang/labels_to_ignore.txt.
+            try {
+                const response = await fetch('lang/labels_to_ignore.txt', { cache: 'no-cache' });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const names = this.parseExcludedLabelSpeciesLines(await response.text());
+                this.excludedLabelSpeciesNames = this.createExcludedLabelSpeciesSet([
+                    ...this.defaultExcludedLabelSpeciesNames,
+                    ...names
+                ]);
+            } catch (error) {
+                console.warn('Could not load lang/labels_to_ignore.txt; no label exclusions were applied:', error);
+            }
+        }
+
+        isExcludedLabelSpecies(scientificName, commonName = '') {
+            // Treat exact known non-bird label rows as hidden data without changing upstream lang files.
+            const excluded = this.excludedLabelSpeciesNames || this.createExcludedLabelSpeciesSet(this.defaultExcludedLabelSpeciesNames);
+            return excluded.has(this.normalizeLabelSpeciesName(scientificName))
+                || excluded.has(this.normalizeLabelSpeciesName(commonName));
         }
 
         rememberBirdRecord(record) {
@@ -433,12 +634,17 @@
             this.renderEmpty(this.t('featheration.loading'));
             const relays = await this.getReadRelays();
             const searchTerms = this.buildSearchTerms(query);
+            this.currentRelays = relays;
+            this.currentSearchTerms = searchTerms;
+            this.oldestLoadedCreatedAt = 0;
+            this.loadingOlderNotes = false;
+            this.noMoreOlderNotes = false;
             this.lastSearchTerms = searchTerms.highlightTerms;
             this.localFilterTerms = searchTerms.localTerms;
             this.localFilterTags = searchTerms.localTags;
             try {
                 const relayPlans = await this.buildRelayPlans(relays, searchTerms);
-                const events = await this.fetchPlannedRelayEvents(relayPlans, 4500, event => {
+                const events = await this.fetchPlannedRelayEvents(relayPlans, 6500, event => {
                     if (this.activeSearchToken !== searchToken) return;
                     this.addIncomingEvent(event);
                 });
@@ -447,6 +653,7 @@
                 matchingEvents.forEach(event => this.addIncomingEvent(event, { immediate: false }));
                 const accumulatedEvents = this.sortAndDedupeEvents([...this.eventMap.values()]);
                 this.lastEvents = accumulatedEvents;
+                this.oldestLoadedCreatedAt = this.getOldestCreatedAt([...uniqueEvents, ...accumulatedEvents]);
                 this.renderFeed(accumulatedEvents);
                 this.loadProfilesForEvents(accumulatedEvents).then(() => {
                     if (this.activeSearchToken === searchToken) this.renderFeed(this.lastEvents);
@@ -461,6 +668,62 @@
                 this.renderError(this.t('featheration.loadFailed'));
                 this.setStatus(this.t('featheration.loadFailed'), true);
             }
+        }
+
+        handleFeedScroll() {
+            // Load the next older Nostr page shortly before the visitor reaches the bottom of the feed.
+            if (this.loadingOlderNotes || this.noMoreOlderNotes || !this.currentSearchTerms || !this.oldestLoadedCreatedAt) return;
+            const distanceFromBottom = document.documentElement.scrollHeight - (window.scrollY + window.innerHeight);
+            if (distanceFromBottom > 900) return;
+            this.loadOlderNotes();
+        }
+
+        async loadOlderNotes() {
+            // Fetch one older page with an `until` cursor so long lookback windows can reveal more notes.
+            if (this.loadingOlderNotes || this.noMoreOlderNotes || !this.currentSearchTerms || !this.currentRelays.length) return;
+            const searchToken = this.activeSearchToken;
+            const until = Number(this.oldestLoadedCreatedAt || 0) - 1;
+            if (until <= 0) return;
+            this.loadingOlderNotes = true;
+            this.setStatus(this.t('featheration.loading'));
+            try {
+                const relayPlans = await this.buildRelayPlans(this.currentRelays, this.currentSearchTerms, { until });
+                const beforeCount = this.eventMap.size;
+                const events = await this.fetchPlannedRelayEvents(relayPlans, 6500, event => {
+                    if (this.activeSearchToken !== searchToken) return;
+                    this.addIncomingEvent(event);
+                });
+                if (this.activeSearchToken !== searchToken) return;
+                const uniqueEvents = this.sortAndDedupeEvents(events);
+                uniqueEvents
+                    .filter(event => this.eventMatchesLocalSearch(event))
+                    .forEach(event => this.addIncomingEvent(event, { immediate: false }));
+                const accumulatedEvents = this.sortAndDedupeEvents([...this.eventMap.values()]);
+                this.lastEvents = accumulatedEvents;
+                this.oldestLoadedCreatedAt = this.getOldestCreatedAt([...uniqueEvents, ...accumulatedEvents]) || this.oldestLoadedCreatedAt;
+                if (this.eventMap.size === beforeCount && !uniqueEvents.length) this.noMoreOlderNotes = true;
+                this.renderFeed(accumulatedEvents);
+                this.loadProfilesForEvents(accumulatedEvents).then(() => {
+                    if (this.activeSearchToken === searchToken) this.renderFeed(this.lastEvents);
+                });
+                this.loadEngagementForEvents(accumulatedEvents, this.currentRelays, searchToken);
+                this.setStatus(this.t('featheration.loaded', {
+                    count: this.formatNumber(this.getVisibleEvents(accumulatedEvents).length),
+                    relays: this.formatNumber(relayPlans.length)
+                }));
+            } catch (error) {
+                console.warn('Could not load older Featheration notes:', error);
+            } finally {
+                this.loadingOlderNotes = false;
+            }
+        }
+
+        getOldestCreatedAt(events) {
+            // Find the oldest relay timestamp from a batch so the next request can page backward.
+            return events
+                .map(event => Number(event?.created_at || 0))
+                .filter(value => value > 0)
+                .reduce((oldest, value) => oldest ? Math.min(oldest, value) : value, 0);
         }
 
         buildSearchTerms(query) {
@@ -478,27 +741,44 @@
                 .filter(Boolean)
                 .slice(0, query ? 5 : 4);
             const joinedQueryTag = plainWords.length > 1 ? plainWords.join('') : '';
-            const tagFilter = [...new Set(query ? [...tags, ...plainWords, joinedQueryTag].filter(Boolean) : ['bird', 'birds', 'birding', 'birdphotography'])].slice(0, 10);
+            const shouldExpandBirdRoot = plainWords.length === 1 && ['bird', 'birds'].includes(plainWords[0]);
+            const expandedSearchWords = shouldExpandBirdRoot ? this.expandSearchTags(plainWords, { includeRelatedBirdTags: true }) : plainWords;
+            const expandedTags = this.expandSearchTags([...tags, ...plainWords, joinedQueryTag].filter(Boolean), { includeRelatedBirdTags: shouldExpandBirdRoot });
+            const tagFilter = [...new Set(query ? expandedTags : ['bird', 'birds', 'birding', 'birdphotography'])].slice(0, 12);
             const since = this.getLookbackSince();
             const tagFilters = [];
-            if (tagFilter.length) tagFilters.push(this.withLookback({ kinds: [1], '#t': tagFilter, limit: query ? 100 : 150 }, since));
-            const fallbackFilters = [
-                ...tagFilters,
-                this.withLookback({ kinds: [1], limit: query ? 260 : 220 }, since)
-            ];
-            const searchFilters = plainWords.length
-                ? [{ kinds: [1], search: plainWords.join(' OR '), limit: query ? 100 : 80 }]
+            if (tagFilter.length) tagFilters.push(this.withRelayWindow({ kinds: [1], '#t': tagFilter, limit: query ? 180 : 220 }, since));
+            const fallbackFilters = query
+                ? tagFilters
+                : [...tagFilters, this.withRelayWindow({ kinds: [1], limit: 260 }, since)];
+            const searchFilters = expandedSearchWords.length
+                ? [this.withRelayWindow({ kinds: [1], search: expandedSearchWords.slice(0, 8).join(' OR '), limit: query ? 180 : 120 }, since)]
                 : [];
             return {
                 fallbackFilters,
                 searchFilters,
                 highlightTerms: [...new Set([...words.map(word => word.replace(/^#+/, '')), joinedQueryTag, ...this.defaultTerms].filter(Boolean))],
-                localTerms: [...plainWords.map(word => this.normalizeText(word)).filter(Boolean), this.normalizeText(joinedQueryTag)].filter(Boolean),
+                localTerms: [...expandedSearchWords.map(word => this.normalizeText(word)).filter(Boolean), this.normalizeText(joinedQueryTag)].filter(Boolean),
                 localTags: tagFilter.map(tag => this.normalizeText(tag)).filter(Boolean)
             };
         }
 
-        async buildRelayPlans(relays, searchTerms) {
+        expandSearchTags(tags, options = {}) {
+            // Add practical singular/plural hashtag variants because relays only match #t values exactly.
+            const expanded = new Set();
+            tags.forEach(tag => {
+                const normalized = this.normalizeText(tag);
+                if (!normalized) return;
+                expanded.add(normalized);
+                if (options.includeRelatedBirdTags && (normalized === 'bird' || normalized === 'birds')) {
+                    ['bird', 'birds', 'birding', 'birdphotography', 'birdwatching', 'ornithology'].forEach(value => expanded.add(value));
+                }
+                if (normalized.endsWith('s') && normalized.length > 4) expanded.add(normalized.slice(0, -1));
+            });
+            return [...expanded];
+        }
+
+        async buildRelayPlans(relays, searchTerms, options = {}) {
             // Use NIP-50 search only on relays advertising supported_nips: [50], and use fallback filters everywhere else.
             const infos = await Promise.all(relays.map(relay => this.getRelayInfo(relay)));
             return relays.map((relay, index) => {
@@ -506,8 +786,14 @@
                 const filters = supportsSearch && searchTerms.searchFilters.length
                     ? [...searchTerms.searchFilters, ...searchTerms.fallbackFilters.slice(0, 1)]
                     : searchTerms.fallbackFilters;
-                return { relay, filters, supportsSearch };
+                return { relay, filters: filters.map(filter => this.withRelayPaging(filter, options)), supportsSearch };
             });
+        }
+
+        withRelayPaging(filter, options = {}) {
+            // Apply backward pagination without changing the user's selected lookback start.
+            const until = Number(options.until || 0);
+            return until > 0 ? { ...filter, until } : filter;
         }
 
         async getRelayInfo(relay) {
@@ -571,19 +857,11 @@
         }
 
         async getReadRelays() {
-            // Prefer user relays, include enabled app defaults, and add signer relays when available.
+            // Fetch public notes only from user-configured relays plus enabled Birds.name defaults.
             const relays = new Set();
             this.getPersonalRelays().forEach(relay => relays.add(relay));
             if (this.shouldUseDefaultRelays()) this.getDefaultRelays().forEach(relay => relays.add(relay));
-            try {
-                const signerRelays = await window.nostr?.getRelays?.();
-                Object.keys(signerRelays || {}).forEach(relay => {
-                    if (/^wss:\/\//i.test(relay)) relays.add(relay.replace(/\/+$/, ''));
-                });
-            } catch (error) {
-                console.warn('Could not read Nostr signer relays:', error);
-            }
-            return [...relays].slice(0, 5);
+            return this.prioritizeHealthyRelays([...relays]).slice(0, 8);
         }
 
         getPersonalRelays() {
@@ -603,7 +881,93 @@
 
         getDefaultRelays() {
             // Use broad public relays that are already exposed in the app settings.
-            return ['wss://nos.lol', 'wss://relay.damus.io', 'wss://relay.primal.net'];
+            return [
+                'wss://nos.lol',
+                'wss://relay.damus.io',
+                'wss://relay.primal.net',
+                'wss://nostr.mom',
+                'wss://relay.snort.social',
+                'wss://offchain.pub'
+            ];
+        }
+
+        prioritizeHealthyRelays(relays) {
+            // Skip relays that recently failed and order the rest by cached browser-local success signals.
+            const normalizedRelays = [...new Set(relays.map(relay => this.normalizeRelayUrl(relay)).filter(Boolean))];
+            const health = this.getRelayHealthCache();
+            const now = Date.now();
+            const freshFailureWindow = 10 * 60 * 1000;
+            const usableRelays = normalizedRelays.filter(relay => {
+                const entry = health[relay];
+                if (!entry?.lastFailureAt) return true;
+                if (entry.lastSuccessAt && entry.lastSuccessAt > entry.lastFailureAt) return true;
+                return now - Number(entry.lastFailureAt || 0) > freshFailureWindow;
+            });
+            const candidates = usableRelays.length ? usableRelays : normalizedRelays;
+            return candidates.sort((a, b) => this.relayHealthScore(b, health) - this.relayHealthScore(a, health));
+        }
+
+        relayHealthScore(relay, health) {
+            // Rank relays by recent success so responsive relays are queried first on future page loads.
+            const entry = health[relay] || {};
+            const successes = Number(entry.successes || 0);
+            const failures = Number(entry.failures || 0);
+            const recentSuccessBonus = entry.lastSuccessAt ? Math.max(0, 20 - ((Date.now() - Number(entry.lastSuccessAt)) / 60000)) : 0;
+            const recentFailurePenalty = entry.lastFailureAt ? Math.max(0, 20 - ((Date.now() - Number(entry.lastFailureAt)) / 60000)) : 0;
+            return successes * 4 + recentSuccessBonus - failures * 3 - recentFailurePenalty;
+        }
+
+        normalizeRelayUrl(relay) {
+            // Normalize relay URLs before caching health so trailing slashes do not create duplicate entries.
+            const value = String(relay || '').trim().replace(/\/+$/, '');
+            return /^wss:\/\//i.test(value) ? value : '';
+        }
+
+        getRelayHealthCache() {
+            // Read browser-local relay health; stale entries are harmless and only affect ordering.
+            try {
+                const cache = JSON.parse(localStorage.getItem(RELAY_HEALTH_CACHE_KEY) || '{}');
+                return cache && typeof cache === 'object' ? cache : {};
+            } catch (error) {
+                return {};
+            }
+        }
+
+        writeRelayHealthCache(cache) {
+            // Persist compact relay health signals without any external API or paid relay directory.
+            try {
+                localStorage.setItem(RELAY_HEALTH_CACHE_KEY, JSON.stringify(cache));
+            } catch (error) {
+                console.warn('Could not cache relay health:', error);
+            }
+        }
+
+        markRelaySuccess(relay) {
+            // Remember successful websocket opens so future searches start with responsive relays.
+            const cleanRelay = this.normalizeRelayUrl(relay);
+            if (!cleanRelay) return;
+            const cache = this.getRelayHealthCache();
+            const entry = cache[cleanRelay] || {};
+            cache[cleanRelay] = {
+                ...entry,
+                successes: Math.min(999, Number(entry.successes || 0) + 1),
+                lastSuccessAt: Date.now()
+            };
+            this.writeRelayHealthCache(cache);
+        }
+
+        markRelayFailure(relay) {
+            // Remember failed websocket opens briefly so dead relays do not slow the next search.
+            const cleanRelay = this.normalizeRelayUrl(relay);
+            if (!cleanRelay) return;
+            const cache = this.getRelayHealthCache();
+            const entry = cache[cleanRelay] || {};
+            cache[cleanRelay] = {
+                ...entry,
+                failures: Math.min(999, Number(entry.failures || 0) + 1),
+                lastFailureAt: Date.now()
+            };
+            this.writeRelayHealthCache(cache);
         }
 
         fetchEventsFromRelays(relays, filters, timeoutMs, onEvent = null) {
@@ -625,9 +989,11 @@
                 const subscriptionId = `bn-${Math.random().toString(36).slice(2)}`;
                 let socket;
                 let settled = false;
-                const finish = () => {
+                let opened = false;
+                const finish = (wasFailure = false) => {
                     if (settled) return;
                     settled = true;
+                    if (wasFailure && !opened) this.markRelayFailure(relay);
                     try {
                         if (socket?.readyState === WebSocket.OPEN) socket.send(JSON.stringify(['CLOSE', subscriptionId]));
                         if (socket?.readyState === WebSocket.OPEN || socket?.readyState === WebSocket.CONNECTING) socket.close();
@@ -636,10 +1002,12 @@
                     }
                     resolve(events);
                 };
-                const timer = window.setTimeout(finish, timeoutMs);
+                const timer = window.setTimeout(() => finish(!opened), timeoutMs);
                 try {
                     socket = new WebSocket(relay);
                     socket.addEventListener('open', () => {
+                        opened = true;
+                        this.markRelaySuccess(relay);
                         socket.send(JSON.stringify(['REQ', subscriptionId, ...filters]));
                     });
                     socket.addEventListener('message', message => {
@@ -659,28 +1027,28 @@
                     });
                     socket.addEventListener('error', () => {
                         window.clearTimeout(timer);
-                        finish();
+                        finish(true);
                     });
                     socket.addEventListener('close', () => {
                         window.clearTimeout(timer);
-                        finish();
+                        finish(!opened);
                     });
                 } catch (error) {
                     window.clearTimeout(timer);
-                    finish();
+                    finish(true);
                 }
             });
         }
 
         sortAndDedupeEvents(events) {
-            // Keep the newest copy of each event ID and cap rendering work on busy relays.
+            // Keep the newest copy of each event ID and cap rendering work after several older pages.
             const byId = new Map();
             events.forEach(event => {
                 if (event?.id && event?.kind === 1 && !byId.has(event.id)) byId.set(event.id, event);
             });
             return [...byId.values()]
                 .sort((a, b) => Number(b.created_at || 0) - Number(a.created_at || 0))
-                .slice(0, 140);
+                .slice(0, 600);
         }
 
         addIncomingEvent(event, { immediate = true } = {}) {
@@ -844,15 +1212,15 @@
         }
 
         getProfileRelays() {
-            // Query common profile-heavy relays plus broad relays used by the feed.
-            return [...new Set(['wss://purplepag.es', 'wss://user.kindpag.es', 'wss://nos.lol', ...this.getDefaultRelays()])].slice(0, 6);
+            // Fetch kind-0 profile metadata and avatars from Purple Pages instead of public note relays.
+            return ['wss://purplepag.es'];
         }
 
         async loadLoggedInContacts() {
             // Load the logged-in user's follow list for a simple positive WOT signal.
             const publicHex = localStorage.getItem('birdNostrPublicKeyHex');
             if (!publicHex) return;
-            const relays = this.getProfileRelays();
+            const relays = await this.getReadRelays();
             const events = await this.fetchEventsFromRelays(relays, [{ kinds: [3], authors: [publicHex], limit: 1 }], 2200);
             const latest = events.sort((a, b) => Number(b.created_at || 0) - Number(a.created_at || 0))[0];
             this.followedPubkeys = new Set((latest?.tags || [])
@@ -908,8 +1276,8 @@
             return Math.floor(Date.now() / 1000) - days * 24 * 60 * 60;
         }
 
-        withLookback(filter, since) {
-            // Add a since bound only when the visitor did not choose "all" posts.
+        withRelayWindow(filter, since) {
+            // Add the selected lookback start to every feed search filter, including NIP-50 text search.
             return since ? { ...filter, since } : filter;
         }
 
@@ -1022,7 +1390,7 @@
             return `
                 <article class="featheration-note" data-event-id="${this.escapeHtml(event.id)}" data-pubkey="${this.escapeHtml(event.pubkey)}">
                     <header class="featheration-note-header">
-                        <img class="featheration-author-avatar" src="${this.escapeHtml(this.getProfileImageUrl(profile))}" alt="">
+                        <img class="featheration-author-avatar" src="${this.escapeHtml(this.getProfileImageUrl(profile))}" alt="" loading="lazy" decoding="async">
                         <div class="featheration-author-copy">
                             <span class="featheration-author-name">${this.escapeHtml(name)}</span>
                             ${nip05 ? `<span class="featheration-author-nip05">${this.escapeHtml(nip05)}</span>` : ''}
@@ -1168,13 +1536,13 @@
         getProfileImageUrl(profile) {
             // Accept common Nostr metadata image fields and fall back when the URL is missing or invalid.
             const imageUrl = profile?.picture || profile?.image || profile?.avatar || '';
-            if (!imageUrl) return 'img/origami_bird_B-ICO.png';
+            if (!imageUrl) return 'img/origami_bird_B.png';
             try {
                 const parsed = new URL(String(imageUrl));
-                if (!['http:', 'https:'].includes(parsed.protocol)) return 'img/origami_bird_B-ICO.png';
+                if (!['http:', 'https:'].includes(parsed.protocol)) return 'img/origami_bird_B.png';
                 return parsed.toString();
             } catch (error) {
-                return 'img/origami_bird_B-ICO.png';
+                return 'img/origami_bird_B.png';
             }
         }
 
@@ -1183,7 +1551,7 @@
             const image = event.target.closest?.('.featheration-author-avatar');
             if (!image || image.dataset.fallbackApplied === 'true') return;
             image.dataset.fallbackApplied = 'true';
-            image.src = 'img/origami_bird_B-ICO.png';
+            image.src = 'img/origami_bird_B.png';
         }
 
         renderNoteMenu(event, isHidden) {
@@ -1261,7 +1629,7 @@
             const visibleContent = this.removeDisplayedMediaUrls(reply.content || '', media);
             return `
                 <article class="featheration-reply" data-event-id="${this.escapeHtml(reply.id)}">
-                    <img class="featheration-author-avatar featheration-reply-avatar" src="${this.escapeHtml(this.getProfileImageUrl(profile))}" alt="">
+                    <img class="featheration-author-avatar featheration-reply-avatar" src="${this.escapeHtml(this.getProfileImageUrl(profile))}" alt="" loading="lazy" decoding="async">
                     <div class="featheration-reply-body">
                         <div class="featheration-reply-meta">
                             <strong>${this.escapeHtml(this.getProfileName(profile, reply.pubkey))}</strong>
@@ -1590,7 +1958,7 @@
             // Render profile, observation totals, type stats, badges, and clickable observed species.
             if (!this.checkResults) return;
             const profileName = this.getProfileName(summary.profile || {}, summary.publicHex);
-            const avatar = this.getProfileImageUrl(summary.profile) || 'img/origami_bird_B-ICO.png';
+            const avatar = this.getProfileImageUrl(summary.profile) || 'img/origami_bird_B.png';
             const nip05 = this.getProfileNip05(summary.profile || {});
             const npub = this.toNpub(summary.publicHex) || this.formatNpub(summary.publicHex);
             this.checkResults.innerHTML = `
@@ -2355,9 +2723,21 @@
             // Find scientific and local bird names, including multi-word names joined into hashtags.
             const matches = [];
             const sourceNormalized = this.normalizeText(source);
+            const sourceTokens = this.getNormalizedTokens(source);
             const sourceJoined = sourceNormalized.replace(/\s+/g, '');
+            const candidateKeys = new Set(sourceTokens);
+            this.getContentHashtags(source).forEach(tag => {
+                candidateKeys.add(tag);
+                candidateKeys.add(tag.replace(/[\s_-]+/g, ''));
+            });
+            sourceTokens.forEach(token => {
+                if (token.length >= 4) candidateKeys.add(token.replace(/[\s_-]+/g, ''));
+            });
             const seen = new Set();
-            const terms = (this.birdHighlightRecords || [])
+            const candidateRecords = this.birdHighlightRecordsByToken?.size
+                ? [...candidateKeys].flatMap(key => this.birdHighlightRecordsByToken.get(key) || [])
+                : (this.birdHighlightRecords || []);
+            const terms = candidateRecords
                 .filter(record => String(record.term || '').trim().length >= 4)
                 .filter(record => {
                     const normalizedTerm = this.normalizeText(record.term);

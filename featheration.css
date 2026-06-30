@@ -388,6 +388,7 @@ body[data-theme="midnight"] .dropdown-title-logo {
 
 .featheration-logo {
     width: 100%;
+    aspect-ratio: 3.2 / 1;
     max-height: 56px;
     object-fit: contain;
     filter: var(--logo-filter, none);

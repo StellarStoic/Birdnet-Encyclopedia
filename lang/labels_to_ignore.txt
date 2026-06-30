@@ -1,0 +1,16 @@
+# BirdNET label rows that are not bird species and should be hidden across the app.
+# You can paste full rows from lang/labels_*.txt, or put one plain name per line.
+# Matching is normalized, so punctuation and case do not matter.
+Car_Car
+Cricket_Cricket
+Crickets_Crickets
+Dog_Dog
+Engine_Engine
+Gun_Gun
+Human_Human
+Human non-vocal_Human non-vocal
+Human vocal_Human vocal
+Human whistle_Human whistle
+Noise_Noise
+Siren_Siren
+Vehicle_Vehicle
