@@ -1225,8 +1225,16 @@ body[data-theme="paper"] {
     min-width: 0;
 }
 
-.diary-publish-button {
+.diary-publish-controls {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 8px;
     margin-left: auto;
+    min-width: 0;
+}
+
+.diary-publish-button {
+    flex: 0 1 auto;
 }
 
 .diary-summary-button {
@@ -1813,11 +1821,12 @@ body[data-theme="paper"] {
     }
 
     .diary-overview-summary-controls,
+    .diary-publish-controls,
     .diary-publish-button {
         max-width: 100%;
     }
 
-    .diary-publish-button {
+    .diary-publish-controls {
         margin-left: 0;
     }
 
@@ -4942,7 +4951,7 @@ body[data-theme="midnight"] .site-title-logo {
 
 .results-separator {
     height: 1px;
-    background: #e0e0e0;
+    background: var(--border);
     margin: 30px 0;
     width: 100%;
 }
@@ -4950,8 +4959,11 @@ body[data-theme="midnight"] .site-title-logo {
 .cross-language-results {
     margin-top: 2rem;
     padding: 1.5rem;
-    background: #f8f9fa;
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--surface-solid) 92%, var(--primary) 8%);
+    color: var(--text);
     border-radius: 8px;
+    box-shadow: var(--shadow);
 }
 
 .cross-language-header {
@@ -4972,24 +4984,25 @@ body[data-theme="midnight"] .site-title-logo {
     flex: 0 0 auto;
     width: 34px;
     height: 34px;
-    border: 1px solid rgba(73, 80, 87, 0.18);
+    border: 1px solid var(--border);
     border-radius: 50%;
-    background: #ffffff;
-    color: #495057;
+    background: var(--surface-solid);
+    color: var(--text);
     cursor: pointer;
     transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
 }
 
 .cross-language-close:hover,
 .cross-language-close:focus-visible {
-    background: #e9ecef;
-    color: #212529;
+    border-color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 12%, var(--surface-solid));
+    color: var(--primary);
     transform: translateY(-1px);
 }
 
 .cross-language-results h3 {
     margin-top: 0;
-    color: #495057;
+    color: var(--text);
 }
 
 .cross-language-summary {
@@ -5004,10 +5017,10 @@ body[data-theme="midnight"] .site-title-logo {
     align-items: center;
     gap: 0.45rem;
     padding: 0.45rem 0.7rem;
-    border: 1px solid rgba(76, 130, 61, 0.3);
+    border: 1px solid color-mix(in srgb, var(--primary) 36%, var(--border));
     border-radius: 999px;
-    background: #eef8ea;
-    color: #285c2c;
+    background: color-mix(in srgb, var(--primary) 12%, var(--surface-solid));
+    color: var(--primary);
     cursor: pointer;
     font-size: 0.86rem;
     font-family: inherit;
@@ -5016,22 +5029,22 @@ body[data-theme="midnight"] .site-title-logo {
 
 .cross-language-summary-pill:hover,
 .cross-language-summary-pill:focus-visible {
-    border-color: rgba(76, 130, 61, 0.7);
+    border-color: var(--primary);
     filter: brightness(0.98);
 }
 
 .cross-language-summary-pill i {
-    color: #2f9e44;
+    color: var(--primary);
 }
 
 .cross-language-summary-pill.is-hidden {
-    border-color: #c7cbd1;
-    background: #edf0f2;
-    color: #6b7280;
+    border-color: color-mix(in srgb, var(--muted) 45%, var(--border));
+    background: color-mix(in srgb, var(--muted) 12%, var(--surface-solid));
+    color: var(--muted);
 }
 
 .cross-language-summary-pill.is-hidden i {
-    color: #9aa1aa;
+    color: var(--muted);
 }
 
 .cross-language-birds {
@@ -5042,16 +5055,18 @@ body[data-theme="midnight"] .site-title-logo {
 }
 
 .cross-language-bird {
-    background: white;
+    border: 1px solid var(--border);
+    background: var(--surface-solid);
+    color: var(--text);
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--primary) 12%, transparent);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .cross-language-bird:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    box-shadow: 0 8px 18px color-mix(in srgb, var(--primary) 22%, transparent);
 }
 
 .cross-language-bird .bird-image-container {
@@ -5078,7 +5093,7 @@ body[data-theme="midnight"] .site-title-logo {
 }
 
 .cross-language-image[data-src] {
-    background: #f0f0f0;
+    background: color-mix(in srgb, var(--muted) 10%, var(--surface-solid));
 }
 
 .cross-language-bird .bird-info {
@@ -5092,13 +5107,13 @@ body[data-theme="midnight"] .site-title-logo {
 
 .cross-language-bird .bird-latin {
     font-size: 0.8rem;
-    color: #6c757d;
+    color: var(--muted);
     margin: 0.25rem 0;
 }
 
 .language-badge {
-    background: #667eea;
-    color: white;
+    background: var(--primary);
+    color: var(--surface-solid);
     padding: 0.25rem 0.5rem;
     border-radius: 4px;
     font-size: 0.7rem;
@@ -5115,26 +5130,26 @@ body[data-theme="midnight"] .site-title-logo {
 .cross-language-action {
     width: 100%;
     padding: 0.55rem 0.7rem;
-    border: 1px solid #4c823d;
+    border: 1px solid var(--primary);
     border-radius: 7px;
-    background: white;
-    color: #315f32;
+    background: var(--surface-solid);
+    color: var(--primary);
     cursor: pointer;
     font-weight: 600;
     transition: background 0.2s ease, color 0.2s ease;
 }
 
 .cross-language-action:hover {
-    background: #eef6e9;
+    background: color-mix(in srgb, var(--primary) 12%, var(--surface-solid));
 }
 
 .cross-language-action.switch-language {
-    background: #4c823d;
-    color: white;
+    background: var(--primary);
+    color: var(--surface-solid);
 }
 
 .cross-language-action.switch-language:hover {
-    background: #315f32;
+    background: var(--primary-strong);
 }
 
 .name-language-flag {

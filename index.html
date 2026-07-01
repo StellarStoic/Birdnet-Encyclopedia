@@ -651,7 +651,7 @@
                 <p data-i18n="nostr.locationWarningText">One or more selected notes include coordinates. Publishing them may reveal where you observed the bird.</p>
             </div>
             <div class="nostr-publish-list" id="nostr-publish-list"></div>
-            <label class="nostr-publish-aggregate">
+            <label class="nostr-publish-aggregate" hidden>
                 <input id="nostr-publish-aggregate" type="checkbox" checked>
                 <span data-i18n="nostr.publishAggregate">Also publish my observed species totals for collective Birds.name statistics.</span>
             </label>
@@ -7057,10 +7057,16 @@
                                 </select>
                             </label>
                         </div>
-                        <button class="diary-summary-button diary-publish-button" type="button" data-diary-publish-all>
-                            <i class="fa-solid fa-feather" aria-hidden="true"></i>
-                            ${this.escapeHtml(this.t('nostr.publishAllDiary'))}
-                        </button>
+                        <div class="diary-publish-controls">
+                            <button class="diary-summary-button diary-publish-button" type="button" data-diary-publish-all>
+                                <i class="fa-solid fa-feather" aria-hidden="true"></i>
+                                ${this.escapeHtml(this.t('nostr.publishAllDiary'))}
+                            </button>
+                            <button class="diary-summary-button diary-publish-button diary-publish-observations-button" type="button" data-diary-publish-observations>
+                                <i class="fa-solid fa-binoculars" aria-hidden="true"></i>
+                                ${this.escapeHtml(this.t('nostr.publishObservations'))}
+                            </button>
+                        </div>
                         <span class="diary-summary-scope">${this.escapeHtml(this.t('diary.summaryScope', {
                             count: this.formatInterfaceNumber(summaryEntries.length)
                         }))}</span>
@@ -7069,7 +7075,7 @@
                     <div class="diary-overview-map" id="diary-overview-map">
                         ${mapEntries.length ? '' : `<p>${this.escapeHtml(this.t('diary.noMappedNotes'))}</p>`}
                     </div>
-                    ${this.renderDiaryObservedSection(observedSpecies)}
+                    ${this.renderDiaryObservedSection(observedSpecies, Boolean(options.observedOpen))}
                     <div class="diary-overview-list">
                         ${entries.length ? entries.map(item => this.renderDiaryOverviewCard(item)).join('') : `
                             <p class="diary-overview-empty">${this.escapeHtml(this.t('diary.noNotes'))}</p>
@@ -7119,7 +7125,7 @@
             });
         }
 
-        renderDiaryObservedSection(observedSpecies) {
+        renderDiaryObservedSection(observedSpecies, observedOpen = false) {
             // Collapse long observed-species lists so My Diary stays usable with large personal datasets.
             const speciesMarkup = observedSpecies.length
                 ? observedSpecies.map(item => this.renderDiaryObservedSpecies(item)).join('')
@@ -7138,7 +7144,7 @@
             }
 
             return `
-                <details class="diary-observed-section diary-observed-section-collapsible">
+                <details class="diary-observed-section diary-observed-section-collapsible" ${observedOpen ? 'open' : ''}>
                     <summary class="diary-observed-summary">
                         <span>
                             <i class="fa-solid fa-chevron-right diary-observed-chevron" aria-hidden="true"></i>
@@ -7284,8 +7290,7 @@
             }
             const reviewEntries = entries.filter(item => item?.entry && String(item.entry.note || '').trim());
             const publishEntries = reviewEntries.filter(item => !this.isDiaryEntryPublishCurrent(item.entry));
-            const hasAggregateSpecies = this.hasObservedSpeciesForNostrAggregate();
-            if (!reviewEntries.length && !hasAggregateSpecies) {
+            if (!reviewEntries.length) {
                 this.showTemporaryDiaryNotice(this.t('nostr.noPublishableNotes'));
                 return;
             }
@@ -7298,8 +7303,8 @@
                     .map(item => this.renderNostrPublishedOption(item))
             ].join('');
             if (this.nostrPublishAggregate) {
-                this.nostrPublishAggregate.checked = hasAggregateSpecies;
-                this.nostrPublishAggregate.disabled = !hasAggregateSpecies;
+                this.nostrPublishAggregate.checked = false;
+                this.nostrPublishAggregate.disabled = true;
             }
             this.updateNostrPublishLocationWarning();
             this.showNostrPublishStatus(
@@ -7313,12 +7318,18 @@
             this.nostrPublishModal.hidden = false;
             document.body.classList.add('ai-consent-open');
             this.updateNostrPublishConfirmState();
-            (publishEntries.length || hasAggregateSpecies ? this.nostrPublishConfirm : this.nostrPublishCancel)?.focus();
+            (publishEntries.length ? this.nostrPublishConfirm : this.nostrPublishCancel)?.focus();
         }
 
         hasObservedSpeciesForNostrAggregate() {
             // Let observed-species counters publish even when every diary note is already published.
-            return this.getDiaryObservedSpecies('', 'name').length > 0;
+            return this.getPublishableObservedSpeciesForNostr().length > 0;
+        }
+
+        getPublishableObservedSpeciesForNostr() {
+            // Exclude species the visitor hid in My Diary before building the public observation counter.
+            return this.getDiaryObservedSpecies('', 'name')
+                .filter(item => !this.diaryHiddenSpecies.has(this.observationKey(item.scientificName)));
         }
 
         renderNostrPublishOption(item, index) {
@@ -7490,6 +7501,56 @@
             }
         }
 
+        async publishObservedSpeciesAggregateToNostr(button) {
+            // Publish only the observed-species counters as a replaceable NIP-78 event.
+            const result = this.birdGrid.querySelector('[data-diary-summary-result]');
+            const publicHex = localStorage.getItem('birdNostrPublicKeyHex');
+            if (!publicHex) {
+                this.openNostrKeyModal();
+                this.showNostrStatus(this.t('nostr.loginRequired'), true);
+                return;
+            }
+            const species = this.getPublishableObservedSpeciesForNostr();
+            if (!species.length) {
+                if (result) {
+                    result.hidden = false;
+                    result.classList.remove('error');
+                    result.textContent = this.t('nostr.noObservedSpeciesToPublish');
+                }
+                return;
+            }
+
+            try {
+                if (button) button.disabled = true;
+                if (result) {
+                    result.hidden = false;
+                    result.classList.remove('error');
+                    result.textContent = this.t('nostr.publishingObservations');
+                }
+                const aggregateEvent = await this.signNostrEvent(this.buildDiaryAggregateNip78Event(species));
+                const publishResult = await this.publishNostrEvents([aggregateEvent]);
+                const badgeResult = await this.publishEarnedNostrObservationBadges();
+                const signedEvents = [aggregateEvent, ...badgeResult.events];
+                this.storePublishedNostrEvents(signedEvents);
+                if (result) {
+                    result.textContent = this.t('nostr.observationsPublished', {
+                        species: this.formatInterfaceNumber(species.length),
+                        relays: this.formatInterfaceNumber(publishResult.successRelays)
+                    });
+                    result.classList.toggle('error', publishResult.successRelays < 1);
+                }
+            } catch (error) {
+                console.warn('Nostr observation counter publish failed:', error);
+                if (result) {
+                    result.hidden = false;
+                    result.textContent = error?.message || this.t('nostr.publishFailed');
+                    result.classList.add('error');
+                }
+            } finally {
+                if (button) button.disabled = false;
+            }
+        }
+
         renderNostrPublishProgress(done, total, relays = 0) {
             // Show sequential bulk-publish progress so users see each diary note publishing separately.
             if (!this.nostrPublishStatus) return;
@@ -7653,10 +7714,11 @@
             };
         }
 
-        buildDiaryAggregateNip78Event() {
+        buildDiaryAggregateNip78Event(speciesItems = null) {
             // Publish replaceable observed-species totals for collective Birds.name statistics.
             const publicHex = localStorage.getItem('birdNostrPublicKeyHex');
-            const species = this.getDiaryObservedSpecies('', 'name').map(item => ({
+            const sourceSpecies = Array.isArray(speciesItems) ? speciesItems : this.getPublishableObservedSpeciesForNostr();
+            const species = sourceSpecies.map(item => ({
                 scientificName: item.scientificName,
                 localName: item.localName || '',
                 englishName: item.englishName || '',
@@ -8138,6 +8200,13 @@
                 return;
             }
 
+            const publishObservationsButton = event.target.closest('[data-diary-publish-observations]');
+            if (publishObservationsButton) {
+                event.preventDefault();
+                this.publishObservedSpeciesAggregateToNostr(publishObservationsButton);
+                return;
+            }
+
             const publishNoteButton = event.target.closest('[data-diary-publish-note]');
             if (publishNoteButton) {
                 event.preventDefault();
@@ -8168,6 +8237,7 @@
             const toggleButton = event.target.closest('[data-diary-toggle-species]');
             if (toggleButton) {
                 event.preventDefault();
+                const observedOpen = Boolean(this.birdGrid.querySelector('.diary-observed-section-collapsible')?.open);
                 const key = this.observationKey(toggleButton.dataset.diaryToggleSpecies);
                 if (this.diaryHiddenSpecies.has(key)) {
                     this.diaryHiddenSpecies.delete(key);
@@ -8176,7 +8246,10 @@
                 }
                 const searchInput = this.birdGrid.querySelector('[data-diary-search]');
                 const sortSelect = this.birdGrid.querySelector('[data-diary-sort]');
-                this.showDiaryOverview(searchInput?.value || '', sortSelect?.value || 'date', { skipImageFetch: true });
+                this.showDiaryOverview(searchInput?.value || '', sortSelect?.value || 'date', {
+                    observedOpen,
+                    skipImageFetch: true
+                });
                 return;
             }
 
