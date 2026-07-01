@@ -2861,7 +2861,11 @@
             this.nostrPublishModal?.addEventListener('click', event => {
                 if (event.target === this.nostrPublishModal) this.closeNostrPublishModal();
             });
-            this.nostrPublishList?.addEventListener('change', () => this.updateNostrPublishLocationWarning());
+            this.nostrPublishAggregate?.addEventListener('change', () => this.updateNostrPublishConfirmState());
+            this.nostrPublishList?.addEventListener('change', () => {
+                this.updateNostrPublishLocationWarning();
+                this.updateNostrPublishConfirmState();
+            });
             this.nostrPublishModal?.addEventListener('click', event => {
                 const copyButton = event.target.closest('[data-copy-nostr-event-id]');
                 if (copyButton) this.copyNostrValue(copyButton.dataset.copyNostrEventId, 'nostr.eventIdCopied');
@@ -7280,7 +7284,8 @@
             }
             const reviewEntries = entries.filter(item => item?.entry && String(item.entry.note || '').trim());
             const publishEntries = reviewEntries.filter(item => !this.isDiaryEntryPublishCurrent(item.entry));
-            if (!reviewEntries.length) {
+            const hasAggregateSpecies = this.hasObservedSpeciesForNostrAggregate();
+            if (!reviewEntries.length && !hasAggregateSpecies) {
                 this.showTemporaryDiaryNotice(this.t('nostr.noPublishableNotes'));
                 return;
             }
@@ -7293,15 +7298,27 @@
                     .map(item => this.renderNostrPublishedOption(item))
             ].join('');
             if (this.nostrPublishAggregate) {
-                this.nostrPublishAggregate.checked = Boolean(publishEntries.length);
-                this.nostrPublishAggregate.disabled = !publishEntries.length;
+                this.nostrPublishAggregate.checked = hasAggregateSpecies;
+                this.nostrPublishAggregate.disabled = !hasAggregateSpecies;
             }
             this.updateNostrPublishLocationWarning();
-            this.showNostrPublishStatus(publishEntries.length ? '' : this.t('nostr.allSelectedAlreadyPublished'), !publishEntries.length);
+            this.showNostrPublishStatus(
+                publishEntries.length
+                    ? ''
+                    : reviewEntries.length
+                        ? this.t('nostr.allSelectedAlreadyPublished')
+                        : '',
+                false
+            );
             this.nostrPublishModal.hidden = false;
             document.body.classList.add('ai-consent-open');
-            if (this.nostrPublishConfirm) this.nostrPublishConfirm.disabled = !publishEntries.length;
-            (publishEntries.length ? this.nostrPublishConfirm : this.nostrPublishCancel)?.focus();
+            this.updateNostrPublishConfirmState();
+            (publishEntries.length || hasAggregateSpecies ? this.nostrPublishConfirm : this.nostrPublishCancel)?.focus();
+        }
+
+        hasObservedSpeciesForNostrAggregate() {
+            // Let observed-species counters publish even when every diary note is already published.
+            return this.getDiaryObservedSpecies('', 'name').length > 0;
         }
 
         renderNostrPublishOption(item, index) {
@@ -7371,6 +7388,14 @@
             if (this.nostrLocationWarning) this.nostrLocationWarning.hidden = !hasLocation;
         }
 
+        updateNostrPublishConfirmState() {
+            // Keep aggregate-only publishing available when no diary note rows are selected.
+            if (!this.nostrPublishConfirm) return;
+            const selectedEntries = this.getSelectedNostrPublishEntries();
+            const shouldPublishAggregate = Boolean(this.nostrPublishAggregate?.checked && this.hasObservedSpeciesForNostrAggregate());
+            this.nostrPublishConfirm.disabled = !selectedEntries.length && !shouldPublishAggregate;
+        }
+
         getSelectedNostrPublishEntries() {
             // Convert checked publish-modal rows back to their pending diary items.
             if (!this.nostrPublishList) return [];
@@ -7402,7 +7427,8 @@
         async publishSelectedDiaryEntriesToNostr() {
             // Sign and publish the checked diary entries as NIP-78 application-data events.
             const selectedEntries = this.getSelectedNostrPublishEntries();
-            if (!selectedEntries.length) {
+            const shouldPublishAggregate = Boolean(this.nostrPublishAggregate?.checked && this.hasObservedSpeciesForNostrAggregate());
+            if (!selectedEntries.length && !shouldPublishAggregate) {
                 this.showNostrPublishStatus(this.t('nostr.selectAtLeastOne'), true);
                 return;
             }
@@ -7414,7 +7440,7 @@
                 this.nostrPublishConfirm.disabled = true;
                 this.nostrPublishModal.querySelectorAll('.nostr-published-events').forEach(element => element.remove());
                 const signedEvents = [];
-                const totalItems = selectedEntries.length + (this.nostrPublishAggregate?.checked ? 1 : 0);
+                const totalItems = selectedEntries.length + (shouldPublishAggregate ? 1 : 0);
                 let completedItems = 0;
                 let successfulRelayMax = 0;
                 this.renderNostrPublishProgress(completedItems, totalItems);
@@ -7431,7 +7457,7 @@
                     await this.delay(900);
                 }
 
-                if (this.nostrPublishAggregate?.checked) {
+                if (shouldPublishAggregate) {
                     const aggregateEvent = await this.signNostrEvent(this.buildDiaryAggregateNip78Event());
                     const result = await this.publishNostrEvents([aggregateEvent]);
                     successfulRelayMax = Math.max(successfulRelayMax, result.successRelays);
