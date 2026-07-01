@@ -937,7 +937,6 @@
             this.localizedNameCache = new Map(); // Caches language-file names used to guide AI description translations
             this.wikipediaSitelinkCache = new Map(); // Caches Wikidata language links so localized Wikipedia pages are resolved exactly once per species/language.
             this.birdImageProviderCache = new Map(); // Caches multi-source carousel images per scientific name during the browser session.
-            this.localBirdThumbnailExistsCache = new Map(); // Avoids repeated local thumbnail existence checks for modal carousel images.
             this.defaultExcludedLabelSpeciesNames = [];
             this.excludedLabelSpeciesNames = new Set(); // Hidden non-bird labels loaded from lang/labels_to_ignore.txt.
             this.otherNamesBySciName = new Map(); // Optional alternate names loaded from data/otherNames.txt for search and modal synonyms.
@@ -3650,7 +3649,7 @@
                 : achieved
                     ? this.t('achievements.readyToPublish')
                     : progressText;
-            const publishButton = achieved && !issued
+            const publishButton = achieved || issued
                 ? `<button class="achievement-publish-button" type="button" data-achievement-publish="${this.escapeHtml(badge.id)}">
                         <i class="fa-solid fa-feather" aria-hidden="true"></i>
                         ${this.escapeHtml(this.t('achievements.publishButton'))}
@@ -4265,13 +4264,19 @@
             return new Uint8Array(await crypto.subtle.digest('SHA-256', new Uint8Array([...tagHash, ...tagHash, ...message])));
         }
 
-        async publishNostrEvents(events) {
-            // Send signed events to the user's signer relays plus common public relays.
-            const relays = await this.getNostrPublishRelays();
+        async publishNostrEvents(events, options = {}) {
+            // Send signed events to caller-provided relays or the user's signer/common public relays.
+            const relays = Array.isArray(options.relays) && options.relays.length
+                ? options.relays
+                : await this.getNostrPublishRelays();
             const results = await Promise.allSettled(relays.map(relay => this.publishNostrEventsToRelay(relay, events)));
+            const successfulRelays = results
+                .map((result, index) => result.status === 'fulfilled' && result.value ? relays[index] : '')
+                .filter(Boolean);
             return {
-                successRelays: results.filter(result => result.status === 'fulfilled' && result.value).length,
-                attemptedRelays: relays.length
+                successRelays: successfulRelays.length,
+                attemptedRelays: relays.length,
+                successfulRelays
             };
         }
 
@@ -4330,7 +4335,7 @@
                 let socket;
                 try {
                     socket = new WebSocket(relay);
-                    const timer = window.setTimeout(() => finish(accepted > 0), 6500);
+                    const timer = window.setTimeout(() => finish(accepted >= events.length), 6500);
                     socket.addEventListener('open', () => {
                         events.forEach(event => socket.send(JSON.stringify(['EVENT', event])));
                     });
@@ -7680,8 +7685,22 @@
                 return;
             }
             if (this.getStoredNostrAwardedBadges()[badge.id]) {
-                this.showAchievementsStatus(this.t('achievements.alreadyPublished'));
-                this.renderAchievements();
+                try {
+                    if (button) button.disabled = true;
+                    this.showAchievementsStatus(this.t('achievements.publishing'));
+                    const result = await this.republishNostrProfileBadges({ storeEvents: true });
+                    this.showAchievementsStatus(
+                        result.successRelays > 0
+                            ? this.t('achievements.published', { relays: this.formatInterfaceNumber(result.successRelays) })
+                            : this.t('achievements.publishFailed'),
+                        result.successRelays < 1
+                    );
+                } catch (error) {
+                    console.warn('Badge profile republish failed:', error);
+                    this.showAchievementsStatus(error?.message || this.t('achievements.publishFailed'), true);
+                } finally {
+                    if (button) button.disabled = false;
+                }
                 return;
             }
 
@@ -7728,19 +7747,21 @@
         }
 
         async publishNostrBadgeBatch(badges, options = {}) {
-            // Sign badge definitions, badge awards, and the NIP-58 profile-badges event as one publish batch.
+            // Sign NIP-58 badge definitions and awards first, then publish the profile list with a relay hint clients can follow.
             const publicHex = localStorage.getItem('birdNostrPublicKeyHex');
             if (!publicHex) return { awarded: 0, events: [], successRelays: 0 };
+            const relays = await this.getNostrPublishRelays();
             const awarded = this.getStoredNostrAwardedBadges();
             const signedEvents = [];
             const newlyAwarded = [];
             const nextAwarded = { ...awarded };
+            const provisionalRelayHint = relays[0] || '';
 
             for (const badge of badges) {
                 if (!badge || nextAwarded[badge.id]) continue;
                 const definitionEvent = await this.signNostrEvent(this.buildNostrBadgeDefinitionEvent(badge));
                 const badgeDefinitionRef = `30009:${definitionEvent.pubkey}:${badge.id}`;
-                const awardEvent = await this.signNostrEvent(this.buildNostrBadgeAwardEvent(badge, definitionEvent.pubkey));
+                const awardEvent = await this.signNostrEvent(this.buildNostrBadgeAwardEvent(badge, definitionEvent.pubkey, provisionalRelayHint));
                 signedEvents.push(definitionEvent, awardEvent);
                 nextAwarded[badge.id] = {
                     id: badge.id,
@@ -7755,16 +7776,39 @@
             }
 
             if (!newlyAwarded.length) return { awarded: 0, events: [], successRelays: 0 };
-            signedEvents.push(await this.signNostrEvent(this.buildNostrProfileBadgesEvent(nextAwarded)));
-            const result = await this.publishNostrEvents(signedEvents);
-            if (result.successRelays > 0) {
+            const badgeResult = await this.publishNostrEvents(signedEvents, { relays });
+            if (badgeResult.successRelays < 1) {
+                return { awarded: 0, events: [], successRelays: 0 };
+            }
+            const relayHint = badgeResult.successfulRelays[0] || provisionalRelayHint;
+            const profileBadgesEvent = await this.signNostrEvent(this.buildNostrProfileBadgesEvent(nextAwarded, relayHint));
+            const profileResult = await this.publishNostrEvents([profileBadgesEvent], { relays });
+            const allSignedEvents = [...signedEvents, profileBadgesEvent];
+            if (profileResult.successRelays > 0) {
                 this.saveStoredNostrAwardedBadges(nextAwarded);
-                if (options.storeEvents) this.storePublishedNostrEvents(signedEvents);
+                if (options.storeEvents) this.storePublishedNostrEvents(allSignedEvents);
                 if (!this.achievementsModal?.hidden) this.renderAchievements();
             }
             return {
-                awarded: result.successRelays > 0 ? newlyAwarded.length : 0,
-                events: result.successRelays > 0 ? signedEvents : [],
+                awarded: profileResult.successRelays > 0 ? newlyAwarded.length : 0,
+                events: profileResult.successRelays > 0 ? allSignedEvents : [],
+                successRelays: profileResult.successRelays
+            };
+        }
+
+        async republishNostrProfileBadges(options = {}) {
+            // Re-sign the replaceable NIP-58 profile-badges list so old local awards get relay hints for other clients.
+            const awarded = this.getStoredNostrAwardedBadges();
+            if (!Object.values(awarded).some(award => award?.badgeDefinitionRef && award?.awardEventId)) {
+                return { events: [], successRelays: 0 };
+            }
+            const relays = await this.getNostrPublishRelays();
+            const relayHint = relays[0] || '';
+            const profileBadgesEvent = await this.signNostrEvent(this.buildNostrProfileBadgesEvent(awarded, relayHint));
+            const result = await this.publishNostrEvents([profileBadgesEvent], { relays });
+            if (result.successRelays > 0 && options.storeEvents) this.storePublishedNostrEvents([profileBadgesEvent]);
+            return {
+                events: result.successRelays > 0 ? [profileBadgesEvent] : [],
                 successRelays: result.successRelays
             };
         }
@@ -7910,7 +7954,8 @@
                     ['d', badge.id],
                     ['name', badge.name],
                     ['description', badge.description],
-                    ['image', new URL(badge.image, window.location.href).href],
+                    ['image', this.buildPublicBadgeImageUrl(badge.image), '1024x1024'],
+                    ['thumb', this.buildPublicBadgeImageUrl(badge.image), '512x512'],
                     ['client', 'Birds.name'],
                     ['achievement', badge.track],
                     ['threshold', String(badge.threshold)],
@@ -7920,16 +7965,26 @@
             };
         }
 
-        buildNostrBadgeAwardEvent(badge, issuerPubkey) {
+        buildPublicBadgeImageUrl(imagePath) {
+            // Use a public canonical origin so badges published from localhost still render in other Nostr clients.
+            const localHostnames = new Set(['localhost', '127.0.0.1', '0.0.0.0']);
+            const publicOrigin = window.location.protocol.startsWith('http') && !localHostnames.has(window.location.hostname)
+                ? window.location.origin
+                : 'https://birds.name';
+            return new URL(imagePath, `${publicOrigin}/`).href;
+        }
+
+        buildNostrBadgeAwardEvent(badge, issuerPubkey, relayHint = '') {
             // Award the achieved badge to the logged-in user as a NIP-58 immutable kind 8 event.
             const publicHex = localStorage.getItem('birdNostrPublicKeyHex');
+            const personTag = relayHint ? ['p', publicHex, relayHint] : ['p', publicHex];
             return {
                 kind: 8,
                 pubkey: publicHex,
                 created_at: Math.floor(Date.now() / 1000),
                 tags: [
                     ['a', `30009:${issuerPubkey}:${badge.id}`],
-                    ['p', publicHex],
+                    personTag,
                     ['client', 'Birds.name'],
                     ['achievement', badge.track],
                     ['threshold', String(badge.threshold)],
@@ -7939,16 +7994,16 @@
             };
         }
 
-        buildNostrProfileBadgesEvent(awardedBadges) {
+        buildNostrProfileBadgesEvent(awardedBadges, relayHint = '') {
             // Publish the NIP-58 profile-badges list so badge-aware clients can show the user's selected achievements.
             const publicHex = localStorage.getItem('birdNostrPublicKeyHex');
-            const tags = [['client', 'Birds.name']];
+            const tags = [];
             Object.values(awardedBadges || {})
                 .filter(award => award?.badgeDefinitionRef && award?.awardEventId)
                 .sort((left, right) => String(left.awardedAt || '').localeCompare(String(right.awardedAt || '')))
                 .forEach(award => {
                     tags.push(['a', award.badgeDefinitionRef]);
-                    tags.push(['e', award.awardEventId]);
+                    tags.push(relayHint ? ['e', award.awardEventId, relayHint] : ['e', award.awardEventId]);
                 });
             return {
                 kind: 10008,
@@ -9217,14 +9272,13 @@
         }
 
         async getBirdCarouselImages(bird, details = {}) {
-            // Build the bird-modal carousel from local and public media providers without letting one failed provider block the modal.
+            // Build the bird-modal carousel from public media providers without showing generated local thumbnails.
             const cacheKey = this.observationKey(bird.latin);
             if (this.birdImageProviderCache.has(cacheKey)) {
                 return this.birdImageProviderCache.get(cacheKey);
             }
 
             const providerTasks = [
-                this.getLocalBirdCarouselImage(bird),
                 this.getWikipediaCarouselImages(bird),
                 this.getWikimediaCommonsCarouselImages(bird),
                 this.getINaturalistCarouselImages(details),
@@ -9244,33 +9298,11 @@
                 }]
                 : [];
 
-            const images = this.deduplicateCarouselImages([...thumbnailFallback, ...providerImages]).slice(0, 36);
+            const images = this.deduplicateCarouselImages([...thumbnailFallback, ...providerImages])
+                .filter(image => image.source !== 'Birds.name local thumbnail')
+                .slice(0, 36);
             this.birdImageProviderCache.set(cacheKey, images);
             return images;
-        }
-
-        async getLocalBirdCarouselImage(bird) {
-            // Use the generated local thumbnail first when it exists, so the modal has a fast same-origin image.
-            const imageKey = this.localBirdImageKey(bird.latin);
-            if (!imageKey) return [];
-            const imageUrl = `data/bird-images/thumbnails/${encodeURIComponent(imageKey)}.webp`;
-            const exists = await this.localBirdThumbnailExists(imageUrl);
-            return exists
-                ? [{ url: imageUrl, source: 'Birds.name local thumbnail', pageUrl: '' }]
-                : [];
-        }
-
-        async localBirdThumbnailExists(imageUrl) {
-            // Cache HEAD checks so reopening the same species does not repeat same-origin thumbnail probes.
-            if (this.localBirdThumbnailExistsCache.has(imageUrl)) {
-                return this.localBirdThumbnailExistsCache.get(imageUrl);
-            }
-
-            const existsPromise = this.fetchWithTimeout(imageUrl, { method: 'HEAD' }, 1800)
-                .then(response => response.ok)
-                .catch(() => false);
-            this.localBirdThumbnailExistsCache.set(imageUrl, existsPromise);
-            return existsPromise;
         }
 
         async fetchWithTimeout(url, options = {}, timeoutMs = 4500) {
@@ -9722,32 +9754,47 @@
             });
             if (!uniqueEntries.length) return '';
 
-            const visibleEntries = uniqueEntries.slice(0, 3);
-            const hiddenEntries = uniqueEntries.slice(3);
-            const renderEntry = entry => `
-                <li>
+            const hiddenCount = Math.max(0, uniqueEntries.length - 3);
+            const renderEntry = (entry, index) => `
+                <li class="${index >= 3 ? 'detail-other-name-extra' : ''}">
                     <span class="detail-other-name-text">${this.escapeHtml(entry.name)}</span>
                     <small>${this.escapeHtml(entry.meta)}</small>
                 </li>
             `;
+            const renderTwoColumnList = listEntries => {
+                // Split the complete name list in half so expanded other names are balanced in two columns.
+                const splitIndex = Math.ceil(listEntries.length / 2);
+                const columns = [
+                    listEntries.slice(0, splitIndex),
+                    listEntries.slice(splitIndex)
+                ];
+                return `
+                    <div class="detail-other-names-columns">
+                        ${columns.map((column, columnIndex) => `
+                            <ul class="detail-other-names-list">
+                                ${column.map((entry, index) => renderEntry(entry, columnIndex === 0 ? index : splitIndex + index)).join('')}
+                            </ul>
+                        `).join('')}
+                    </div>
+                `;
+            };
 
             return `
                 <div class="detail-group detail-other-names-group">
                     <div class="detail-label">${this.escapeHtml(this.t('detail.otherNames'))}</div>
                     <div class="detail-value detail-other-names">
-                        <ul class="detail-other-names-list detail-other-names-list-visible">
-                            ${visibleEntries.map(renderEntry).join('')}
-                        </ul>
-                        ${hiddenEntries.length ? `
+                        ${hiddenCount ? `
                             <details class="detail-other-names-more">
-                                <summary>${this.escapeHtml(this.t('detail.moreOtherNames', {
-                                    count: this.formatInterfaceNumber(hiddenEntries.length)
-                                }))}</summary>
-                                <ul class="detail-other-names-list">
-                                    ${hiddenEntries.map(renderEntry).join('')}
-                                </ul>
+                                <summary>
+                                    ${this.escapeHtml(this.t('detail.moreOtherNames', {
+                                        count: this.formatInterfaceNumber(hiddenCount)
+                                    }))}
+                                </summary>
+                                ${renderTwoColumnList(uniqueEntries)}
                             </details>
-                        ` : ''}
+                        ` : `
+                            ${renderTwoColumnList(uniqueEntries)}
+                        `}
                     </div>
                 </div>
             `;

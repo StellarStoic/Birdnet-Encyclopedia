@@ -2579,16 +2579,24 @@ body[data-theme="midnight"] .site-title-logo {
             line-height: 1.45;
         }
 
-        .detail-other-names-list {
+        .detail-other-names-columns {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 6px 18px;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 6px 28px;
+            align-items: start;
+        }
+
+        .detail-other-names-list {
             margin: 0;
             padding-left: 1.1rem;
         }
 
         .detail-other-names-list li {
             padding: 2px 0;
+        }
+
+        .detail-other-names-more:not([open]) .detail-other-name-extra {
+            display: none;
         }
 
         .detail-other-name-text {
@@ -2603,7 +2611,7 @@ body[data-theme="midnight"] .site-title-logo {
         }
 
         .detail-other-names-more {
-            margin-top: 8px;
+            margin-top: 0;
         }
 
         .detail-other-names-more summary {
@@ -2611,6 +2619,7 @@ body[data-theme="midnight"] .site-title-logo {
             color: var(--primary);
             font-size: 0.9rem;
             font-weight: 700;
+            margin-bottom: 8px;
         }
 
         .modal-description {
@@ -2815,12 +2824,14 @@ body[data-theme="midnight"] .site-title-logo {
 
             .detail-other-names-group,
             .detail-other-names,
+            .detail-other-names-columns,
             .detail-other-names-list {
                 width: 100%;
             }
 
-            .detail-other-names-list {
+            .detail-other-names-columns {
                 grid-template-columns: 1fr;
+                gap: 6px;
             }
             
             .carousel {
